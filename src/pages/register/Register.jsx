@@ -105,7 +105,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8800/api/auth/register", inputs);
+      await axios.post("https://server-wi41.onrender.com/api/auth/register", inputs);
       navigate("/login"); // ✅ Redirect to login page after successful registration
     } catch (err) {
       setErr(err.response?.data?.message || "Registration failed. Try again.");
