@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (inputs) => {
     try {
       const res = await axios.post(
-        "https://mern-project-o20y.onrender.com/api/auth/login",
+        "https://server-wi41.onrender.com/api/auth/login",
         inputs,
         { withCredentials: true }
       );
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   // ✅ Function to Logout
   const logout = async () => {
     try {
-      await axios.post("https://mern-project-o20y.onrender.com/api/auth/logout", {}, { withCredentials: true });
+      await axios.post("https://server-wi41.onrender.com/api/auth/logout", {}, { withCredentials: true });
       setCurrentUser(null);
       localStorage.removeItem("user");
     } catch (err) {
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const res = await axios.put(
-        `https://mern-project-o20y.onrender.com/api/users/${currentUser?._id}`,
+        `https://server-wi41.onrender.com/api/users/${currentUser?._id}`,
         inputs,
         { withCredentials: true }
       );
