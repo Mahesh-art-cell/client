@@ -197,16 +197,18 @@ const Update = ({ setOpenUpdate, user }) => {
     username: user?.username || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Fixed upload function with proper URL and error handling
+  // Improved upload function with better error handling
   const upload = async (file) => {
     if (!file) return null;
+    setError(null);
     
     try {
       const formData = new FormData();
       formData.append("file", file);
       
-      console.log(`📤 Uploading file: ${file.name}`);
+      console.log(`📤 Uploading file: ${file.name}, size: ${file.size} bytes`);
       
       const res = await makeRequest.post(`/users/upload/${user.id}`, formData, {
         headers: { 
@@ -217,13 +219,13 @@ const Update = ({ setOpenUpdate, user }) => {
       console.log("📸 Upload Successful:", res.data);
       return res.data.filename; // Return just the filename
     } catch (err) {
-      console.error("❌ Upload Error:", err.response?.data || err.message);
-      alert("Failed to upload image. Please try again.");
+      console.error("❌ Upload Error:", err);
+      setError(err.response?.data?.error || "Failed to upload image. Please try again.");
       return null;
     }
   };
 
-  // Mutation for updating user profile with proper error handling
+  // Improved mutation for updating user profile
   const mutation = useMutation(
     async (updatedUser) => {
       console.log("🔄 Sending update with data:", updatedUser);
@@ -238,20 +240,21 @@ const Update = ({ setOpenUpdate, user }) => {
         setTimeout(() => {
           setOpenUpdate(false);
           setIsSubmitting(false);
-        }, 500);
+        }, 1000);
       },
       onError: (error) => {
-        console.error("❌ Update Failed:", error.response?.data || error.message);
-        alert("Failed to update profile. Please try again.");
+        console.error("❌ Update Failed:", error);
+        setError(error.response?.data?.error || "Failed to update profile. Please try again.");
         setIsSubmitting(false);
       },
     }
   );
 
-  // Improved form submission with better image handling
+  // Improved form submission with better error handling
   const handleClick = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
     try {
       // Create a new object that will hold the updated user data
@@ -270,6 +273,10 @@ const Update = ({ setOpenUpdate, user }) => {
         if (coverFilename) {
           console.log(`✅ Cover uploaded: ${coverFilename}`);
           updatedUser.coverPic = coverFilename;
+        } else if (error) {
+          // If upload failed and error is set, return early
+          setIsSubmitting(false);
+          return;
         }
       }
       
@@ -280,16 +287,27 @@ const Update = ({ setOpenUpdate, user }) => {
         if (profileFilename) {
           console.log(`✅ Profile uploaded: ${profileFilename}`);
           updatedUser.profilePic = profileFilename;
+        } else if (error) {
+          // If upload failed and error is set, return early
+          setIsSubmitting(false);
+          return;
         }
       }
       
       console.log("🔄 Final update payload:", updatedUser);
       
-      // Send the update request with the new data
-      mutation.mutate(updatedUser);
+      // Only proceed with update if we have data to update
+      if (Object.keys(updatedUser).length > 0) {
+        // Send the update request with the new data
+        mutation.mutate(updatedUser);
+      } else {
+        console.log("ℹ️ No changes to update");
+        setOpenUpdate(false);
+        setIsSubmitting(false);
+      }
     } catch (err) {
       console.error("❌ Update process failed:", err);
-      alert("Update process failed. Please try again.");
+      setError("Update process failed. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -300,13 +318,14 @@ const Update = ({ setOpenUpdate, user }) => {
     // If it's a full URL, use it directly
     if (imagePath.startsWith('http')) return imagePath;
     // Otherwise, assume it's a filename in the upload folder
-    return `/upload/${imagePath}`;
+    return `/upload/${imagePath}?t=${Date.now()}`;
   };
 
   return (
     <div className="update">
       <div className="wrapper">
         <h1>Update Your Profile</h1>
+        {error && <div className="error-message">{error}</div>}
         <form>
           {/* Cover Upload */}
           <label htmlFor="cover">
@@ -327,7 +346,15 @@ const Update = ({ setOpenUpdate, user }) => {
             type="file"
             id="cover"
             style={{ display: "none" }}
-            onChange={(e) => setCover(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file && file.size > 10 * 1024 * 1024) {
+                setError("File too large! Max size is 10MB.");
+                return;
+              }
+              setCover(file);
+              setError(null);
+            }}
             accept="image/jpeg,image/png,image/gif"
           />
 
@@ -350,7 +377,15 @@ const Update = ({ setOpenUpdate, user }) => {
             type="file"
             id="profile"
             style={{ display: "none" }}
-            onChange={(e) => setProfile(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file && file.size > 10 * 1024 * 1024) {
+                setError("File too large! Max size is 10MB.");
+                return;
+              }
+              setProfile(file);
+              setError(null);
+            }}
             accept="image/jpeg,image/png,image/gif"
           />
 
