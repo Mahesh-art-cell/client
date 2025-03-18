@@ -198,7 +198,7 @@ const Update = ({ setOpenUpdate, user }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ✅ Fixed upload function with proper URL handling
+  // Fixed upload function with proper URL and error handling
   const upload = async (file) => {
     if (!file) return null;
     
@@ -218,11 +218,12 @@ const Update = ({ setOpenUpdate, user }) => {
       return res.data.filename; // Return just the filename
     } catch (err) {
       console.error("❌ Upload Error:", err.response?.data || err.message);
+      alert("Failed to upload image. Please try again.");
       return null;
     }
   };
 
-  // ✅ Mutation for updating user profile
+  // Mutation for updating user profile with proper error handling
   const mutation = useMutation(
     async (updatedUser) => {
       console.log("🔄 Sending update with data:", updatedUser);
@@ -231,18 +232,23 @@ const Update = ({ setOpenUpdate, user }) => {
     {
       onSuccess: () => {
         console.log("✅ Profile updated successfully!");
+        // Force refetch to ensure data is fresh
         queryClient.invalidateQueries(["user", user.id]);
-        setOpenUpdate(false);
-        setIsSubmitting(false);
+        // Short delay to ensure data is refreshed
+        setTimeout(() => {
+          setOpenUpdate(false);
+          setIsSubmitting(false);
+        }, 500);
       },
       onError: (error) => {
         console.error("❌ Update Failed:", error.response?.data || error.message);
+        alert("Failed to update profile. Please try again.");
         setIsSubmitting(false);
       },
     }
   );
 
-  // ✅ Improved form submission with proper image handling
+  // Improved form submission with better image handling
   const handleClick = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -253,9 +259,6 @@ const Update = ({ setOpenUpdate, user }) => {
         name: texts.name,
         email: texts.email,
         username: texts.username,
-        // Include existing image paths for now
-        coverPic: user.coverPic,
-        profilePic: user.profilePic,
       };
       
       console.log("🔄 Starting update process...");
@@ -286,8 +289,18 @@ const Update = ({ setOpenUpdate, user }) => {
       mutation.mutate(updatedUser);
     } catch (err) {
       console.error("❌ Update process failed:", err);
+      alert("Update process failed. Please try again.");
       setIsSubmitting(false);
     }
+  };
+
+  // Helper function to get image URL
+  const getImageUrl = (imagePath, defaultPath) => {
+    if (!imagePath) return defaultPath;
+    // If it's a full URL, use it directly
+    if (imagePath.startsWith('http')) return imagePath;
+    // Otherwise, assume it's a filename in the upload folder
+    return `/upload/${imagePath}`;
   };
 
   return (
@@ -303,9 +316,7 @@ const Update = ({ setOpenUpdate, user }) => {
                 src={
                   cover 
                     ? URL.createObjectURL(cover) 
-                    : user.coverPic 
-                      ? `/upload/${user.coverPic}` 
-                      : "/default-cover.png"
+                    : getImageUrl(user.coverPic, "/default-cover.png")
                 }
                 alt="Cover"
               />
@@ -317,6 +328,7 @@ const Update = ({ setOpenUpdate, user }) => {
             id="cover"
             style={{ display: "none" }}
             onChange={(e) => setCover(e.target.files[0])}
+            accept="image/jpeg,image/png,image/gif"
           />
 
           {/* Profile Upload */}
@@ -327,9 +339,7 @@ const Update = ({ setOpenUpdate, user }) => {
                 src={
                   profile 
                     ? URL.createObjectURL(profile) 
-                    : user.profilePic 
-                      ? `/upload/${user.profilePic}` 
-                      : "/default-avatar.png"
+                    : getImageUrl(user.profilePic, "/default-avatar.png")
                 }
                 alt="Profile"
               />
@@ -341,6 +351,7 @@ const Update = ({ setOpenUpdate, user }) => {
             id="profile"
             style={{ display: "none" }}
             onChange={(e) => setProfile(e.target.files[0])}
+            accept="image/jpeg,image/png,image/gif"
           />
 
           {/* Name */}
