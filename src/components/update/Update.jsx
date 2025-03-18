@@ -595,3 +595,4 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
 
 export default Update;
 
+
