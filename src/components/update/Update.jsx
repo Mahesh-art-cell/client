@@ -1,7 +1,4 @@
 
-
-
-
 // import { useState } from "react";
 // import { makeRequest } from "../../axios";
 // import "./update.scss";
@@ -242,6 +239,7 @@
 //             type="button" 
 //             onClick={handleClick} 
 //             disabled={isSubmitting}
+//             className="update-button"
 //           >
 //             {isSubmitting ? "Updating..." : "Update"}
 //           </button>
@@ -276,9 +274,13 @@ const Update = ({ setOpenUpdate, user }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState({
+    cover: 0,
+    profile: 0
+  });
 
-  // Improved upload function with better error handling
-  const upload = async (file) => {
+  // Improved upload function with progress tracking
+  const upload = async (file, type) => {
     if (!file) return null;
     setError(null);
     
@@ -286,19 +288,28 @@ const Update = ({ setOpenUpdate, user }) => {
       const formData = new FormData();
       formData.append("file", file);
       
-      console.log(`📤 Uploading file: ${file.name}, size: ${file.size} bytes`);
+      console.log(`📤 Uploading ${type} file: ${file.name}, size: ${file.size} bytes`);
       
       const res = await makeRequest.post(`/users/upload/${user.id}`, formData, {
         headers: { 
           "Content-Type": "multipart/form-data",
         },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(prev => ({
+            ...prev,
+            [type]: percentCompleted
+          }));
+        }
       });
       
-      console.log("📸 Upload Successful:", res.data);
+      console.log(`📸 ${type} Upload Successful:`, res.data);
       return res.data.filename; // Return just the filename
     } catch (err) {
-      console.error("❌ Upload Error:", err);
-      setError(err.response?.data?.error || "Failed to upload image. Please try again.");
+      console.error(`❌ ${type} Upload Error:`, err);
+      setError(err.response?.data?.error || `Failed to upload ${type} image. Please try again.`);
       return null;
     }
   };
@@ -328,7 +339,7 @@ const Update = ({ setOpenUpdate, user }) => {
     }
   );
 
-  // Improved form submission with better error handling
+  // Improved form submission with better error handling and sequential uploads
   const handleClick = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -347,7 +358,7 @@ const Update = ({ setOpenUpdate, user }) => {
       // Handle cover image upload if a new file is selected
       if (cover) {
         console.log("📤 Uploading new cover image...");
-        const coverFilename = await upload(cover);
+        const coverFilename = await upload(cover, "cover");
         if (coverFilename) {
           console.log(`✅ Cover uploaded: ${coverFilename}`);
           updatedUser.coverPic = coverFilename;
@@ -361,7 +372,7 @@ const Update = ({ setOpenUpdate, user }) => {
       // Handle profile image upload if a new file is selected
       if (profile) {
         console.log("📤 Uploading new profile image...");
-        const profileFilename = await upload(profile);
+        const profileFilename = await upload(profile, "profile");
         if (profileFilename) {
           console.log(`✅ Profile uploaded: ${profileFilename}`);
           updatedUser.profilePic = profileFilename;
@@ -390,7 +401,7 @@ const Update = ({ setOpenUpdate, user }) => {
     }
   };
 
-  // Helper function to get image URL
+  // Helper function to get image URL with cache busting
   const getImageUrl = (imagePath, defaultPath) => {
     if (!imagePath) return defaultPath;
     // If it's a full URL, use it directly
@@ -406,66 +417,80 @@ const Update = ({ setOpenUpdate, user }) => {
         {error && <div className="error-message">{error}</div>}
         <form>
           {/* Cover Upload */}
-          <label htmlFor="cover">
-            <span>Cover Picture</span>
-            <div className="imgContainer">
-              <img
-                src={
-                  cover 
-                    ? URL.createObjectURL(cover) 
-                    : getImageUrl(user.coverPic, "/default-cover.png")
+          <div className="image-upload-container">
+            <label>Cover Picture</label>
+            <label htmlFor="cover" className="image-upload-label">
+              <div className="imgContainer">
+                <img
+                  src={
+                    cover 
+                      ? URL.createObjectURL(cover) 
+                      : getImageUrl(user.coverPic, "/default-cover.png")
+                  }
+                  alt="Cover"
+                  className="preview-image"
+                />
+                <CloudUploadIcon className="icon" />
+                {uploadProgress.cover > 0 && uploadProgress.cover < 100 && (
+                  <div className="upload-progress">{uploadProgress.cover}%</div>
+                )}
+              </div>
+            </label>
+            <input
+              type="file"
+              id="cover"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file && file.size > 10 * 1024 * 1024) {
+                  setError("File too large! Max size is 10MB.");
+                  return;
                 }
-                alt="Cover"
-              />
-              <CloudUploadIcon className="icon" />
-            </div>
-          </label>
-          <input
-            type="file"
-            id="cover"
-            style={{ display: "none" }}
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file && file.size > 10 * 1024 * 1024) {
-                setError("File too large! Max size is 10MB.");
-                return;
-              }
-              setCover(file);
-              setError(null);
-            }}
-            accept="image/jpeg,image/png,image/gif"
-          />
+                setCover(file);
+                setError(null);
+                setUploadProgress(prev => ({...prev, cover: 0}));
+              }}
+              accept="image/jpeg,image/png,image/gif"
+            />
+          </div>
 
           {/* Profile Upload */}
-          <label htmlFor="profile">
-            <span>Profile Picture</span>
-            <div className="imgContainer">
-              <img
-                src={
-                  profile 
-                    ? URL.createObjectURL(profile) 
-                    : getImageUrl(user.profilePic, "/default-avatar.png")
+          <div className="image-upload-container">
+            <label>Profile Picture</label>
+            <label htmlFor="profile" className="image-upload-label">
+              <div className="imgContainer profile-container">
+                <img
+                  src={
+                    profile 
+                      ? URL.createObjectURL(profile) 
+                      : getImageUrl(user.profilePic, "/default-avatar.png")
+                  }
+                  alt="Profile"
+                  className="preview-image profile-preview"
+                />
+                <CloudUploadIcon className="icon" />
+                {uploadProgress.profile > 0 && uploadProgress.profile < 100 && (
+                  <div className="upload-progress">{uploadProgress.profile}%</div>
+                )}
+              </div>
+            </label>
+            <input
+              type="file"
+              id="profile"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file && file.size > 10 * 1024 * 1024) {
+                  setError("File too large! Max size is 10MB.");
+                  return;
                 }
-                alt="Profile"
-              />
-              <CloudUploadIcon className="icon" />
-            </div>
-          </label>
-          <input
-            type="file"
-            id="profile"
-            style={{ display: "none" }}
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file && file.size > 10 * 1024 * 1024) {
-                setError("File too large! Max size is 10MB.");
-                return;
-              }
-              setProfile(file);
-              setError(null);
-            }}
-            accept="image/jpeg,image/png,image/gif"
-          />
+                setProfile(file);
+                setError(null);
+                setUploadProgress(prev => ({...prev, profile: 0}));
+              }}
+              accept="image/jpeg,image/png,image/gif"
+            />
+          </div>
 
           {/* Name */}
           <label>Name</label>
