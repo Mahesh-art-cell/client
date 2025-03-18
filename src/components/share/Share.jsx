@@ -132,19 +132,28 @@ const Share = () => {
   const queryClient = useQueryClient();
 
   // Upload image function
-  const upload = async () => {
-    if (!file) return null;
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await makeRequest.post("/upload", formData);
-      console.log("✅ Image uploaded successfully:", res.data);
-      return res.data;
-    } catch (err) {
-      console.log("❌ Upload Error:", err);
-      return null;
-    }
-  };
+// Upload image function
+const upload = async () => {
+  if (!file) return null;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    // Add logging to debug the upload process
+    console.log("Uploading file:", file.name, file.type, file.size);
+    
+    const res = await makeRequest.post("/upload", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    console.log("✅ Image uploaded successfully:", res.data);
+    return res.data;
+  } catch (err) {
+    console.log("❌ Upload Error:", err.response?.data || err.message);
+    return null;
+  }
+};
 
   // Mutation to create a new post
   const mutation = useMutation(
