@@ -133,7 +133,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Posts from "../../components/posts/Posts";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { useLocation } from "react-router-dom";
 import { useContext, useState } from "react";
@@ -153,7 +153,7 @@ const Profile = () => {
     { enabled: !isNaN(userId) }
   );
 
-  // ✅ Upload Handler (Fixed)
+  // ✅ Fixed Upload Handler
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -162,15 +162,19 @@ const Profile = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await makeRequest.post("/upload", formData);
-      const uploadedUrl = res.data.url; // ✅ Get the uploaded image URL
-
+      // ✅ Use consistent endpoint
+      const res = await makeRequest.post(`/users/upload/${userId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      
+      const uploadedFilename = res.data.filename;
+      
       // ✅ Update user data with new image
-      await makeRequest.put(`/users/${userId}`, { [type]: uploadedUrl });
+      await makeRequest.put(`/users/${userId}`, { [type]: uploadedFilename });
 
-      queryClient.invalidateQueries(["user", userId]); // ✅ Refresh user data
+      queryClient.invalidateQueries(["user", userId]); // Refresh user data
     } catch (err) {
-      console.error("Upload Error:", err);
+      console.error("Upload Error:", err.response?.data || err.message);
     }
   };
 
@@ -181,28 +185,38 @@ const Profile = () => {
       ) : (
         <>
           <div className="images">
-            {/* ✅ Clickable Cover Image Upload */}
+            {/* Cover Image Upload */}
             <label htmlFor="coverUpload">
               <img
-                src={data?.coverPic || "/default-cover.png"}
+                src={data?.coverPic ? `/upload/${data.coverPic}` : "/default-cover.png"}
                 alt="Cover"
                 className="cover"
               />
             </label>
             {userId === currentUser.id && (
-              <input type="file" id="coverUpload" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, "coverPic")} />
+              <input 
+                type="file" 
+                id="coverUpload" 
+                style={{ display: "none" }} 
+                onChange={(e) => handleFileUpload(e, "coverPic")} 
+              />
             )}
 
-            {/* ✅ Clickable Profile Picture Upload */}
+            {/* Profile Picture Upload */}
             <label htmlFor="profileUpload">
               <img
-                src={data?.profilePic || "/default-avatar.png"}
+                src={data?.profilePic ? `/upload/${data.profilePic}` : "/default-avatar.png"}
                 alt="Profile"
                 className="profilePic"
               />
             </label>
             {userId === currentUser.id && (
-              <input type="file" id="profileUpload" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, "profilePic")} />
+              <input 
+                type="file" 
+                id="profileUpload" 
+                style={{ display: "none" }} 
+                onChange={(e) => handleFileUpload(e, "profilePic")} 
+              />
             )}
           </div>
 

@@ -158,16 +158,14 @@
 
 
 
-
 import { useState } from "react";
 import { makeRequest } from "../../axios";
-// import { makeRequest } from "../../api/axios"; // ✅ Correct Path
 import "./update.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const Update = ({ setOpenUpdate, user }) => {
-  const queryClient = useQueryClient(); // ✅ For caching and refetching
+  const queryClient = useQueryClient();
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [texts, setTexts] = useState({
@@ -175,22 +173,25 @@ const Update = ({ setOpenUpdate, user }) => {
     name: user?.name || "",
     username: user?.username || "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ✅ Upload function - sends image to backend
+  // ✅ Fixed upload function
   const upload = async (file) => {
     if (!file) return null;
-
+    
     try {
       const formData = new FormData();
       formData.append("file", file);
-
-      // ✅ POST to upload file using axios instance
+      
+      // ✅ Consistent endpoint
       const res = await makeRequest.post(`/users/upload/${user.id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+        },
       });
-
+      
       console.log("📸 Upload Successful:", res.data);
-      return res.data.filename; // ✅ Return uploaded filename
+      return res.data.filename;
     } catch (err) {
       console.error("❌ Upload Error:", err.response?.data || err.message);
       return null;
@@ -205,11 +206,13 @@ const Update = ({ setOpenUpdate, user }) => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["user", user.id]); // ✅ Invalidate cache to refresh user data
+        queryClient.invalidateQueries(["user", user.id]);
         setOpenUpdate(false);
+        setIsSubmitting(false);
       },
       onError: (error) => {
         console.error("❌ Update Failed:", error.response?.data || error.message);
+        setIsSubmitting(false);
       },
     }
   );
@@ -217,20 +220,37 @@ const Update = ({ setOpenUpdate, user }) => {
   // ✅ Handle form submission
   const handleClick = async (e) => {
     e.preventDefault();
-
-    const coverUrl = await upload(cover); // ✅ Upload cover if selected
-    const profileUrl = await upload(profile); // ✅ Upload profile if selected
-
-    // ✅ Updated user data to send to API
-    const updatedUser = {
-      name: texts.name,
-      email: texts.email,
-      username: texts.username,
-      coverPic: coverUrl || user.coverPic,
-      profilePic: profileUrl || user.profilePic,
-    };
-
-    mutation.mutate(updatedUser); // ✅ Trigger update mutation
+    setIsSubmitting(true);
+    
+    try {
+      let coverUrl = user.coverPic;
+      let profileUrl = user.profilePic;
+      
+      if (cover) {
+        const uploadedCover = await upload(cover);
+        if (uploadedCover) coverUrl = uploadedCover;
+      }
+      
+      if (profile) {
+        const uploadedProfile = await upload(profile);
+        if (uploadedProfile) profileUrl = uploadedProfile;
+      }
+      
+      // ✅ Updated user data to send to API
+      const updatedUser = {
+        name: texts.name,
+        email: texts.email,
+        username: texts.username,
+        coverPic: coverUrl,
+        profilePic: profileUrl,
+      };
+      
+      console.log("🔄 Updating user with:", updatedUser);
+      mutation.mutate(updatedUser);
+    } catch (err) {
+      console.error("❌ Update process failed:", err);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -292,8 +312,19 @@ const Update = ({ setOpenUpdate, user }) => {
             onChange={(e) => setTexts((prev) => ({ ...prev, email: e.target.value }))}
           />
 
+          {/* Username */}
+          <label>Username</label>
+          <input
+            type="text"
+            value={texts.username}
+            name="username"
+            onChange={(e) => setTexts((prev) => ({ ...prev, username: e.target.value }))}
+          />
+
           {/* Submit Button */}
-          <button onClick={handleClick}>Update</button>
+          <button onClick={handleClick} disabled={isSubmitting}>
+            {isSubmitting ? "Updating..." : "Update"}
+          </button>
         </form>
 
         <button className="close" onClick={() => setOpenUpdate(false)}>
