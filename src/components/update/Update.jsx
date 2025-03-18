@@ -1,4 +1,7 @@
 
+
+
+
 // import { useState } from "react";
 // import { makeRequest } from "../../axios";
 // import "./update.scss";
@@ -15,16 +18,19 @@
 //     username: user?.username || "",
 //   });
 //   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [error, setError] = useState(null);
 
-//   // ✅ Fixed upload function
+//   // Improved upload function with better error handling
 //   const upload = async (file) => {
 //     if (!file) return null;
+//     setError(null);
     
 //     try {
 //       const formData = new FormData();
 //       formData.append("file", file);
       
-//       // ✅ Consistent endpoint
+//       console.log(`📤 Uploading file: ${file.name}, size: ${file.size} bytes`);
+      
 //       const res = await makeRequest.post(`/users/upload/${user.id}`, formData, {
 //         headers: { 
 //           "Content-Type": "multipart/form-data",
@@ -32,79 +38,126 @@
 //       });
       
 //       console.log("📸 Upload Successful:", res.data);
-//       return res.data.filename;
+//       return res.data.filename; // Return just the filename
 //     } catch (err) {
-//       console.error("❌ Upload Error:", err.response?.data || err.message);
+//       console.error("❌ Upload Error:", err);
+//       setError(err.response?.data?.error || "Failed to upload image. Please try again.");
 //       return null;
 //     }
 //   };
 
-//   // ✅ Mutation for updating user profile
+//   // Improved mutation for updating user profile
 //   const mutation = useMutation(
 //     async (updatedUser) => {
-//       // ✅ PUT request to update user info
+//       console.log("🔄 Sending update with data:", updatedUser);
 //       return makeRequest.put(`/users/${user.id}`, updatedUser);
 //     },
 //     {
 //       onSuccess: () => {
+//         console.log("✅ Profile updated successfully!");
+//         // Force refetch to ensure data is fresh
 //         queryClient.invalidateQueries(["user", user.id]);
-//         setOpenUpdate(false);
-//         setIsSubmitting(false);
+//         // Short delay to ensure data is refreshed
+//         setTimeout(() => {
+//           setOpenUpdate(false);
+//           setIsSubmitting(false);
+//         }, 1000);
 //       },
 //       onError: (error) => {
-//         console.error("❌ Update Failed:", error.response?.data || error.message);
+//         console.error("❌ Update Failed:", error);
+//         setError(error.response?.data?.error || "Failed to update profile. Please try again.");
 //         setIsSubmitting(false);
 //       },
 //     }
 //   );
 
-//   // ✅ Handle form submission
+//   // Improved form submission with better error handling
 //   const handleClick = async (e) => {
 //     e.preventDefault();
 //     setIsSubmitting(true);
+//     setError(null);
     
 //     try {
-//       let coverUrl = user.coverPic;
-//       let profileUrl = user.profilePic;
-      
-//       if (cover) {
-//         const uploadedCover = await upload(cover);
-//         if (uploadedCover) coverUrl = uploadedCover;
-//       }
-      
-//       if (profile) {
-//         const uploadedProfile = await upload(profile);
-//         if (uploadedProfile) profileUrl = uploadedProfile;
-//       }
-      
-//       // ✅ Updated user data to send to API
+//       // Create a new object that will hold the updated user data
 //       const updatedUser = {
 //         name: texts.name,
 //         email: texts.email,
 //         username: texts.username,
-//         coverPic: coverUrl,
-//         profilePic: profileUrl,
 //       };
       
-//       console.log("🔄 Updating user with:", updatedUser);
-//       mutation.mutate(updatedUser);
+//       console.log("🔄 Starting update process...");
+      
+//       // Handle cover image upload if a new file is selected
+//       if (cover) {
+//         console.log("📤 Uploading new cover image...");
+//         const coverFilename = await upload(cover);
+//         if (coverFilename) {
+//           console.log(`✅ Cover uploaded: ${coverFilename}`);
+//           updatedUser.coverPic = coverFilename;
+//         } else if (error) {
+//           // If upload failed and error is set, return early
+//           setIsSubmitting(false);
+//           return;
+//         }
+//       }
+      
+//       // Handle profile image upload if a new file is selected
+//       if (profile) {
+//         console.log("📤 Uploading new profile image...");
+//         const profileFilename = await upload(profile);
+//         if (profileFilename) {
+//           console.log(`✅ Profile uploaded: ${profileFilename}`);
+//           updatedUser.profilePic = profileFilename;
+//         } else if (error) {
+//           // If upload failed and error is set, return early
+//           setIsSubmitting(false);
+//           return;
+//         }
+//       }
+      
+//       console.log("🔄 Final update payload:", updatedUser);
+      
+//       // Only proceed with update if we have data to update
+//       if (Object.keys(updatedUser).length > 0) {
+//         // Send the update request with the new data
+//         mutation.mutate(updatedUser);
+//       } else {
+//         console.log("ℹ️ No changes to update");
+//         setOpenUpdate(false);
+//         setIsSubmitting(false);
+//       }
 //     } catch (err) {
 //       console.error("❌ Update process failed:", err);
+//       setError("Update process failed. Please try again.");
 //       setIsSubmitting(false);
 //     }
+//   };
+
+//   // Helper function to get image URL
+//   const getImageUrl = (imagePath, defaultPath) => {
+//     if (!imagePath) return defaultPath;
+//     // If it's a full URL, use it directly
+//     if (imagePath.startsWith('http')) return imagePath;
+//     // Otherwise, assume it's a filename in the upload folder
+//     return `/upload/${imagePath}?t=${Date.now()}`;
 //   };
 
 //   return (
 //     <div className="update">
 //       <div className="wrapper">
 //         <h1>Update Your Profile</h1>
+//         {error && <div className="error-message">{error}</div>}
 //         <form>
 //           {/* Cover Upload */}
 //           <label htmlFor="cover">
 //             <span>Cover Picture</span>
 //             <div className="imgContainer">
 //               <img
-//                 src={cover ? URL.createObjectURL(cover) : `/upload/${user.coverPic}`}
+//                 src={
+//                   cover 
+//                     ? URL.createObjectURL(cover) 
+//                     : getImageUrl(user.coverPic, "/default-cover.png")
+//                 }
 //                 alt="Cover"
 //               />
 //               <CloudUploadIcon className="icon" />
@@ -114,7 +167,16 @@
 //             type="file"
 //             id="cover"
 //             style={{ display: "none" }}
-//             onChange={(e) => setCover(e.target.files[0])}
+//             onChange={(e) => {
+//               const file = e.target.files[0];
+//               if (file && file.size > 10 * 1024 * 1024) {
+//                 setError("File too large! Max size is 10MB.");
+//                 return;
+//               }
+//               setCover(file);
+//               setError(null);
+//             }}
+//             accept="image/jpeg,image/png,image/gif"
 //           />
 
 //           {/* Profile Upload */}
@@ -122,7 +184,11 @@
 //             <span>Profile Picture</span>
 //             <div className="imgContainer">
 //               <img
-//                 src={profile ? URL.createObjectURL(profile) : `/upload/${user.profilePic}`}
+//                 src={
+//                   profile 
+//                     ? URL.createObjectURL(profile) 
+//                     : getImageUrl(user.profilePic, "/default-avatar.png")
+//                 }
 //                 alt="Profile"
 //               />
 //               <CloudUploadIcon className="icon" />
@@ -132,7 +198,16 @@
 //             type="file"
 //             id="profile"
 //             style={{ display: "none" }}
-//             onChange={(e) => setProfile(e.target.files[0])}
+//             onChange={(e) => {
+//               const file = e.target.files[0];
+//               if (file && file.size > 10 * 1024 * 1024) {
+//                 setError("File too large! Max size is 10MB.");
+//                 return;
+//               }
+//               setProfile(file);
+//               setError(null);
+//             }}
+//             accept="image/jpeg,image/png,image/gif"
 //           />
 
 //           {/* Name */}
@@ -163,7 +238,11 @@
 //           />
 
 //           {/* Submit Button */}
-//           <button onClick={handleClick} disabled={isSubmitting}>
+//           <button 
+//             type="button" 
+//             onClick={handleClick} 
+//             disabled={isSubmitting}
+//           >
 //             {isSubmitting ? "Updating..." : "Update"}
 //           </button>
 //         </form>
@@ -177,7 +256,6 @@
 // };
 
 // export default Update;
-
 
 
 
@@ -421,6 +499,7 @@ const Update = ({ setOpenUpdate, user }) => {
             type="button" 
             onClick={handleClick} 
             disabled={isSubmitting}
+            className="update-button"
           >
             {isSubmitting ? "Updating..." : "Update"}
           </button>
