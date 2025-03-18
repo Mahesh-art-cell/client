@@ -214,7 +214,7 @@ import Posts from "../../components/posts/Posts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { useLocation } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
 
@@ -225,13 +225,15 @@ const Profile = () => {
   const userId = Number(useLocation().pathname.split("/")[2]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(Date.now()); // Add refresh key for forcing re-renders
 
   // Fetch user data with better error handling
   const { isLoading, error: fetchError, data } = useQuery(
-    ["user", userId],
+    ["user", userId, refreshKey], // Add refreshKey to the query key
     async () => {
       try {
         const res = await makeRequest.get(`/users/find/${userId}`);
+        console.log("🔍 Fetched user data:", res.data);
         return res.data;
       } catch (err) {
         console.error("Error fetching user data:", err);
@@ -241,9 +243,25 @@ const Profile = () => {
     { 
       enabled: !isNaN(userId),
       refetchOnWindowFocus: false,
-      staleTime: 30000 // 30 seconds
+      staleTime: 0, // Always fetch fresh data
+      cacheTime: 0 // Don't cache data
     }
   );
+
+  // Listen for update completion
+  useEffect(() => {
+    // This function will be called when we need to force a refresh
+    const handleUpdateCompletion = () => {
+      console.log("🔄 Forcing profile refresh");
+      setRefreshKey(Date.now());
+      queryClient.invalidateQueries(["user", userId]);
+    };
+
+    // Clean up function to avoid memory leaks
+    return () => {
+      // Any cleanup code if needed
+    };
+  }, [queryClient, userId]);
 
   // Improved Upload Handler with proper error tracking and caching
   const handleFileUpload = async (e, type) => {
@@ -269,6 +287,7 @@ const Profile = () => {
       });
       
       const uploadedFilename = res.data.filename;
+      console.log(`✅ ${type} uploaded successfully:`, uploadedFilename);
       
       // Step 2: Update user profile with the new image
       const updateData = {};
@@ -278,10 +297,13 @@ const Profile = () => {
         updateData.coverPic = uploadedFilename;
       }
       
-      await makeRequest.put(`/users/${currentUser.id}`, updateData);
+      const updateRes = await makeRequest.put(`/users/${currentUser.id}`, updateData);
+      console.log("✅ Profile updated via direct upload:", updateRes.data);
       
-      // Step 3: Invalidate the cache to refresh the data
+      // Step 3: Force refresh
+      setRefreshKey(Date.now());
       queryClient.invalidateQueries(["user", userId]);
+      queryClient.refetchQueries(["user", userId]);
       
       // Add a short delay before setting isUploading to false
       setTimeout(() => {
@@ -300,7 +322,18 @@ const Profile = () => {
     // If it's a full URL, use it directly
     if (imagePath.startsWith('http')) return imagePath;
     // Otherwise, assume it's a filename in the upload folder
-    return `/upload/${imagePath}?t=${Date.now()}`;
+    return `/upload/${imagePath}?t=${refreshKey}`; // Using refreshKey for cache busting
+  };
+
+  // Update close handler to force refresh
+  const handleUpdateClose = (updated) => {
+    setOpenUpdate(false);
+    if (updated) {
+      console.log("🔄 Update completed, refreshing data");
+      setRefreshKey(Date.now());
+      queryClient.invalidateQueries(["user", userId]);
+      queryClient.refetchQueries(["user", userId]);
+    }
   };
 
   if (isLoading) return <div className="loading">Loading profile...</div>;
@@ -315,6 +348,7 @@ const Profile = () => {
             src={getImageUrl(data?.coverPic, "/default-cover.png")}
             alt="Cover"
             className="cover"
+            key={`cover-${refreshKey}`} // Force re-render on refresh
           />
           {userId === currentUser.id && (
             <div className="upload-button-container">
@@ -340,6 +374,7 @@ const Profile = () => {
             src={getImageUrl(data?.profilePic, "/default-avatar.png")}
             alt="Profile"
             className="profilePic"
+            key={`profile-${refreshKey}`} // Force re-render on refresh
           />
           {userId === currentUser.id && (
             <div className="profile-upload-button">
@@ -415,7 +450,11 @@ const Profile = () => {
         <Posts userId={userId} />
       </div>
 
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
+      {openUpdate && <Update setOpenUpdate={handleUpdateClose} user={data} refreshProfile={() => {
+        setRefreshKey(Date.now());
+        queryClient.invalidateQueries(["user", userId]);
+        queryClient.refetchQueries(["user", userId]);
+      }} />}
     </div>
   );
 };

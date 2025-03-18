@@ -291,7 +291,7 @@ import "./update.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-const Update = ({ setOpenUpdate, user }) => {
+const Update = ({ setOpenUpdate, user, refreshProfile }) => {
   const queryClient = useQueryClient();
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -365,9 +365,19 @@ const Update = ({ setOpenUpdate, user }) => {
         console.log("✅ Profile updated successfully!");
         // Force refetch to ensure data is fresh
         queryClient.invalidateQueries(["user", user.id]);
+        
+        // Explicitly refetch queries
+        queryClient.refetchQueries(["user", user.id]);
+        
+        // Trigger parent component refresh if provided
+        if (typeof refreshProfile === 'function') {
+          console.log("🔄 Calling parent refresh function");
+          refreshProfile();
+        }
+        
         // Short delay to ensure data is refreshed
         setTimeout(() => {
-          setOpenUpdate(false);
+          setOpenUpdate(true); // Pass true to indicate successful update
           setIsSubmitting(false);
         }, 1000);
       },
