@@ -213,12 +213,14 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
+      console.log(token)
       return user;
     } catch (err) {
       console.error("❌ Login Error:", err.response?.data || err.message);
       throw err.response?.data || "Login failed. Please try again.";
     }
   };
+
 
   // ✅ Logout Function
   const logout = async () => {
@@ -247,3 +249,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+
