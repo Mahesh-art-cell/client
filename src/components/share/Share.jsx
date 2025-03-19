@@ -169,7 +169,6 @@ import { makeRequest } from "../../axios";
 
 const Share = () => {
   const [file, setFile] = useState(null);
-  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
   const { currentUser } = useContext(AuthContext);
@@ -177,46 +176,45 @@ const Share = () => {
 
   // Upload image function
   const upload = async () => {
-    if (!file) return null;
-    setUploading(true);
-    
     try {
+      if (!file) return null;
+      
       const formData = new FormData();
       formData.append("file", file);
       
-      const res = await makeRequest.post("/upload", formData);
-      setUploading(false);
+      const res = await makeRequest.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
+      });
+      
+      console.log("Upload successful:", res.data);
       return res.data;
     } catch (err) {
       console.error("Upload Error:", err);
-      setUploading(false);
-      alert("Failed to upload image. Please try again.");
-      return null;
+      throw new Error("Failed to upload image");
     }
   };
 
   // Mutation to create a new post
-  const mutation = useMutation(
-    async (newPost) => {
+  const mutation = useMutation({
+    mutationFn: async (newPost) => {
       const response = await makeRequest.post("/posts", newPost);
       return response.data;
     },
-    {
-      onSuccess: () => {
-        // Refresh posts list
-        queryClient.invalidateQueries(["posts"]);
-        
-        // Reset form
-        setTitle("");
-        setContent("");
-        setFile(null);
-      },
-      onError: (error) => {
-        console.error("Post creation error:", error);
-        alert("Error sharing post. Please try again.");
-      }
+    onSuccess: () => {
+      // Refresh posts list
+      queryClient.invalidateQueries(["posts"]);
+      
+      // Reset form
+      setContent("");
+      setFile(null);
+    },
+    onError: (error) => {
+      console.error("Post creation error:", error);
+      alert("Error sharing post. Please try again.");
     }
-  );
+  });
 
   // Handle share button click
   const handleClick = async (e) => {
@@ -229,23 +227,25 @@ const Share = () => {
     }
     
     try {
+      setUploading(true);
+      
       // Upload image if present
       let imgUrl = null;
       if (file) {
         imgUrl = await upload();
-        if (!imgUrl && file) return; // Exit if upload failed but file was selected
       }
       
-      // Create post with correct fields matching backend
+      // Create post with or without image
       mutation.mutate({
-        title: title || "My Post", // Default title if not provided
         content: content,
         img: imgUrl
       });
       
     } catch (error) {
       console.error("Share error:", error);
-      alert("Error sharing post. Please try again.");
+      alert("Error sharing post: " + (error.message || "Please try again."));
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -259,13 +259,6 @@ const Share = () => {
               alt="Profile" 
             />
             <div className="input-area">
-              <input
-                type="text"
-                placeholder="Add a title (optional)"
-                onChange={(e) => setTitle(e.target.value)}
-                value={title}
-                className="title-input"
-              />
               <textarea
                 placeholder={`What's on your mind, ${currentUser.name}?`}
                 onChange={(e) => setContent(e.target.value)}
@@ -312,10 +305,10 @@ const Share = () => {
           <div className="right">
             <button 
               onClick={handleClick} 
-              disabled={mutation.isLoading || uploading}
-              className={mutation.isLoading || uploading ? "disabled" : ""}
+              disabled={mutation.isPending || uploading}
+              className={mutation.isPending || uploading ? "disabled" : ""}
             >
-              {mutation.isLoading || uploading ? "Sharing..." : "Share"}
+              {mutation.isPending || uploading ? "Sharing..." : "Share"}
             </button>
           </div>
         </div>
