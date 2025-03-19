@@ -176,11 +176,12 @@ const Share = () => {
 
     try {
       const formData = new FormData();
-      formData.append("file", file); // ✅ FormData with correct key
+      formData.append("file", file);
 
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // ✅ Include token
         },
       });
 
@@ -195,7 +196,11 @@ const Share = () => {
   // ✅ Mutation to create a new post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      const res = await makeRequest.post("/posts", newPost);
+      const res = await makeRequest.post("/posts", newPost, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
       return res.data;
     },
     onSuccess: () => {
