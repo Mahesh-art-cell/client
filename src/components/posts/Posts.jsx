@@ -42,7 +42,6 @@ import { AuthContext } from "../../context/authContext";
 
 const Posts = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
-  
   // Define query key based on whether we're viewing a profile or home feed
   const queryKey = userId ? ["posts", userId] : ["posts"];
   
@@ -79,6 +78,12 @@ const Posts = ({ userId }) => {
 };
 
 export default Posts;
+
+
+
+
+
+
 
 
 

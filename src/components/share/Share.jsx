@@ -174,7 +174,7 @@ const Share = () => {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // ✅ Upload image function
+  // ✅ Upload Image to Backend
   const upload = async () => {
     if (!file) return null;
 
@@ -182,7 +182,6 @@ const Share = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // Correct upload URL
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -214,7 +213,7 @@ const Share = () => {
     },
   });
 
-  // ✅ Handle share button click
+  // ✅ Handle Share Button Click
   const handleClick = async (e) => {
     e.preventDefault();
 
