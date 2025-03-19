@@ -182,7 +182,7 @@ const Share = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // Correct URL without /api prefix (base URL is handled in makeRequest)
+      // Correct upload URL
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
