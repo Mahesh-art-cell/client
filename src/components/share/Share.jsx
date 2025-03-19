@@ -176,6 +176,7 @@ const Share = () => {
       const formData = new FormData();
       formData.append("file", file);
 
+      // ✅ Correct Upload URL
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -185,7 +186,7 @@ const Share = () => {
       console.log("✅ Upload successful:", res.data);
       return res.data.filename;
     } catch (err) {
-      console.error("❌ Upload Error:", err.response?.data || err.message);
+      console.error("❌ Upload Error:", err);
       throw new Error("Failed to upload image.");
     }
   };
@@ -193,7 +194,7 @@ const Share = () => {
   // ✅ Mutation to create a new post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      const res = await makeRequest.post("/posts", newPost);
+      const res = await makeRequest.post("/api/posts", newPost); // ✅ Correct URL
       return res.data;
     },
     onSuccess: () => {
@@ -202,7 +203,7 @@ const Share = () => {
       setFile(null);
     },
     onError: (error) => {
-      console.error("❌ Post creation error:", error.response?.data || error.message);
+      console.error("❌ Post creation error:", error);
       alert("Error sharing post. Please try again.");
     },
   });
@@ -219,15 +220,14 @@ const Share = () => {
     try {
       setUploading(true);
 
-      // Upload image if file exists
+      // ✅ Upload image if file exists
       let imgUrl = null;
       if (file) {
         imgUrl = await upload();
       }
 
-      // Create post with or without image
+      // ✅ Create post with content or image
       mutation.mutate({
-        title: "Post Title", // Default title
         content: content,
         img: imgUrl,
       });
@@ -245,7 +245,11 @@ const Share = () => {
         <div className="top">
           <div className="left">
             <img
-              src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
+              src={
+                currentUser.profilePic
+                  ? `/upload/${currentUser.profilePic}`
+                  : "/avatar.png"
+              }
               alt="Profile"
             />
             <div className="input-area">
@@ -259,7 +263,11 @@ const Share = () => {
           </div>
           <div className="right">
             {file && (
-              <img className="file" alt="Preview" src={URL.createObjectURL(file)} />
+              <img
+                className="file"
+                alt="Preview"
+                src={URL.createObjectURL(file)}
+              />
             )}
           </div>
         </div>
