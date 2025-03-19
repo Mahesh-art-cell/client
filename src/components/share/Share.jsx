@@ -1,5 +1,4 @@
 
-// // Share.jsx Component
 // import "./share.scss";
 // import Image from "../../assets/img.png";
 // import Map from "../../assets/map.png";
@@ -11,81 +10,78 @@
 
 // const Share = () => {
 //   const [file, setFile] = useState(null);
-//   const [desc, setDesc] = useState("");
+//   const [content, setContent] = useState("");
 //   const [uploading, setUploading] = useState(false);
 //   const { currentUser } = useContext(AuthContext);
 //   const queryClient = useQueryClient();
 
-//   // Upload image function - Fixed to handle errors properly
+//   // ✅ Upload Image to Backend
 //   const upload = async () => {
 //     if (!file) return null;
-//     setUploading(true);
-    
+
 //     try {
 //       const formData = new FormData();
 //       formData.append("file", file);
-      
-//       // Ensure Content-Type is NOT set (browser will set it with boundary)
-//       const res = await makeRequest.post("/upload", formData);
-//       setUploading(false);
-//       return res.data;
+
+//       const res = await makeRequest.post("/upload", formData, {
+//         headers: {
+//           "Content-Type": "multipart/form-data",
+//         },
+//       });
+
+//       console.log("✅ Upload successful:", res.data);
+//       return res.data.filename;
 //     } catch (err) {
-//       console.error("Upload Error:", err);
-//       setUploading(false);
-//       alert("Failed to upload image. Please try again.");
-//       return null;
+//       console.error("❌ Upload Error:", err);
+//       throw new Error("Failed to upload image.");
 //     }
 //   };
 
-//   // Mutation to create a new post
-//   const mutation = useMutation(
-//     async (newPost) => {
-//       const response = await makeRequest.post("/posts", newPost);
-//       return response.data;
+//   // ✅ Mutation to create a new post
+//   const mutation = useMutation({
+//     mutationFn: async (newPost) => {
+//       const res = await makeRequest.post("/posts", newPost);
+//       return res.data;
 //     },
-//     {
-//       onSuccess: () => {
-//         // Refresh posts list
-//         queryClient.invalidateQueries(["posts"]);
-        
-//         // Reset form
-//         setDesc("");
-//         setFile(null);
-//       },
-//       onError: (error) => {
-//         console.error("Post creation error:", error);
-//         alert("Error sharing post. Please try again.");
-//       }
-//     }
-//   );
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(["posts"]);
+//       setContent("");
+//       setFile(null);
+//     },
+//     onError: (error) => {
+//       console.error("❌ Post creation error:", error);
+//       alert("Error sharing post. Please try again.");
+//     },
+//   });
 
-//   // Handle share button click
+//   // ✅ Handle Share Button Click
 //   const handleClick = async (e) => {
 //     e.preventDefault();
-    
-//     // Validation
-//     if (!desc.trim() && !file) {
-//       alert("Please add a description or image before sharing!");
+
+//     if (!content.trim() && !file) {
+//       alert("Please add some content or an image before sharing.");
 //       return;
 //     }
-    
+
 //     try {
-//       // Upload image if present
+//       setUploading(true);
+
+//       // Upload image if file exists
 //       let imgUrl = null;
 //       if (file) {
 //         imgUrl = await upload();
-//         if (!imgUrl) return; // Exit if upload failed
 //       }
-      
-//       // Create post with correct fields matching backend
+
+//       // Create post with or without image
 //       mutation.mutate({
-//         content: desc,
-//         img: imgUrl // Backend should expect this field
+//         content: content,
+//         img: imgUrl,
 //       });
-      
 //     } catch (error) {
-//       console.error("Share error:", error);
-//       alert("Error sharing post. Please try again.");
+//       console.error("❌ Error while sharing post:", error);
+//       alert("Error while sharing post. Please try again.");
+//     } finally {
+//       setUploading(false);
 //     }
 //   };
 
@@ -94,24 +90,22 @@
 //       <div className="container">
 //         <div className="top">
 //           <div className="left">
-//             <img 
-//               src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"} 
-//               alt="" 
+//             <img
+//               src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
+//               alt="Profile"
 //             />
-//             <input
-//               type="text"
-//               placeholder={`What's on your mind, ${currentUser.name}?`}
-//               onChange={(e) => setDesc(e.target.value)}
-//               value={desc}
-//             />
+//             <div className="input-area">
+//               <textarea
+//                 placeholder={`What's on your mind, ${currentUser.name}?`}
+//                 onChange={(e) => setContent(e.target.value)}
+//                 value={content}
+//                 className="content-input"
+//               />
+//             </div>
 //           </div>
 //           <div className="right">
 //             {file && (
-//               <img 
-//                 className="file" 
-//                 alt="" 
-//                 src={URL.createObjectURL(file)} 
-//               />
+//               <img className="file" alt="Preview" src={URL.createObjectURL(file)} />
 //             )}
 //           </div>
 //         </div>
@@ -127,25 +121,26 @@
 //             />
 //             <label htmlFor="file">
 //               <div className="item">
-//                 <img src={Image} alt="" />
+//                 <img src={Image} alt="Add" />
 //                 <span>Add Image</span>
 //               </div>
 //             </label>
 //             <div className="item">
-//               <img src={Map} alt="" />
+//               <img src={Map} alt="Location" />
 //               <span>Add Place</span>
 //             </div>
 //             <div className="item">
-//               <img src={Friend} alt="" />
+//               <img src={Friend} alt="Friends" />
 //               <span>Tag Friends</span>
 //             </div>
 //           </div>
 //           <div className="right">
-//             <button 
-//               onClick={handleClick} 
-//               disabled={mutation.isLoading || uploading}
+//             <button
+//               onClick={handleClick}
+//               disabled={mutation.isPending || uploading}
+//               className={mutation.isPending || uploading ? "disabled" : ""}
 //             >
-//               {mutation.isLoading || uploading ? "Sharing..." : "Share"}
+//               {mutation.isPending || uploading ? "Sharing..." : "Share"}
 //             </button>
 //           </div>
 //         </div>
@@ -155,7 +150,6 @@
 // };
 
 // export default Share;
-
 
 
 import "./share.scss";
@@ -191,7 +185,7 @@ const Share = () => {
       console.log("✅ Upload successful:", res.data);
       return res.data.filename;
     } catch (err) {
-      console.error("❌ Upload Error:", err);
+      console.error("❌ Upload Error:", err.response?.data || err.message);
       throw new Error("Failed to upload image.");
     }
   };
@@ -208,7 +202,7 @@ const Share = () => {
       setFile(null);
     },
     onError: (error) => {
-      console.error("❌ Post creation error:", error);
+      console.error("❌ Post creation error:", error.response?.data || error.message);
       alert("Error sharing post. Please try again.");
     },
   });
@@ -233,6 +227,7 @@ const Share = () => {
 
       // Create post with or without image
       mutation.mutate({
+        title: "Post Title", // Default title
         content: content,
         img: imgUrl,
       });
