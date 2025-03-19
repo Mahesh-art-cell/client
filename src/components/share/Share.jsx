@@ -171,6 +171,7 @@ const Share = () => {
   const [file, setFile] = useState(null);
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
@@ -182,16 +183,20 @@ const Share = () => {
       const formData = new FormData();
       formData.append("file", file);
       
-      const res = await makeRequest.post("/upload", formData, {
+      console.log("Uploading file:", file.name, "Size:", file.size);
+      
+      const res = await makeRequest.post("/api/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         }
       });
       
       console.log("Upload successful:", res.data);
+      setUploadError(null);
       return res.data;
     } catch (err) {
-      console.error("Upload Error:", err);
+      console.error("Upload Error:", err.response?.data || err.message);
+      setUploadError(err.response?.data || "Failed to upload image");
       throw new Error("Failed to upload image");
     }
   };
@@ -199,7 +204,7 @@ const Share = () => {
   // Mutation to create a new post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      const response = await makeRequest.post("/posts", newPost);
+      const response = await makeRequest.post("/api/posts", newPost);
       return response.data;
     },
     onSuccess: () => {
@@ -209,6 +214,7 @@ const Share = () => {
       // Reset form
       setContent("");
       setFile(null);
+      setUploadError(null);
     },
     onError: (error) => {
       console.error("Post creation error:", error);
@@ -228,6 +234,7 @@ const Share = () => {
     
     try {
       setUploading(true);
+      setUploadError(null);
       
       // Upload image if present
       let imgUrl = null;
@@ -243,7 +250,7 @@ const Share = () => {
       
     } catch (error) {
       console.error("Share error:", error);
-      alert("Error sharing post: " + (error.message || "Please try again."));
+      // Error is already set in upload function
     } finally {
       setUploading(false);
     }
@@ -255,7 +262,7 @@ const Share = () => {
         <div className="top">
           <div className="left">
             <img 
-              src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"} 
+              src={currentUser.profilePic ? `/api/upload/${currentUser.profilePic}` : "/avatar.png"} 
               alt="Profile" 
             />
             <div className="input-area">
@@ -278,13 +285,28 @@ const Share = () => {
           </div>
         </div>
         <hr />
+        {uploadError && (
+          <div className="error-message">
+            Upload error: {uploadError}
+          </div>
+        )}
         <div className="bottom">
           <div className="left">
             <input
               type="file"
               id="file"
               style={{ display: "none" }}
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={(e) => {
+                const selectedFile = e.target.files[0];
+                if (selectedFile) {
+                  if (selectedFile.size > 5 * 1024 * 1024) {
+                    alert("File size must be less than 5MB");
+                    return;
+                  }
+                  setFile(selectedFile);
+                  setUploadError(null);
+                }
+              }}
               accept="image/*"
             />
             <label htmlFor="file">
@@ -318,4 +340,3 @@ const Share = () => {
 };
 
 export default Share;
-
