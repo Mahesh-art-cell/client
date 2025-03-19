@@ -176,7 +176,6 @@ const Share = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // ✅ Correct Upload URL
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -194,7 +193,7 @@ const Share = () => {
   // ✅ Mutation to create a new post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      const res = await makeRequest.post("/api/posts", newPost); // ✅ Correct URL
+      const res = await makeRequest.post("/posts", newPost);
       return res.data;
     },
     onSuccess: () => {
@@ -220,13 +219,13 @@ const Share = () => {
     try {
       setUploading(true);
 
-      // ✅ Upload image if file exists
+      // Upload image if file exists
       let imgUrl = null;
       if (file) {
         imgUrl = await upload();
       }
 
-      // ✅ Create post with content or image
+      // Create post with or without image
       mutation.mutate({
         content: content,
         img: imgUrl,
@@ -245,16 +244,12 @@ const Share = () => {
         <div className="top">
           <div className="left">
             <img
-              src={
-                currentUser.profilePic
-                  ? `/upload/${currentUser.profilePic}`
-                  : "/avatar.png"
-              }
+              src={currentUser?.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
               alt="Profile"
             />
             <div className="input-area">
               <textarea
-                placeholder={`What's on your mind, ${currentUser.name}?`}
+                placeholder={`What's on your mind, ${currentUser?.name || "User"}?`}
                 onChange={(e) => setContent(e.target.value)}
                 value={content}
                 className="content-input"
@@ -263,11 +258,7 @@ const Share = () => {
           </div>
           <div className="right">
             {file && (
-              <img
-                className="file"
-                alt="Preview"
-                src={URL.createObjectURL(file)}
-              />
+              <img className="file" alt="Preview" src={URL.createObjectURL(file)} />
             )}
           </div>
         </div>
