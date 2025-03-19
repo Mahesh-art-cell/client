@@ -1,4 +1,5 @@
 
+
 // import "./share.scss";
 // import Image from "../../assets/img.png";
 // import Map from "../../assets/map.png";
@@ -91,12 +92,12 @@
 //         <div className="top">
 //           <div className="left">
 //             <img
-//               src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
+//               src={currentUser?.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
 //               alt="Profile"
 //             />
 //             <div className="input-area">
 //               <textarea
-//                 placeholder={`What's on your mind, ${currentUser.name}?`}
+//                 placeholder={`What's on your mind, ${currentUser?.name || "User"}?`}
 //                 onChange={(e) => setContent(e.target.value)}
 //                 value={content}
 //                 className="content-input"
@@ -152,6 +153,7 @@
 // export default Share;
 
 
+
 import "./share.scss";
 import Image from "../../assets/img.png";
 import Map from "../../assets/map.png";
@@ -174,7 +176,7 @@ const Share = () => {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", file); // ✅ FormData with correct key
 
       const res = await makeRequest.post("/upload", formData, {
         headers: {
@@ -185,7 +187,7 @@ const Share = () => {
       console.log("✅ Upload successful:", res.data);
       return res.data.filename;
     } catch (err) {
-      console.error("❌ Upload Error:", err);
+      console.error("❌ Upload Error:", err.response?.data || err.message);
       throw new Error("Failed to upload image.");
     }
   };
@@ -202,7 +204,7 @@ const Share = () => {
       setFile(null);
     },
     onError: (error) => {
-      console.error("❌ Post creation error:", error);
+      console.error("❌ Post creation error:", error.response?.data || error.message);
       alert("Error sharing post. Please try again.");
     },
   });
@@ -227,8 +229,8 @@ const Share = () => {
 
       // Create post with or without image
       mutation.mutate({
-        content: content,
-        img: imgUrl,
+        content: content || "",
+        img: imgUrl || "",
       });
     } catch (error) {
       console.error("❌ Error while sharing post:", error);
