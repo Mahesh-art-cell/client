@@ -174,78 +174,72 @@ const Share = () => {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // Upload image function
+  // ✅ Upload image function
   const upload = async () => {
+    if (!file) return null;
+
     try {
-      if (!file) return null;
-      
       const formData = new FormData();
       formData.append("file", file);
-      
-      // Fix: Don't use /api prefix since it's already in makeRequest baseURL
+
+      // Correct URL without /api prefix (base URL is handled in makeRequest)
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-        }
+        },
       });
-      
-      console.log("Upload successful:", res.data);
-      return res.data;
+
+      console.log("✅ Upload successful:", res.data);
+      return res.data.filename;
     } catch (err) {
-      console.error("Upload Error:", err);
-      throw new Error("Failed to upload image");
+      console.error("❌ Upload Error:", err);
+      throw new Error("Failed to upload image.");
     }
   };
 
-  // Mutation to create a new post
+  // ✅ Mutation to create a new post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      // Fix: Don't use /api prefix since it's already in makeRequest baseURL
-      const response = await makeRequest.post("/posts", newPost);
-      return response.data;
+      const res = await makeRequest.post("/posts", newPost);
+      return res.data;
     },
     onSuccess: () => {
-      // Refresh posts list
       queryClient.invalidateQueries(["posts"]);
-      
-      // Reset form
       setContent("");
       setFile(null);
     },
     onError: (error) => {
-      console.error("Post creation error:", error);
+      console.error("❌ Post creation error:", error);
       alert("Error sharing post. Please try again.");
-    }
+    },
   });
 
-  // Handle share button click
+  // ✅ Handle share button click
   const handleClick = async (e) => {
     e.preventDefault();
-    
-    // Validation
+
     if (!content.trim() && !file) {
-      alert("Please add a description or image before sharing!");
+      alert("Please add some content or an image before sharing.");
       return;
     }
-    
+
     try {
       setUploading(true);
-      
-      // Upload image if present
+
+      // Upload image if file exists
       let imgUrl = null;
       if (file) {
         imgUrl = await upload();
       }
-      
+
       // Create post with or without image
       mutation.mutate({
         content: content,
-        img: imgUrl
+        img: imgUrl,
       });
-      
     } catch (error) {
-      console.error("Share error:", error);
-      alert("Error sharing post: " + (error.message || "Please try again."));
+      console.error("❌ Error while sharing post:", error);
+      alert("Error while sharing post. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -256,10 +250,9 @@ const Share = () => {
       <div className="container">
         <div className="top">
           <div className="left">
-            <img 
-              // Fix: Use correct image path without /api since baseURL has it
-              src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"} 
-              alt="Profile" 
+            <img
+              src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
+              alt="Profile"
             />
             <div className="input-area">
               <textarea
@@ -272,11 +265,7 @@ const Share = () => {
           </div>
           <div className="right">
             {file && (
-              <img 
-                className="file" 
-                alt="Preview" 
-                src={URL.createObjectURL(file)} 
-              />
+              <img className="file" alt="Preview" src={URL.createObjectURL(file)} />
             )}
           </div>
         </div>
@@ -306,8 +295,8 @@ const Share = () => {
             </div>
           </div>
           <div className="right">
-            <button 
-              onClick={handleClick} 
+            <button
+              onClick={handleClick}
               disabled={mutation.isPending || uploading}
               className={mutation.isPending || uploading ? "disabled" : ""}
             >
