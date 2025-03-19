@@ -1,33 +1,8 @@
-// .posts{
-//     display: flex;
-//     flex-direction: column;
-//     gap: 50px;
-//   }
+.posts{
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+  }
 
 
 
-.posts {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-  
-  .loading {
-    text-align: center;
-    padding: 20px;
-    color: #555;
-  }
-  
-  .no-posts {
-    text-align: center;
-    padding: 20px;
-    color: #555;
-    font-style: italic;
-  }
-  
-  .error-message {
-    text-align: center;
-    padding: 20px;
-    color: #ff3333;
-    font-weight: bold;
-  }
