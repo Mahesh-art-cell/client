@@ -181,12 +181,11 @@ const Share = () => {
       const res = await makeRequest.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
 
       console.log("✅ Upload successful:", res.data);
-      return res.data.filename; // Return uploaded filename
+      return res.data.filename;
     } catch (err) {
       console.error("❌ Upload Error:", err);
       throw new Error("Failed to upload image.");
@@ -196,18 +195,13 @@ const Share = () => {
   // ✅ Mutation to create a new post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      const res = await makeRequest.post("/posts", newPost, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const res = await makeRequest.post("/posts", newPost);
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["posts"]);
       setContent("");
       setFile(null);
-      alert("✅ Post shared successfully!");
     },
     onError: (error) => {
       console.error("❌ Post creation error:", error);
@@ -220,7 +214,7 @@ const Share = () => {
     e.preventDefault();
 
     if (!content.trim() && !file) {
-      alert("⚠️ Please add some content or an image before sharing.");
+      alert("Please add some content or an image before sharing.");
       return;
     }
 
@@ -230,13 +224,13 @@ const Share = () => {
       // Upload image if file exists
       let imgUrl = null;
       if (file) {
-        imgUrl = await upload(); // Get uploaded image URL
+        imgUrl = await upload(); // ✅ Get uploaded image URL
       }
 
-      // Create post with or without image
+      // ✅ Create post with content and image URL
       mutation.mutate({
         content: content,
-        img: imgUrl, // Pass uploaded image URL
+        img: imgUrl,
       });
     } catch (error) {
       console.error("❌ Error while sharing post:", error);
@@ -252,18 +246,12 @@ const Share = () => {
         <div className="top">
           <div className="left">
             <img
-              src={
-                currentUser?.profilePic
-                  ? `/upload/${currentUser.profilePic}`
-                  : "/avatar.png"
-              }
+              src={currentUser?.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
               alt="Profile"
             />
             <div className="input-area">
               <textarea
-                placeholder={`What's on your mind, ${
-                  currentUser?.name || "User"
-                }?`}
+                placeholder={`What's on your mind, ${currentUser?.name || "User"}?`}
                 onChange={(e) => setContent(e.target.value)}
                 value={content}
                 className="content-input"
@@ -272,11 +260,7 @@ const Share = () => {
           </div>
           <div className="right">
             {file && (
-              <img
-                className="file"
-                alt="Preview"
-                src={URL.createObjectURL(file)}
-              />
+              <img className="file" alt="Preview" src={URL.createObjectURL(file)} />
             )}
           </div>
         </div>

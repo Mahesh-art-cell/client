@@ -10,18 +10,18 @@
 
 import axios from "axios";
 
-// ✅ Create Axios Instance with Token from Local Storage
+// ✅ Create Axios instance with base URL
 export const makeRequest = axios.create({
-  baseURL: "https://server-wi41.onrender.com/api",
-  withCredentials: true, // ✅ Ensures cookies are sent
+  baseURL: "https://server-wi41.onrender.com/api", // ✅ Backend API URL
+  withCredentials: true,
 });
 
-// ✅ Add Interceptor to Attach Token Automatically
+// ✅ Attach token from localStorage to requests
 makeRequest.interceptors.request.use(
   (config) => {
     const token = JSON.parse(localStorage.getItem("user"))?.accessToken;
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // ✅ Attach token to header
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
