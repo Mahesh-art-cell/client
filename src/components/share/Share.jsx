@@ -70,10 +70,10 @@
 //       // Upload image if file exists
 //       let imgUrl = null;
 //       if (file) {
-//         imgUrl = await upload();
+//         imgUrl = await upload(); // ✅ Get uploaded image URL
 //       }
 
-//       // Create post with or without image
+//       // ✅ Create post with content and image URL
 //       mutation.mutate({
 //         content: content,
 //         img: imgUrl,
@@ -155,7 +155,6 @@
 
 
 
-
 import "./share.scss";
 import Image from "../../assets/img.png";
 import Map from "../../assets/map.png";
@@ -187,7 +186,7 @@ const Share = () => {
       });
 
       console.log("✅ Upload successful:", res.data);
-      return res.data.filename;
+      return res.data.filename; // ✅ Return correct image filename
     } catch (err) {
       console.error("❌ Upload Error:", err);
       throw new Error("Failed to upload image.");
@@ -223,7 +222,7 @@ const Share = () => {
     try {
       setUploading(true);
 
-      // Upload image if file exists
+      // ✅ Upload image if file exists
       let imgUrl = null;
       if (file) {
         imgUrl = await upload(); // ✅ Get uploaded image URL
@@ -232,7 +231,7 @@ const Share = () => {
       // ✅ Create post with content and image URL
       mutation.mutate({
         content: content,
-        img: imgUrl,
+        img: imgUrl, // Include uploaded image URL
       });
     } catch (error) {
       console.error("❌ Error while sharing post:", error);
@@ -248,7 +247,11 @@ const Share = () => {
         <div className="top">
           <div className="left">
             <img
-              src={currentUser?.profilePic ? `/upload/${currentUser.profilePic}` : "/avatar.png"}
+              src={
+                currentUser?.profilePic
+                  ? `/upload/${currentUser.profilePic}` // ✅ Correct path
+                  : "/avatar.png"
+              }
               alt="Profile"
             />
             <div className="input-area">
@@ -262,7 +265,11 @@ const Share = () => {
           </div>
           <div className="right">
             {file && (
-              <img className="file" alt="Preview" src={URL.createObjectURL(file)} />
+              <img
+                className="file"
+                alt="Preview"
+                src={URL.createObjectURL(file)} // ✅ Local preview before upload
+              />
             )}
           </div>
         </div>
