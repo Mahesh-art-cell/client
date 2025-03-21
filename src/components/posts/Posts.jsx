@@ -42,24 +42,20 @@ import { AuthContext } from "../../context/authContext";
 
 const Posts = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
-  // Define query key based on whether we're viewing a profile or home feed
+
+  // ✅ Dynamically set query key
   const queryKey = userId ? ["posts", userId] : ["posts"];
 
-  // Fetch posts from backend
+  // ✅ Fetch posts based on userId or feed
   const { isLoading, error, data } = useQuery(queryKey, async () => {
-    try {
-      // If userId is provided, fetch that user's posts, otherwise fetch feed
-      const endpoint = userId ? `/posts?userId=${userId}` : "/posts";
-      const res = await makeRequest.get(endpoint);
-      return res.data;
-    } catch (err) {
-      throw new Error(err.response?.data?.message || "Failed to fetch posts");
-    }
+    const endpoint = userId ? `/posts?userId=${userId}` : "/posts";
+    const res = await makeRequest.get(endpoint);
+    return res.data;
   });
 
   return (
     <div className="posts-container">
-      {/* ✅ Show Share component only on home feed or own profile */}
+      {/* ✅ Share appears only on home and own profile */}
       {(!userId || userId === currentUser?.id) && <Share />}
       
       <div className="posts">
@@ -70,7 +66,7 @@ const Posts = ({ userId }) => {
         ) : data?.length === 0 ? (
           <div className="no-posts">No posts available.</div>
         ) : (
-          data?.map((post) => <Post post={post} key={post.id} />)
+          data.map((post) => <Post post={post} key={post.id} />)
         )}
       </div>
     </div>

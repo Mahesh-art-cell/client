@@ -10,13 +10,11 @@
 
 import axios from "axios";
 
-// ✅ Create Axios instance with base URL
 export const makeRequest = axios.create({
-  baseURL: "https://server-wi41.onrender.com/api", // ✅ Backend API URL
+  baseURL: "https://server-wi41.onrender.com/api",
   withCredentials: true,
 });
 
-// ✅ Attach token from localStorage to requests
 makeRequest.interceptors.request.use(
   (config) => {
     const token = JSON.parse(localStorage.getItem("user"))?.accessToken;
