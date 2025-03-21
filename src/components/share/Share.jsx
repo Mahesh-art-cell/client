@@ -176,6 +176,11 @@ const Share = () => {
   const upload = async (file) => {
     console.log("📢 Uploading File to Backend:", file);
   
+    if (!file) {
+      console.error("❌ No File Selected!");
+      throw new Error("No file selected.");
+    }
+  
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -189,7 +194,6 @@ const Share = () => {
     }
   };
   
-
   
 
   // ✅ Mutation to create a new post
@@ -275,13 +279,19 @@ const Share = () => {
         <hr />
         <div className="bottom">
           <div className="left">
-            <input
+            {/* <input
               type="file"
               id="file"
               style={{ display: "none" }}
               onChange={(e) => setFile(e.target.files[0])}
               accept="image/*"
-            />
+            /> */}
+            <input
+  type="file"
+  id="file"
+  onChange={(e) => setFile(e.target.files[0])}
+/>
+
             <label htmlFor="file">
               <div className="item">
                 <img src={Image} alt="Add" />
