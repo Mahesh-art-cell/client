@@ -155,100 +155,159 @@
 
 
 
-import { useState, useRef, useContext } from "react";
 import "./share.scss";
+import Image from "../../assets/img.png";
+import Map from "../../assets/map.png";
+import Friend from "../../assets/friend.png";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 
 const Share = () => {
-  const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
+  const [content, setContent] = useState("");
+  const [uploading, setUploading] = useState(false);
   const { currentUser } = useContext(AuthContext);
-  const inputRef = useRef();
+  const queryClient = useQueryClient();
 
-  // ✅ Upload Function
-  const upload = async (file) => {
-    if (!file) {
-      console.error("❌ No file selected for upload!");
-      throw new Error("No file selected.");
-    }
-
+  
+  const upload = async () => {
+    if (!file) return null;
+  
     try {
-      console.log("📸 Uploading File to Backend:", file.name);
-
       const formData = new FormData();
       formData.append("file", file);
-
+  
       const res = await makeRequest.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-      console.log("✅ Upload Successful. File URL:", res.data.url);
-      return res.data.url;
+  
+      console.log("✅ Upload successful:", res.data);
+      return res.data.imageUrl; // ✅ Return Cloudinary URL
     } catch (err) {
       console.error("❌ Upload Error:", err);
       throw new Error("Failed to upload image.");
     }
   };
+  
 
-  // ✅ Handle Post Share
-  const onClick = async () => {
+  // ✅ Mutation to create a new post
+  const mutation = useMutation({
+    mutationFn: async (newPost) => {
+      const res = await makeRequest.post("/posts", newPost);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["posts"]);
+      setContent("");
+      setFile(null);
+    },
+    onError: (error) => {
+      console.error("❌ Post creation error:", error);
+      alert("Error sharing post. Please try again.");
+    },
+  });
+
+  // ✅ Handle Share Button Click
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    if (!content.trim() && !file) {
+      alert("Please add some content or an image before sharing.");
+      return;
+    }
+
     try {
-      let fileUrl = "";
+      setUploading(true);
+
+      // ✅ Upload image if file exists
+      let imgUrl = null;
       if (file) {
-        fileUrl = await upload(file);
+        imgUrl = await upload(); // ✅ Get uploaded image URL
       }
 
-      const newPost = {
-        userId: currentUser.id,
-        desc,
-        img: fileUrl || null,
-      };
-
-      await makeRequest.post("/posts", newPost);
-      console.log("✅ Post Shared Successfully!");
-      setDesc("");
-      setFile(null);
+      // ✅ Create post with content and image URL
+      mutation.mutate({
+        content: content,
+        img: imgUrl, // Include uploaded image URL
+      });
     } catch (error) {
       console.error("❌ Error while sharing post:", error);
-      alert("Failed to share the post.");
+      alert("Error while sharing post. Please try again.");
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
     <div className="share">
-      <div className="shareWrapper">
-        <div className="shareTop">
-          <img
-            src={
-              currentUser.profilePic
-                ? `/upload/${currentUser.profilePic}`
-                : "/defaultProfilePic.jpg"
-            }
-            alt="Profile"
-            className="shareProfileImg"
-          />
-          <input
-            type="text"
-            placeholder={`What's on your mind, ${currentUser.name}?`}
-            className="shareInput"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-          />
+      <div className="container">
+        <div className="top">
+          <div className="left">
+            <img
+              src={
+                currentUser?.profilePic
+                  ? `/upload/${currentUser.profilePic}` // ✅ Correct path
+                  : "/avatar.png"
+              }
+              alt="Profile"
+            />
+            <div className="input-area">
+              <textarea
+                placeholder={`What's on your mind, ${currentUser?.name || "User"}?`}
+                onChange={(e) => setContent(e.target.value)}
+                value={content}
+                className="content-input"
+              />
+            </div>
+          </div>
+          <div className="right">
+            {file && (
+              <img
+                className="file"
+                alt="Preview"
+                src={URL.createObjectURL(file)} // ✅ Local preview before upload
+              />
+            )}
+          </div>
         </div>
-
-        <hr className="shareHr" />
-
-        <div className="shareBottom">
-          <input
-            type="file"
-            id="file"
-            ref={inputRef}
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-          <button className="shareButton" onClick={onClick}>
-            Share
-          </button>
+        <hr />
+        <div className="bottom">
+          <div className="left">
+            <input
+              type="file"
+              id="file"
+              style={{ display: "none" }}
+              onChange={(e) => setFile(e.target.files[0])}
+              accept="image/*"
+            />
+            <label htmlFor="file">
+              <div className="item">
+                <img src={Image} alt="Add" />
+                <span>Add Image</span>
+              </div>
+            </label>
+            <div className="item">
+              <img src={Map} alt="Location" />
+              <span>Add Place</span>
+            </div>
+            <div className="item">
+              <img src={Friend} alt="Friends" />
+              <span>Tag Friends</span>
+            </div>
+          </div>
+          <div className="right">
+            <button
+              onClick={handleClick}
+              disabled={mutation.isPending || uploading}
+              className={mutation.isPending || uploading ? "disabled" : ""}
+            >
+              {mutation.isPending || uploading ? "Sharing..." : "Share"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
