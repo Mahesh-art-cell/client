@@ -174,17 +174,17 @@ const Share = () => {
   // ✅ Upload Image to Cloudinary and Get URL
   const upload = async () => {
     if (!file) return null;
-
+  
     try {
       const formData = new FormData();
       formData.append("file", file);
-
+  
       const res = await makeRequest.post("/upload", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "multipart/form-data", // ✅ Correct Header
         },
       });
-
+  
       console.log("✅ Upload successful:", res.data.imageUrl);
       return res.data.imageUrl; // ✅ Return Cloudinary URL
     } catch (err) {
@@ -192,6 +192,7 @@ const Share = () => {
       throw new Error("Failed to upload image.");
     }
   };
+  
 
   // ✅ Mutation to Create a New Post
   const mutation = useMutation({
