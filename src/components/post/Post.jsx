@@ -192,69 +192,69 @@ const Post = ({ post }) => {
     }
   };
 
-  // return (
-  //   <div className="post">
-  //     <div className="container">
-  //       <div className="user">
-  //         <div className="userInfo">
-  //           <img
-  //             src={post.profilePic ? `/upload/${post.profilePic}` : "/defaultProfilePic.jpg"}
-  //             alt="Profile"
-  //           />
-  //           <div className="details">
-  //             <Link
-  //               to={`/profile/${post.userId}`}
-  //               style={{ textDecoration: "none", color: "inherit" }}
-  //             >
-  //               <span className="name">{post.name}</span>
-  //             </Link>
-  //             <span className="date">{moment(post.createdAt).fromNow()}</span>
-  //           </div>
-  //         </div>
-  //         <div className="actions">
-  //           <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />
-  //           {menuOpen && post.userId === currentUser.id && (
-  //             <div className="menu">
-  //               <button className="delete-btn" onClick={handleDelete}>Delete</button>
-  //             </div>
-  //           )}
-  //         </div>
-  //       </div>
-  //       <div className="content">
-  //         {post.title && <h3 className="title">{post.title}</h3>}
-  //         <p>{post.content}</p>
-  //         {post.img && (
-  //           <img
-  //             src={`/upload/${post.img}`}
-  //             alt="Post"
-  //             className="post-image"
-  //           />
-  //         )}
-  //       </div>
-  //       <div className="info">
-  //         <div className="item">
-  //           {isLoading ? (
-  //             "Loading..."
-  //           ) : data?.includes(currentUser.id) ? (
-  //             <FavoriteOutlinedIcon style={{ color: "red" }} onClick={handleLike} />
-  //           ) : (
-  //             <FavoriteBorderOutlinedIcon onClick={handleLike} />
-  //           )}
-  //           {data?.length || 0} Likes
-  //         </div>
-  //         <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
-  //           <TextsmsOutlinedIcon />
-  //           See Comments
-  //         </div>
-  //         <div className="item">
-  //           <ShareOutlinedIcon />
-  //           Share
-  //         </div>
-  //       </div>
-  //       {commentOpen && <Comments postId={post.id} />}
-  //     </div>
-  //   </div>
-  // );
+  return (
+    <div className="post">
+      <div className="container">
+        <div className="user">
+          <div className="userInfo">
+            <img
+              src={post.profilePic ? `/upload/${post.profilePic}` : "/defaultProfilePic.jpg"}
+              alt="Profile"
+            />
+            <div className="details">
+              <Link
+                to={`/profile/${post.userId}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                <span className="name">{post.name}</span>
+              </Link>
+              <span className="date">{moment(post.createdAt).fromNow()}</span>
+            </div>
+          </div>
+          <div className="actions">
+            <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />
+            {menuOpen && post.userId === currentUser.id && (
+              <div className="menu">
+                <button className="delete-btn" onClick={handleDelete}>Delete</button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="content">
+          {post.title && <h3 className="title">{post.title}</h3>}
+          <p>{post.content}</p>
+          {post.img && (
+            <img
+              src={`/upload/${post.img}`}
+              alt="Post"
+              className="post-image"
+            />
+          )}
+        </div>
+        <div className="info">
+          <div className="item">
+            {isLoading ? (
+              "Loading..."
+            ) : data?.includes(currentUser.id) ? (
+              <FavoriteOutlinedIcon style={{ color: "red" }} onClick={handleLike} />
+            ) : (
+              <FavoriteBorderOutlinedIcon onClick={handleLike} />
+            )}
+            {data?.length || 0} Likes
+          </div>
+          <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
+            <TextsmsOutlinedIcon />
+            See Comments
+          </div>
+          <div className="item">
+            <ShareOutlinedIcon />
+            Share
+          </div>
+        </div>
+        {commentOpen && <Comments postId={post.id} />}
+      </div>
+    </div>
+  );
 };
 
 export default Post;
