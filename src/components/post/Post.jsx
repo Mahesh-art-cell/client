@@ -134,7 +134,6 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
 import { useState, useContext } from "react";
@@ -145,15 +144,30 @@ import { AuthContext } from "../../context/authContext";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
   // ✅ Fetch likes
-  const { isLoading, error, data } = useQuery(["likes", post.id], () =>
+  const { isLoading, data } = useQuery(["likes", post.id], () =>
     makeRequest.get("/likes?postId=" + post.id).then((res) => res.data)
   );
 
   const queryClient = useQueryClient();
+
+  // ✅ Define Mutation for Like/Unlike
+  const mutation = useMutation(
+    (liked) => {
+      if (liked) {
+        return makeRequest.delete("/likes?postId=" + post.id);
+      } else {
+        return makeRequest.post("/likes", { postId: post.id });
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["likes", post.id]);
+      },
+    }
+  );
 
   // ✅ Fetch media for the post
   const { data: mediaData, isLoading: mediaLoading } = useQuery(
