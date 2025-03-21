@@ -172,26 +172,33 @@ const Share = () => {
   const queryClient = useQueryClient();
 
   
-  const upload = async () => {
-    if (!file) return null;
-  
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      const res = await makeRequest.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-  
-      console.log("✅ Upload successful:", res.data);
-      return res.data.imageUrl; // ✅ Return Cloudinary URL
-    } catch (err) {
-      console.error("❌ Upload Error:", err);
-      throw new Error("Failed to upload image.");
-    }
-  };
+  // ✅ Upload Function
+const upload = async (file) => {
+  if (!file) {
+    console.error("❌ No file selected for upload!");
+    throw new Error("No file selected.");
+  }
+
+  try {
+    console.log("📸 Uploading File to Backend:", file.name);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    console.log("📦 FormData Ready:", formData);
+
+    const res = await makeRequest.post("/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log("✅ Upload Successful. File URL:", res.data.url);
+    return res.data.url;
+  } catch (err) {
+    console.error("❌ Upload Error:", err.response?.data || err.message);
+    throw new Error("Failed to upload image.");
+  }
+};
+
   
 
   // ✅ Mutation to create a new post
