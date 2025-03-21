@@ -171,7 +171,7 @@ const Share = () => {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // ✅ Upload Image to Backend
+  // ✅ Upload Image to Cloudinary and Get URL
   const upload = async () => {
     if (!file) return null;
 
@@ -185,15 +185,15 @@ const Share = () => {
         },
       });
 
-      console.log("✅ Upload successful:", res.data);
-      return res.data.filename; // ✅ Return correct image filename
+      console.log("✅ Upload successful:", res.data.imageUrl);
+      return res.data.imageUrl; // ✅ Return Cloudinary URL
     } catch (err) {
       console.error("❌ Upload Error:", err);
       throw new Error("Failed to upload image.");
     }
   };
 
-  // ✅ Mutation to create a new post
+  // ✅ Mutation to Create a New Post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
       const res = await makeRequest.post("/posts", newPost);
@@ -256,7 +256,9 @@ const Share = () => {
             />
             <div className="input-area">
               <textarea
-                placeholder={`What's on your mind, ${currentUser?.name || "User"}?`}
+                placeholder={`What's on your mind, ${
+                  currentUser?.name || "User"
+                }?`}
                 onChange={(e) => setContent(e.target.value)}
                 value={content}
                 className="content-input"

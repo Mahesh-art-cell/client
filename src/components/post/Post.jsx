@@ -148,48 +148,25 @@ const Post = ({ post }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
-  // Fetch likes data
+  // ✅ Fetch likes
   const { isLoading, error, data } = useQuery(["likes", post.id], () =>
     makeRequest.get("/likes?postId=" + post.id).then((res) => res.data)
   );
 
-  if (error) {
-    console.error("Error fetching likes:", error);
-  }
-
   const queryClient = useQueryClient();
 
-  // Like/Unlike mutation
-  const mutation = useMutation(
-    (liked) => {
-      if (liked) return makeRequest.delete("/likes?postId=" + post.id);
-      return makeRequest.post("/likes", { postId: post.id });
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["likes", post.id]);
-      },
-    }
-  );
-
-  // Delete post mutation
-  const deleteMutation = useMutation(
-    (postId) => makeRequest.delete("/posts/" + postId),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["posts"]);
-      },
-    }
+  // ✅ Fetch media for the post
+  const { data: mediaData, isLoading: mediaLoading } = useQuery(
+    ["media", post.id],
+    () =>
+      makeRequest
+        .get("/media?postId=" + post.id)
+        .then((res) => res.data)
   );
 
   const handleLike = () => {
-    mutation.mutate(data?.includes(currentUser.id) ?? false);
-  };
-
-  const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      deleteMutation.mutate(post.id);
-    }
+    const liked = data?.includes(currentUser.id);
+    mutation.mutate(liked);
   };
 
   return (
@@ -211,24 +188,26 @@ const Post = ({ post }) => {
               <span className="date">{moment(post.createdAt).fromNow()}</span>
             </div>
           </div>
-          <div className="actions">
-            <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />
-            {menuOpen && post.userId === currentUser.id && (
-              <div className="menu">
-                <button className="delete-btn" onClick={handleDelete}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
         </div>
-        <div className="content">
-          {post.title && <h3 className="title">{post.title}</h3>}
-          <p>{post.content}</p>
-          {post.img && (
-            <img src={`/upload/${post.img}`} alt="Post" className="post-image" />
-          )}
-        </div>
+
+        {/* ✅ Display Media */}
+        {mediaLoading ? (
+          <p>Loading media...</p>
+        ) : (
+          mediaData?.map((media) => (
+            <div key={media.id} className="media-container">
+              {media.type === "image" ? (
+                <img src={media.url} alt="Post Media" className="post-image" />
+              ) : (
+                <video width="100%" controls>
+                  <source src={media.url} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+            </div>
+          ))
+        )}
+
         <div className="info">
           <div className="item">
             {isLoading ? (
@@ -249,6 +228,7 @@ const Post = ({ post }) => {
             Share
           </div>
         </div>
+
         {commentOpen && <Comments postId={post.id} />}
       </div>
     </div>

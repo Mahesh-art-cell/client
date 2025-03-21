@@ -1,0 +1,31 @@
+.media-list {
+    width: 80%;
+    margin: 20px auto;
+    text-align: center;
+  
+    h2 {
+      margin-bottom: 20px;
+    }
+  
+    .media-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+  
+    .media-item {
+      width: 200px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+      img,
+      video {
+        width: 100%;
+        border-radius: 8px;
+      }
+    }
+  }
+  
