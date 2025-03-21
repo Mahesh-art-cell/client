@@ -44,7 +44,7 @@ const Posts = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
   // Define query key based on whether we're viewing a profile or home feed
   const queryKey = userId ? ["posts", userId] : ["posts"];
-  
+
   // Fetch posts from backend
   const { isLoading, error, data } = useQuery(queryKey, async () => {
     try {
@@ -59,7 +59,7 @@ const Posts = ({ userId }) => {
 
   return (
     <div className="posts-container">
-      {/* Show Share component only on home feed or own profile */}
+      {/* ✅ Show Share component only on home feed or own profile */}
       {(!userId || userId === currentUser?.id) && <Share />}
       
       <div className="posts">
@@ -78,12 +78,3 @@ const Posts = ({ userId }) => {
 };
 
 export default Posts;
-
-
-
-
-
-
-
-
-

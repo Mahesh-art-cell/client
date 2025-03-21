@@ -215,7 +215,9 @@ const Post = ({ post }) => {
             <MoreHorizIcon onClick={() => setMenuOpen(!menuOpen)} />
             {menuOpen && post.userId === currentUser.id && (
               <div className="menu">
-                <button className="delete-btn" onClick={handleDelete}>Delete</button>
+                <button className="delete-btn" onClick={handleDelete}>
+                  Delete
+                </button>
               </div>
             )}
           </div>
@@ -224,11 +226,7 @@ const Post = ({ post }) => {
           {post.title && <h3 className="title">{post.title}</h3>}
           <p>{post.content}</p>
           {post.img && (
-            <img
-              src={`/upload/${post.img}`}
-              alt="Post"
-              className="post-image"
-            />
+            <img src={`/upload/${post.img}`} alt="Post" className="post-image" />
           )}
         </div>
         <div className="info">
