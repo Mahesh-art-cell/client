@@ -174,16 +174,21 @@ const Share = () => {
   
   // ✅ Upload Function
   const upload = async (file) => {
-    console.log("📢 Uploading File to Backend:", file);
-  
     if (!file) {
-      console.error("❌ No File Selected!");
+      console.error("❌ No file selected!");
       throw new Error("No file selected.");
     }
   
+    console.log("📢 Uploading File to Backend:", file);
+  
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", file); // ✅ Correct key
+  
+      // ✅ Log FormData content
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
   
       const res = await makeRequest.post("/upload", formData);
       console.log("✅ File Uploaded Successfully:", res.data);
