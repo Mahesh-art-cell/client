@@ -205,7 +205,7 @@ const Post = ({ post }) => {
         </div>
 
         {/* ✅ Display Media */}
-        {mediaLoading ? (
+        {/* {mediaLoading ? (
           <p>Loading media...</p>
         ) : (
           mediaData?.map((media) => (
@@ -220,7 +220,31 @@ const Post = ({ post }) => {
               )}
             </div>
           ))
-        )}
+        )} */}
+        {mediaLoading ? (
+  <p>Loading media...</p>
+) : (
+  mediaData?.map((media) => (
+    <div key={media.id} className="media-container">
+      {media.type === "image" ? (
+        <img
+          src={media.url.startsWith("http") ? media.url : `/upload/${media.url}`}
+          alt="Post Media"
+          className="post-image"
+        />
+      ) : (
+        <video width="100%" controls>
+          <source
+            src={media.url.startsWith("http") ? media.url : `/upload/${media.url}`}
+            type="video/mp4"
+          />
+          Your browser does not support the video tag.
+        </video>
+      )}
+    </div>
+  ))
+)}
+
 
         <div className="info">
           <div className="item">

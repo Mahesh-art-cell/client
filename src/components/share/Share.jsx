@@ -173,32 +173,34 @@ const Share = () => {
 
   
   // ✅ Upload Function
-  const upload = async (file) => {
-    if (!file) {
-      console.error("❌ No file selected!");
-      throw new Error("No file selected.");
+  // ✅ Upload to Cloudinary and Return URL
+const upload = async (file) => {
+  if (!file) {
+    console.error("❌ No file selected!");
+    throw new Error("No file selected.");
+  }
+
+  console.log("📢 Uploading File to Backend:", file);
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file); // ✅ Correct key
+
+    // ✅ Log FormData content
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
     }
-  
-    console.log("📢 Uploading File to Backend:", file);
-  
-    try {
-      const formData = new FormData();
-      formData.append("file", file); // ✅ Correct key
-  
-      // ✅ Log FormData content
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-  
-      const res = await makeRequest.post("/upload", formData);
-      console.log("✅ File Uploaded Successfully:", res.data);
-      return res.data.url;
-    } catch (err) {
-      console.error("❌ Upload Error:", err);
-      throw new Error("Failed to upload image.");
-    }
-  };
-  
+
+    // ✅ Upload to Cloudinary via Backend
+    const res = await makeRequest.post("/upload", formData);
+    console.log("✅ File Uploaded Successfully to Cloudinary:", res.data.url);
+    return res.data.url; // ✅ Return Cloudinary URL
+  } catch (err) {
+    console.error("❌ Upload Error:", err);
+    throw new Error("Failed to upload image.");
+  }
+};
+
   
 
   // ✅ Mutation to create a new post
