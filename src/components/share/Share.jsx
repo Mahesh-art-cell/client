@@ -174,6 +174,7 @@ const Share = () => {
   
   // ✅ Upload Function
   // ✅ Upload to Cloudinary and Return URL
+// ✅ Upload to Cloudinary and Return URL
 const upload = async (file) => {
   if (!file) {
     console.error("❌ No file selected!");
@@ -221,35 +222,37 @@ const upload = async (file) => {
   });
 
   // ✅ Handle Share Button Click
-  const handleClick = async (e) => {
-    e.preventDefault();
+  // ✅ Corrected handleClick with file passed properly
+const handleClick = async (e) => {
+  e.preventDefault();
 
-    if (!content.trim() && !file) {
-      alert("Please add some content or an image before sharing.");
-      return;
+  if (!content.trim() && !file) {
+    alert("Please add some content or an image before sharing.");
+    return;
+  }
+
+  try {
+    setUploading(true);
+
+    // ✅ Upload image if file exists
+    let imgUrl = null;
+    if (file) {
+      imgUrl = await upload(file); // ✅ Pass file to upload()
     }
 
-    try {
-      setUploading(true);
+    // ✅ Create post with content and image URL
+    mutation.mutate({
+      content: content,
+      img: imgUrl, // Include uploaded image URL if available
+    });
+  } catch (error) {
+    console.error("❌ Error while sharing post:", error);
+    alert("Error while sharing post. Please try again.");
+  } finally {
+    setUploading(false);
+  }
+};
 
-      // ✅ Upload image if file exists
-      let imgUrl = null;
-      if (file) {
-        imgUrl = await upload(); // ✅ Get uploaded image URL
-      }
-
-      // ✅ Create post with content and image URL
-      mutation.mutate({
-        content: content,
-        img: imgUrl, // Include uploaded image URL
-      });
-    } catch (error) {
-      console.error("❌ Error while sharing post:", error);
-      alert("Error while sharing post. Please try again.");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   return (
     <div className="share">
