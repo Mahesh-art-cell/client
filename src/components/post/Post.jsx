@@ -204,23 +204,6 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* ✅ Display Media */}
-        {/* {mediaLoading ? (
-          <p>Loading media...</p>
-        ) : (
-          mediaData?.map((media) => (
-            <div key={media.id} className="media-container">
-              {media.type === "image" ? (
-                <img src={media.url} alt="Post Media" className="post-image" />
-              ) : (
-                <video width="100%" controls>
-                  <source src={media.url} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              )}
-            </div>
-          ))
-        )} */}
         {mediaLoading ? (
   <p>Loading media...</p>
 ) : (
@@ -228,14 +211,22 @@ const Post = ({ post }) => {
     <div key={media.id} className="media-container">
       {media.type === "image" ? (
         <img
-          src={media.url.startsWith("http") ? media.url : `/upload/${media.url}`}
+          src={
+            media.url.startsWith("http")
+              ? media.url // ✅ Cloudinary Image URL
+              : `/upload/${media.url}` // ✅ Local Image URL
+          }
           alt="Post Media"
           className="post-image"
         />
       ) : (
         <video width="100%" controls>
           <source
-            src={media.url.startsWith("http") ? media.url : `/upload/${media.url}`}
+            src={
+              media.url.startsWith("http")
+                ? media.url
+                : `/upload/${media.url}`
+            }
             type="video/mp4"
           />
           Your browser does not support the video tag.
