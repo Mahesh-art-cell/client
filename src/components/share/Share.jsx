@@ -171,36 +171,39 @@ const Share = () => {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // ✅ Upload Function
-  // ✅ Upload Function
-const upload = async (file) => {
-  if (!file) {
-    console.error("❌ No file selected!");
-    throw new Error("No file selected.");
-  }
+  // ✅ Upload Image to Cloudinary
+  const upload = async (file) => {
+    if (!file) {
+      console.error("❌ No file selected!");
+      throw new Error("No file selected.");
+    }
 
-  console.log("📢 Uploading File to Backend:", file);
+    console.log("📢 Uploading File to Backend:", file);
 
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    // ✅ Upload to backend -> Cloudinary
-    const res = await makeRequest.post("/upload", formData);
-    console.log("✅ File Uploaded Successfully:", res.data.url);
-    return res.data.url;
-  } catch (err) {
-    console.error("❌ Upload Error:", err);
-    throw new Error("Failed to upload image.");
-  }
-};
+      // ✅ Upload to backend -> Cloudinary
+      const res = await makeRequest.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
 
+      console.log("✅ File Uploaded Successfully:", res.data.url);
+      return res.data.url; // ✅ Return Cloudinary URL
+    } catch (err) {
+      console.error("❌ Upload Error:", err);
+      throw new Error("Failed to upload image.");
+    }
+  };
 
-
-  // ✅ Mutation to create a new post
+  // ✅ Mutation to Create Post
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      const res = await makeRequest.post("/posts", newPost);
+      const res = await makeRequest.post("/posts", newPost, {
+        withCredentials: true,
+      });
       return res.data;
     },
     onSuccess: () => {
@@ -231,13 +234,21 @@ const handleClick = async (e) => {
     let imgUrl = null;
     if (file) {
       imgUrl = await upload(file);
+      console.log("✅ Cloudinary URL:", imgUrl); // ✅ Log Cloudinary URL
     }
 
     // ✅ Create post with content and image URL
-    mutation.mutate({
-      content: content,
-      img: imgUrl,
-    });
+    mutation.mutate(
+      {
+        content: content,
+        img: imgUrl,
+      },
+      {
+        onSuccess: (data) => {
+          console.log("✅ Post Added to DB:", data); // ✅ Log DB response
+        },
+      }
+    );
   } catch (error) {
     console.error("❌ Error while sharing post:", error);
     alert("Error while sharing post. Please try again.");
@@ -252,23 +263,16 @@ const handleClick = async (e) => {
         <div className="top">
           <div className="left">
             <img
-              src={
-                currentUser?.profilePic
-                  ? `/upload/${currentUser.profilePic}`
-                  : "/avatar.png"
-              }
+              src={currentUser?.profilePic || "/avatar.png"}
               alt="Profile"
             />
-            <div className="input-area">
-              <textarea
-                placeholder={`What's on your mind, ${
-                  currentUser?.name || "User"
-                }?`}
-                onChange={(e) => setContent(e.target.value)}
-                value={content}
-                className="content-input"
-              />
-            </div>
+            <textarea
+              placeholder={`What's on your mind, ${
+                currentUser?.name || "User"
+              }?`}
+              onChange={(e) => setContent(e.target.value)}
+              value={content}
+            />
           </div>
           <div className="right">
             {file && (
@@ -307,7 +311,6 @@ const handleClick = async (e) => {
             <button
               onClick={handleClick}
               disabled={mutation.isPending || uploading}
-              className={mutation.isPending || uploading ? "disabled" : ""}
             >
               {mutation.isPending || uploading ? "Sharing..." : "Share"}
             </button>
