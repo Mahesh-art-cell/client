@@ -171,36 +171,33 @@ const Share = () => {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  
   // ✅ Upload Function
-  // ✅ Upload to Cloudinary and Return URL
-// ✅ Upload to Cloudinary and Return URL
-// ✅ Upload Function to Send File to Backend
-const upload = async (file) => {
-  if (!file) {
-    console.error("❌ No file selected!");
-    throw new Error("No file selected.");
-  }
-
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
+  const upload = async (file) => {
+    if (!file) {
+      console.error("❌ No file selected!");
+      throw new Error("No file selected.");
+    }
 
     console.log("📢 Uploading File to Backend:", file);
 
-    // ✅ Send File to Backend via POST /upload
-    const res = await makeRequest.post("/upload", formData);
-    console.log("✅ File Uploaded Successfully:", res.data.url);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    return res.data.url; // ✅ Return Cloudinary URL
-  } catch (err) {
-    console.error("❌ Upload Error:", err);
-    throw new Error("Failed to upload image.");
-  }
-};
+      // ✅ Log FormData content
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
 
-
-  
+      // ✅ Upload to backend -> Cloudinary
+      const res = await makeRequest.post("/upload", formData);
+      console.log("✅ File Uploaded Successfully:", res.data.url);
+      return res.data.url;
+    } catch (err) {
+      console.error("❌ Upload Error:", err);
+      throw new Error("Failed to upload image.");
+    }
+  };
 
   // ✅ Mutation to create a new post
   const mutation = useMutation({
@@ -220,37 +217,35 @@ const upload = async (file) => {
   });
 
   // ✅ Handle Share Button Click
-  // ✅ Corrected handleClick with file passed properly
-const handleClick = async (e) => {
-  e.preventDefault();
+  const handleClick = async (e) => {
+    e.preventDefault();
 
-  if (!content.trim() && !file) {
-    alert("Please add some content or an image before sharing.");
-    return;
-  }
-
-  try {
-    setUploading(true);
-
-    // ✅ Upload image if file exists
-    let imgUrl = null;
-    if (file) {
-      imgUrl = await upload(file); // ✅ Pass file to upload()
+    if (!content.trim() && !file) {
+      alert("Please add some content or an image before sharing.");
+      return;
     }
 
-    // ✅ Create post with content and image URL
-    mutation.mutate({
-      content: content,
-      img: imgUrl, // Include uploaded image URL if available
-    });
-  } catch (error) {
-    console.error("❌ Error while sharing post:", error);
-    alert("Error while sharing post. Please try again.");
-  } finally {
-    setUploading(false);
-  }
-};
+    try {
+      setUploading(true);
 
+      // ✅ Upload image if file exists
+      let imgUrl = null;
+      if (file) {
+        imgUrl = await upload(file);
+      }
+
+      // ✅ Create post with content and image URL
+      mutation.mutate({
+        content: content,
+        img: imgUrl,
+      });
+    } catch (error) {
+      console.error("❌ Error while sharing post:", error);
+      alert("Error while sharing post. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="share">
@@ -260,14 +255,16 @@ const handleClick = async (e) => {
             <img
               src={
                 currentUser?.profilePic
-                  ? `/upload/${currentUser.profilePic}` // ✅ Correct path
+                  ? `/upload/${currentUser.profilePic}`
                   : "/avatar.png"
               }
               alt="Profile"
             />
             <div className="input-area">
               <textarea
-                placeholder={`What's on your mind, ${currentUser?.name || "User"}?`}
+                placeholder={`What's on your mind, ${
+                  currentUser?.name || "User"
+                }?`}
                 onChange={(e) => setContent(e.target.value)}
                 value={content}
                 className="content-input"
@@ -279,7 +276,7 @@ const handleClick = async (e) => {
               <img
                 className="file"
                 alt="Preview"
-                src={URL.createObjectURL(file)} // ✅ Local preview before upload
+                src={URL.createObjectURL(file)}
               />
             )}
           </div>
@@ -287,19 +284,11 @@ const handleClick = async (e) => {
         <hr />
         <div className="bottom">
           <div className="left">
-            {/* <input
+            <input
               type="file"
               id="file"
-              style={{ display: "none" }}
               onChange={(e) => setFile(e.target.files[0])}
-              accept="image/*"
-            /> */}
-            <input
-  type="file"
-  id="file"
-  onChange={(e) => setFile(e.target.files[0])}
-/>
-
+            />
             <label htmlFor="file">
               <div className="item">
                 <img src={Image} alt="Add" />
