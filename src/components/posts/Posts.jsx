@@ -94,12 +94,18 @@ const Posts = ({ userId }) => {
   const { isLoading, error, data } = useQuery(queryKey, async () => {
     const token = localStorage.getItem("token");
 
+    if (!token) {
+      throw new Error("❌ No token found. Please login.");
+    }
+
     const endpoint = userId ? `/posts?userId=${userId}` : "/posts";
+    console.log(`📢 Fetching posts from: ${endpoint}`);
+
     const res = await makeRequest.get(endpoint, {
       headers: {
         Authorization: `Bearer ${token}`, // ✅ Send token with request
       },
-      withCredentials: true,
+      withCredentials: true, // ✅ Ensure credentials are included
     });
     return res.data;
   });
@@ -113,7 +119,16 @@ const Posts = ({ userId }) => {
         {isLoading ? (
           <div className="loading">Loading posts...</div>
         ) : error ? (
-          <div className="error">Error: {error.message}</div>
+          error.response?.status === 403 ? (
+            <div className="error">
+              Session expired. Please{" "}
+              <a href="/login" onClick={() => localStorage.removeItem("token")}>
+                login again.
+              </a>
+            </div>
+          ) : (
+            <div className="error">Error: {error.message}</div>
+          )
         ) : data?.length === 0 ? (
           <div className="no-posts">No posts available.</div>
         ) : (
