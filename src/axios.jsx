@@ -31,8 +31,8 @@
 import axios from "axios";
 
 export const makeRequest = axios.create({
-  baseURL: "https://server-wi41.onrender.com/api",
-  withCredentials: true, // ✅ Include cookies in requests
+  baseURL: "https://server-wi41.onrender.com/api", // ✅ Correct Backend URL
+  withCredentials: true, // ✅ Include credentials (cookies/JWT)
   headers: {
     "Content-Type": "application/json",
   },
