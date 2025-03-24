@@ -184,7 +184,7 @@ const Share = () => {
       formData.append("file", file);
 
       // ✅ Correct API Endpoint
-      const res = await makeRequest.post("/api/upload", formData);
+      const res = await makeRequest.post("/upload/", formData);
       console.log("✅ File Uploaded Successfully:", res.data.url);
       return res.data.url; // ✅ Return the uploaded URL
     } catch (err) {
