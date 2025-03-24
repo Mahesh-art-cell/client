@@ -172,89 +172,85 @@ const Share = () => {
   const queryClient = useQueryClient();
 
   // ✅ Upload Image to Cloudinary
-  // ✅ Upload Image to Cloudinary
-const upload = async (file) => {
-  if (!file) {
-    throw new Error("❌ No file selected.");
-  }
-
-  console.log("📢 Uploading file to backend...");
-
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // ✅ Send file to backend -> Cloudinary
-    const res = await makeRequest.post("/api/upload", formData);
-    console.log("✅ File Uploaded Successfully:", res.data.url);
-    return res.data.url; // ✅ Return the uploaded URL
-  } catch (err) {
-    console.error("❌ Upload Error:", err);
-    throw new Error("Failed to upload image.");
-  }
-};
-
-
-  // ✅ Create New Post Mutation
-  // ✅ Create New Post Mutation
-const mutation = useMutation({
-  mutationFn: async (newPost) => {
-    const res = await makeRequest.post("/api/posts", newPost);
-    return res.data;
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries(["posts"]); // ✅ Re-fetch posts list
-    setContent("");
-    setFile(null);
-  },
-  onError: (error) => {
-    console.error("❌ Post creation error:", error);
-    alert("Error sharing post. Please try again.");
-  },
-});
-
-
-  // ✅ Handle Share Button Click
-  // ✅ Handle Share Button Click
-const handleClick = async (e) => {
-  e.preventDefault();
-
-  if (!content.trim() && !file) {
-    alert("Please add some content or an image before sharing.");
-    return;
-  }
-
-  try {
-    setUploading(true);
-
-    // ✅ Upload image if file exists
-    let imgUrl = null;
-    if (file) {
-      imgUrl = await upload(file); // ✅ Get Cloudinary URL
-      console.log("✅ Cloudinary URL:", imgUrl);
+  const upload = async (file) => {
+    if (!file) {
+      throw new Error("❌ No file selected.");
     }
 
-    // ✅ Create post with content and image URL
-    mutation.mutate(
-      {
-        content: content,
-        img: imgUrl, // ✅ Pass Cloudinary URL to backend
-      },
-      {
-        onSuccess: (data) => {
-          console.log("✅ Post Added to DB:", data);
-          queryClient.invalidateQueries(["posts"]); // ✅ Re-fetch posts
-        },
-      }
-    );
-  } catch (error) {
-    console.error("❌ Error while sharing post:", error);
-    alert("Error while sharing post. Please try again.");
-  } finally {
-    setUploading(false);
-  }
-};
+    console.log("📢 Uploading file to backend...");
 
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // ✅ Correct API Endpoint
+      const res = await makeRequest.post("/api/upload", formData);
+      console.log("✅ File Uploaded Successfully:", res.data.url);
+      return res.data.url; // ✅ Return the uploaded URL
+    } catch (err) {
+      console.error("❌ Upload Error:", err);
+      throw new Error("Failed to upload image.");
+    }
+  };
+
+  // ✅ Define Post Mutation with useMutation
+  const mutation = useMutation(
+    async (newPost) => {
+      const res = await makeRequest.post("/api/posts", newPost);
+      return res.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["posts"]); // ✅ Re-fetch posts after adding
+        setContent(""); // ✅ Clear content after success
+        setFile(null); // ✅ Clear file after success
+      },
+      onError: (error) => {
+        console.error("❌ Post creation error:", error);
+        alert("Error sharing post. Please try again.");
+      },
+    }
+  );
+
+  // ✅ Handle Share Button Click
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    if (!content.trim() && !file) {
+      alert("Please add some content or an image before sharing.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      // ✅ Upload image if file exists
+      let imgUrl = null;
+      if (file) {
+        imgUrl = await upload(file); // ✅ Get Cloudinary URL
+        console.log("✅ Cloudinary URL:", imgUrl);
+      }
+
+      // ✅ Create post with content and image URL
+      mutation.mutate(
+        {
+          content: content,
+          img: imgUrl, // ✅ Pass Cloudinary URL to backend
+        },
+        {
+          onSuccess: (data) => {
+            console.log("✅ Post Added to DB:", data);
+            queryClient.invalidateQueries(["posts"]); // ✅ Re-fetch posts
+          },
+        }
+      );
+    } catch (error) {
+      console.error("❌ Error while sharing post:", error);
+      alert("Error while sharing post. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="share">
@@ -273,27 +269,17 @@ const handleClick = async (e) => {
               value={content}
             />
           </div>
-          {/* <div className="right">
-            {file && (
+          <div className="right">
+            {file ? (
               <img
                 className="file"
                 alt="Preview"
-                src={URL.createObjectURL(file)}
+                src={URL.createObjectURL(file)} // ✅ Display selected image
               />
+            ) : (
+              ""
             )}
-          </div> */}
-          <div className="right">
-             {file ? (
-               <img
-                className="file"
-              alt="Preview"
-                  src={URL.createObjectURL(file)} // ✅ Display selected image
-              />
-              ) : (
-                    ""
-                  )}
           </div>
-
         </div>
         <hr />
         <div className="bottom">
