@@ -27,18 +27,13 @@
 
 
 
-// axios.js
+// axios.js or inside Share.jsx
 import axios from "axios";
 
-// ✅ Get token from localStorage or cookies
-const token = localStorage.getItem("token");
-
 export const makeRequest = axios.create({
-  baseURL: "https://server-wi41.onrender.com/api", // ✅ Correct Backend URL
-  withCredentials: true, // ✅ Send credentials with request
+  baseURL: "https://server-wi41.onrender.com/api",
+  withCredentials: true, // ✅ Include cookies in requests
   headers: {
     "Content-Type": "application/json",
-    Authorization: token ? `Bearer ${token}` : "", // ✅ Attach token if available
   },
 });
-
