@@ -184,7 +184,7 @@ const Share = () => {
 
   // ✅ Fetch Posts from Database (including Cloudinary URL)
   const { data: posts, isLoading } = useQuery(["posts"], async () => {
-    const res = await makeRequest.get("/api/posts");
+    const res = await makeRequest.get("/posts");
     console.log("✅ Fetched Posts:", res.data);
     return res.data;
   });
