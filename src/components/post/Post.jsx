@@ -146,12 +146,12 @@ const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
-  // ✅ Fetch likes
+  const queryClient = useQueryClient();
+
+  // ✅ Fetch Likes
   const { isLoading, data } = useQuery(["likes", post.id], () =>
     makeRequest.get("/likes?postId=" + post.id).then((res) => res.data)
   );
-
-  const queryClient = useQueryClient();
 
   // ✅ Define Mutation for Like/Unlike
   const mutation = useMutation(
@@ -169,15 +169,7 @@ const Post = ({ post }) => {
     }
   );
 
-  // ✅ Fetch media for the post
-  const { data: mediaData, isLoading: mediaLoading } = useQuery(
-    ["media", post.id],
-    () =>
-      makeRequest
-        .get("/media?postId=" + post.id)
-        .then((res) => res.data)
-  );
-
+  // ✅ Handle Like Click
   const handleLike = () => {
     const liked = data?.includes(currentUser.id);
     mutation.mutate(liked);
@@ -189,7 +181,7 @@ const Post = ({ post }) => {
         <div className="user">
           <div className="userInfo">
             <img
-              src={post.profilePic ? `/upload/${post.profilePic}` : "/defaultProfilePic.jpg"}
+              src={post.profilePic || "/defaultProfilePic.jpg"}
               alt="Profile"
             />
             <div className="details">
@@ -204,45 +196,45 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {mediaLoading ? (
-  <p>Loading media...</p>
-) : (
-  mediaData?.map((media) => (
-    <div key={media.id} className="media-container">
-      {media.type === "image" ? (
-        <img
-          src={
-            media.url.startsWith("http")
-              ? media.url // ✅ Cloudinary Image URL
-              : `/upload/${media.url}` // ✅ Local Image URL
-          }
-          alt="Post Media"
-          className="post-image"
-        />
-      ) : (
-        <video width="100%" controls>
-          <source
-            src={
-              media.url.startsWith("http")
-                ? media.url
-                : `/upload/${media.url}`
-            }
-            type="video/mp4"
-          />
-          Your browser does not support the video tag.
-        </video>
-      )}
-    </div>
-  ))
-)}
+        {/* ✅ Display Media Content */}
+        {post.mediaUrl && (
+          <div className="media-container">
+            {post.mediaType === "image" ? (
+              <img
+                src={
+                  post.mediaUrl.startsWith("http")
+                    ? post.mediaUrl // ✅ Cloudinary URL
+                    : `/upload/${post.mediaUrl}` // ✅ Local URL
+                }
+                alt="Post Media"
+                className="post-image"
+              />
+            ) : (
+              <video width="100%" controls>
+                <source
+                  src={
+                    post.mediaUrl.startsWith("http")
+                      ? post.mediaUrl
+                      : `/upload/${post.mediaUrl}`
+                  }
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </div>
+        )}
 
-
+        {/* ✅ Like and Comment Section */}
         <div className="info">
           <div className="item">
             {isLoading ? (
               "Loading..."
             ) : data?.includes(currentUser.id) ? (
-              <FavoriteOutlinedIcon style={{ color: "red" }} onClick={handleLike} />
+              <FavoriteOutlinedIcon
+                style={{ color: "red" }}
+                onClick={handleLike}
+              />
             ) : (
               <FavoriteBorderOutlinedIcon onClick={handleLike} />
             )}
@@ -258,6 +250,7 @@ const Post = ({ post }) => {
           </div>
         </div>
 
+        {/* ✅ Comments Section */}
         {commentOpen && <Comments postId={post.id} />}
       </div>
     </div>

@@ -87,10 +87,10 @@ import { AuthContext } from "../../context/authContext";
 const Posts = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
 
-  // ✅ Dynamically set query key
+  // ✅ Dynamically Set Query Key
   const queryKey = userId ? ["posts", userId] : ["posts"];
 
-  // ✅ Fetch posts based on userId or feed
+  // ✅ Fetch Posts from API
   const { isLoading, error, data } = useQuery(queryKey, async () => {
     const token = localStorage.getItem("token");
 
@@ -105,8 +105,8 @@ const Posts = ({ userId }) => {
       headers: {
         Authorization: `Bearer ${token}`, // ✅ Send token with request
       },
-      withCredentials: true, // ✅ Ensure credentials are included
     });
+
     return res.data;
   });
 
@@ -114,7 +114,7 @@ const Posts = ({ userId }) => {
     <div className="posts-container">
       {/* ✅ Share appears only on home and own profile */}
       {(!userId || userId === currentUser?.id) && <Share />}
-      
+
       <div className="posts">
         {isLoading ? (
           <div className="loading">Loading posts...</div>

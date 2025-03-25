@@ -368,7 +368,7 @@ import Map from "../../assets/map.png";
 import Friend from "../../assets/friend.png";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 
 const Share = () => {
@@ -378,40 +378,39 @@ const Share = () => {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // ✅ Fetch Posts from Database (including Cloudinary URL)
-  const { data: posts, isLoading } = useQuery(["posts"], async () => {
-    const res = await makeRequest.get("/posts");
-    console.log("✅ Fetched Posts:", res.data);
-    return res.data;
-  });
-
-  // ✅ Define Post Mutation with useMutation
+  // ✅ Post Mutation
   const mutation = useMutation(
     async (newPost) => {
       const formData = new FormData();
       formData.append("content", newPost.content);
       if (newPost.file) {
-        formData.append("file", newPost.file); // ✅ Add file to formData
+        formData.append("file", newPost.file); // ✅ Add file if exists
       }
 
-      const res = await makeRequest.post("/posts", formData); // ✅ Upload and save in DB
+      const res = await makeRequest.post("/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // ✅ Auth token
+        },
+      });
+
       return res.data;
     },
     {
       onSuccess: (data) => {
-        console.log("✅ Post Added Successfully:", data); // ✅ Console API response
-        queryClient.invalidateQueries(["posts"]); // ✅ Re-fetch posts after adding
-        setContent(""); // ✅ Clear content after success
-        setFile(null); // ✅ Clear file after success
+        console.log("✅ Post Added Successfully:", data);
+        queryClient.invalidateQueries(["posts"]); // ✅ Refetch posts after success
+        setContent(""); // ✅ Clear input after sharing
+        setFile(null);
       },
       onError: (error) => {
-        console.error("❌ Post creation error:", error);
+        console.error("❌ Error sharing post:", error);
         alert("Error sharing post. Please try again.");
       },
     }
   );
 
-  // ✅ Handle Share Button Click
+  // ✅ Handle Share Button
   const handleClick = async (e) => {
     e.preventDefault();
 
@@ -420,20 +419,14 @@ const Share = () => {
       return;
     }
 
-    try {
-      setUploading(true);
+    setUploading(true);
 
-      // ✅ Create post with content and image URL
-      mutation.mutate({
-        content: content,
-        file: file, // ✅ Pass file to mutation
-      });
-    } catch (error) {
-      console.error("❌ Error while sharing post:", error);
-      alert("Error while sharing post. Please try again.");
-    } finally {
-      setUploading(false);
-    }
+    mutation.mutate({
+      content,
+      file,
+    });
+
+    setUploading(false);
   };
 
   return (
@@ -454,14 +447,12 @@ const Share = () => {
             />
           </div>
           <div className="right">
-            {file ? (
+            {file && (
               <img
                 className="file"
                 alt="Preview"
-                src={URL.createObjectURL(file)} // ✅ Display selected image preview
+                src={URL.createObjectURL(file)}
               />
-            ) : (
-              ""
             )}
           </div>
         </div>
@@ -496,26 +487,6 @@ const Share = () => {
               {mutation.isPending || uploading ? "Sharing..." : "Share"}
             </button>
           </div>
-        </div>
-
-        <hr />
-
-        {/* ✅ Display Posts with Cloudinary Images */}
-        <div className="posts">
-          {isLoading ? (
-            <p>Loading posts...</p>
-          ) : (
-            posts?.map((post) => (
-              <div className="post" key={post.id}>
-                <div className="postContent">
-                  <p>{post.content}</p>
-                  {post.img && (
-                    <img src={post.img} alt="Post" className="postImage" />
-                  )}
-                </div>
-              </div>
-            ))
-          )}
         </div>
       </div>
     </div>
