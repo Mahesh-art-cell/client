@@ -86,11 +86,11 @@ import { AuthContext } from "../../context/authContext";
 const Posts = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
 
-  // ✅ Dynamically Fetch Posts
+  // ✅ Fetch Posts Dynamically
   const { isLoading, error, data } = useQuery(["posts", userId], async () => {
     try {
       const endpoint = userId
-        ? `/posts?userId=${userId}` // ✅ Fetch posts by userId
+        ? `/posts?userId=${userId}` // ✅ Fetch posts for a specific user
         : `/posts`; // ✅ Fetch all posts
       const res = await makeRequest.get(endpoint);
       return res.data;

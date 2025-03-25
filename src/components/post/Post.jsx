@@ -142,6 +142,15 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { AuthContext } from "../../context/authContext";
 
+// ✅ Function to Check File Type
+const isImage = (url) => {
+  return /\.(jpeg|jpg|png|gif|bmp|webp)$/i.test(url);
+};
+
+const isVideo = (url) => {
+  return /\.(mp4|webm|ogg|avi|mov)$/i.test(url);
+};
+
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
@@ -150,7 +159,7 @@ const Post = ({ post }) => {
   // ✅ Fetch Likes
   const { isLoading, data } = useQuery(["likes", post.id], async () => {
     try {
-      const res = await makeRequest.get("/likes?postId=" + post.id);
+      const res = await makeRequest.get(`/likes?postId=${post.id}`);
       return res.data;
     } catch (err) {
       console.error("❌ Error fetching likes:", err);
@@ -162,7 +171,7 @@ const Post = ({ post }) => {
   const mutation = useMutation(
     (liked) => {
       if (liked) {
-        return makeRequest.delete("/likes?postId=" + post.id);
+        return makeRequest.delete(`/likes?postId=${post.id}`);
       } else {
         return makeRequest.post("/likes", { postId: post.id });
       }
@@ -201,32 +210,21 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* ✅ Display Media Content (Image/Video) */}
-        {post.mediaUrl && (
+        {/* ✅ Display Media Content from Cloudinary (img column) */}
+        {post.img && (
           <div className="media-container">
-            {post.mediaType === "image" ? (
+            {isImage(post.img) ? (
               <img
-                src={
-                  post.mediaUrl.startsWith("http")
-                    ? post.mediaUrl // ✅ Cloudinary or External URL
-                    : `https://server-wi41.onrender.com/upload/${post.mediaUrl}` // ✅ Local URL from Backend
-                }
+                src={post.img} // ✅ Direct Cloudinary URL
                 alt="Post Media"
                 className="post-image"
               />
-            ) : (
+            ) : isVideo(post.img) ? (
               <video width="100%" controls>
-                <source
-                  src={
-                    post.mediaUrl.startsWith("http")
-                      ? post.mediaUrl
-                      : `https://server-wi41.onrender.com/upload/${post.mediaUrl}`
-                  }
-                  type="video/mp4"
-                />
+                <source src={post.img} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
-            )}
+            ) : null}
           </div>
         )}
 
