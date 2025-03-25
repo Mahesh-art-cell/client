@@ -398,7 +398,8 @@ const Share = () => {
       return res.data;
     },
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log("✅ Post Added Successfully:", data); // ✅ Console API response
         queryClient.invalidateQueries(["posts"]); // ✅ Re-fetch posts after adding
         setContent(""); // ✅ Clear content after success
         setFile(null); // ✅ Clear file after success
