@@ -153,12 +153,15 @@ const Share = () => {
   // ✅ Post Mutation
   const mutation = useMutation(
     async (newPost) => {
+      console.log("📢 Preparing to Send FormData:", newPost);
+
       const formData = new FormData();
-      formData.append("content", newPost.content); // ✅ Add post content
+      formData.append("content", newPost.content);
       if (newPost.file) {
-        formData.append("file", newPost.file); // ✅ Add file if exists
+        formData.append("file", newPost.file); // ✅ Add file if it exists
       }
 
+      console.log("📢 Sending FormData to API...");
       const res = await makeRequest.post("/posts", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -166,28 +169,30 @@ const Share = () => {
         },
       });
 
+      console.log("✅ API Response:", res.data);
       return res.data;
     },
     {
       onSuccess: (data) => {
         console.log("✅ Post Added Successfully:", data);
         queryClient.invalidateQueries(["getPosts"]); // ✅ Refetch posts after success
-        setContent(""); // ✅ Clear input after sharing
-        setFile(null);
+        setContent(""); // ✅ Clear content input
+        setFile(null); // ✅ Clear selected file
+        alert("✅ Post shared successfully!");
       },
       onError: (error) => {
-        console.error("❌ Error sharing post:", error);
-        alert("Error sharing post. Please try again.");
+        console.error("❌ Error sharing post:", error.response?.data || error.message);
+        alert("❌ Error sharing post. Please try again.");
       },
     }
   );
 
-  // ✅ Handle Share Button
+  // ✅ Handle Share Button Click
   const handleClick = async (e) => {
     e.preventDefault();
 
     if (!content.trim() && !file) {
-      alert("Please add some content or an image before sharing.");
+      alert("⚠️ Please add some content or an image before sharing.");
       return;
     }
 
@@ -234,6 +239,7 @@ const Share = () => {
             <input
               type="file"
               id="file"
+              accept="image/*"
               onChange={(e) => setFile(e.target.files[0])}
             />
             <label htmlFor="file">
