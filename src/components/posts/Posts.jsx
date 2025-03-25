@@ -77,7 +77,6 @@
 
 
 import Post from "../post/Post";
-import Share from "../share/Share";
 import "./posts.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
@@ -87,54 +86,22 @@ import { AuthContext } from "../../context/authContext";
 const Posts = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
 
-  // ✅ Dynamically Set Query Key
-  const queryKey = userId ? ["posts", userId] : ["posts"];
-
-  // ✅ Fetch Posts from API
-  const { isLoading, error, data } = useQuery(queryKey, async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      throw new Error("❌ No token found. Please login.");
-    }
-
+  // ✅ Dynamically Fetch Posts
+  const { isLoading, error, data } = useQuery(["posts", userId], async () => {
     const endpoint = userId ? `/posts?userId=${userId}` : "/posts";
-    console.log(`📢 Fetching posts from: ${endpoint}`);
-
-    const res = await makeRequest.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${token}`, // ✅ Send token with request
-      },
-    });
-
+    const res = await makeRequest.get(endpoint);
     return res.data;
   });
 
   return (
-    <div className="posts-container">
-      {/* ✅ Share appears only on home and own profile */}
-      {(!userId || userId === currentUser?.id) && <Share />}
-
-      <div className="posts">
-        {isLoading ? (
-          <div className="loading">Loading posts...</div>
-        ) : error ? (
-          error.response?.status === 403 ? (
-            <div className="error">
-              Session expired. Please{" "}
-              <a href="/login" onClick={() => localStorage.removeItem("token")}>
-                login again.
-              </a>
-            </div>
-          ) : (
-            <div className="error">Error: {error.message}</div>
-          )
-        ) : data?.length === 0 ? (
-          <div className="no-posts">No posts available.</div>
-        ) : (
-          data.map((post) => <Post post={post} key={post.id} />)
-        )}
-      </div>
+    <div className="posts">
+      {isLoading ? (
+        <div className="loading">Loading posts...</div>
+      ) : error ? (
+        <div className="error">Error loading posts: {error.message}</div>
+      ) : (
+        data?.map((post) => <Post post={post} key={post.id} />)
+      )}
     </div>
   );
 };
