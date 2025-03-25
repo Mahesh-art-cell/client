@@ -380,7 +380,7 @@ const Share = () => {
 
   // ✅ Fetch Posts from Database (including Cloudinary URL)
   const { data: posts, isLoading } = useQuery(["posts"], async () => {
-    const res = await makeRequest.get("/api/posts");
+    const res = await makeRequest.get("/posts");
     console.log("✅ Fetched Posts:", res.data);
     return res.data;
   });
@@ -394,7 +394,7 @@ const Share = () => {
         formData.append("file", newPost.file); // ✅ Add file to formData
       }
 
-      const res = await makeRequest.post("/api/posts", formData); // ✅ Upload and save in DB
+      const res = await makeRequest.post("/posts", formData); // ✅ Upload and save in DB
       return res.data;
     },
     {
