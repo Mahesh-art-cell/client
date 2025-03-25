@@ -88,11 +88,19 @@ const Posts = ({ userId }) => {
 
   // ✅ Dynamically Fetch Posts
   const { isLoading, error, data } = useQuery(["posts", userId], async () => {
-    const endpoint = userId ? `/posts?userId=${userId}` : "/posts";
-    const res = await makeRequest.get(endpoint);
-    return res.data;
+    try {
+      const endpoint = userId
+        ? `/posts?userId=${userId}` // ✅ Fetch posts by userId
+        : `/posts`; // ✅ Fetch all posts
+      const res = await makeRequest.get(endpoint);
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error fetching posts:", err);
+      throw new Error(err.response?.data?.message || "Failed to load posts");
+    }
   });
 
+  // ✅ UI Return
   return (
     <div className="posts">
       {isLoading ? (

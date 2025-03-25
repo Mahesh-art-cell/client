@@ -145,13 +145,18 @@ import { AuthContext } from "../../context/authContext";
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
-
   const queryClient = useQueryClient();
 
   // ✅ Fetch Likes
-  const { isLoading, data } = useQuery(["likes", post.id], () =>
-    makeRequest.get("/likes?postId=" + post.id).then((res) => res.data)
-  );
+  const { isLoading, data } = useQuery(["likes", post.id], async () => {
+    try {
+      const res = await makeRequest.get("/likes?postId=" + post.id);
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error fetching likes:", err);
+      throw new Error("Failed to load likes");
+    }
+  });
 
   // ✅ Define Mutation for Like/Unlike
   const mutation = useMutation(
@@ -196,15 +201,15 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* ✅ Display Media Content */}
+        {/* ✅ Display Media Content (Image/Video) */}
         {post.mediaUrl && (
           <div className="media-container">
             {post.mediaType === "image" ? (
               <img
                 src={
                   post.mediaUrl.startsWith("http")
-                    ? post.mediaUrl // ✅ Cloudinary URL
-                    : `/upload/${post.mediaUrl}` // ✅ Local URL
+                    ? post.mediaUrl // ✅ Cloudinary or External URL
+                    : `https://server-wi41.onrender.com/upload/${post.mediaUrl}` // ✅ Local URL from Backend
                 }
                 alt="Post Media"
                 className="post-image"
@@ -215,7 +220,7 @@ const Post = ({ post }) => {
                   src={
                     post.mediaUrl.startsWith("http")
                       ? post.mediaUrl
-                      : `/upload/${post.mediaUrl}`
+                      : `https://server-wi41.onrender.com/upload/${post.mediaUrl}`
                   }
                   type="video/mp4"
                 />
