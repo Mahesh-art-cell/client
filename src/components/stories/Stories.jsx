@@ -44,23 +44,31 @@ import "./stories.scss";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css";
+import "swiper/css/navigation";
+import { Navigation } from "swiper/modules";
 
 const Stories = () => {
   const { currentUser } = useContext(AuthContext);
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Query to Fetch Stories
+  const queryClient = useQueryClient();
+
+  // ✅ Fetch Stories
   const { isLoading, error, data } = useQuery(["stories"], () =>
     makeRequest.get("/stories").then((res) => res.data)
   );
 
-  const queryClient = useQueryClient();
-
   // ✅ Add Story Mutation
   const addMutation = useMutation(
     async (formData) => {
-      return makeRequest.post("/stories", formData);
+      return makeRequest.post("/stories", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     },
     {
       onSuccess: () => {
@@ -92,7 +100,7 @@ const Stories = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // ✅ Upload the file
+      // ✅ Upload story
       await addMutation.mutateAsync(formData);
     } catch (err) {
       console.error("❌ Error uploading story:", err);
@@ -111,7 +119,10 @@ const Stories = () => {
   return (
     <div className="stories">
       {/* ✅ Upload New Story */}
-      <div className="story upload-story" onClick={() => fileInputRef.current.click()}>
+      <div
+        className="story upload-story"
+        onClick={() => fileInputRef.current.click()}
+      >
         <img
           src={
             currentUser.profilePic
@@ -121,10 +132,10 @@ const Stories = () => {
           alt="profile"
         />
         <span>{currentUser.name}</span>
-        <button>+</button>
+        <button className="plus-btn">+</button>
       </div>
 
-      {/* ✅ Hidden File Input for Upload */}
+      {/* ✅ Hidden File Input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -135,22 +146,43 @@ const Stories = () => {
 
       {uploading && <p>Uploading...</p>}
 
-      {/* ✅ Display Stories */}
-      {error
-        ? "Something went wrong"
-        : isLoading
-        ? "Loading..."
-        : data?.map((story) => (
-            <div className="story" key={story.id}>
-              <img src={story.img} alt="story" />
+      {/* ✅ Display Stories in a Swiper */}
+      {error ? (
+        <p>Something went wrong!</p>
+      ) : isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <Swiper
+          spaceBetween={10}
+          slidesPerView="auto"
+          navigation
+          modules={[Navigation]}
+          className="swiper-container"
+        >
+          {/* ✅ Show User Stories */}
+          {data?.map((story) => (
+            <SwiperSlide key={story.id} className="story-slide">
+              {story.img.endsWith(".mp4") ? (
+                <video controls className="story-media">
+                  <source src={story.img} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <img src={story.img} alt="story" className="story-media" />
+              )}
               <span>{story.name}</span>
               {story.userId === currentUser.id && (
-                <button className="delete-btn" onClick={() => handleDeleteStory(story.id)}>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDeleteStory(story.id)}
+                >
                   ❌
                 </button>
               )}
-            </div>
+            </SwiperSlide>
           ))}
+        </Swiper>
+      )}
     </div>
   );
 };
