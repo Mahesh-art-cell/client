@@ -39,108 +39,118 @@
 
 
 
-import { useContext, useState, useEffect } from "react";
+import { useContext, useRef, useState } from "react";
 import "./stories.scss";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/swiper-bundle.css";
 
-// ✅ Stories Component
 const Stories = () => {
   const { currentUser } = useContext(AuthContext);
-  const queryClient = useQueryClient();
-
-  // ✅ State for File Upload and Story List
-  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Fetch Stories
+  // ✅ Query to Fetch Stories
   const { isLoading, error, data } = useQuery(["stories"], () =>
     makeRequest.get("/stories").then((res) => res.data)
   );
 
-  // ✅ Upload Story to Backend
-  const handleStoryUpload = async () => {
-    if (!file) {
-      alert("Please select a file to upload!");
-      return;
+  const queryClient = useQueryClient();
+
+  // ✅ Add Story Mutation
+  const addMutation = useMutation(
+    async (formData) => {
+      return makeRequest.post("/stories", formData);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["stories"]);
+      },
     }
+  );
+
+  // ✅ Delete Story Mutation
+  const deleteMutation = useMutation(
+    async (storyId) => {
+      return makeRequest.delete(`/stories/${storyId}`);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["stories"]);
+      },
+    }
+  );
+
+  // ✅ Handle Story Upload
+  const handleStoryUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
-      await makeRequest.post("/stories", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("✅ Story uploaded successfully!");
-      queryClient.invalidateQueries("stories"); // Refresh stories after upload
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // ✅ Upload the file
+      await addMutation.mutateAsync(formData);
     } catch (err) {
       console.error("❌ Error uploading story:", err);
-      alert("Error uploading story. Please try again.");
     } finally {
       setUploading(false);
-      setFile(null);
     }
   };
 
-  // ✅ Handle File Selection
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  // ✅ Handle Story Deletion
+  const handleDeleteStory = async (storyId) => {
+    if (window.confirm("Are you sure you want to delete this story?")) {
+      await deleteMutation.mutateAsync(storyId);
+    }
   };
 
   return (
-    <div className="stories-container">
-      <Swiper
-        slidesPerView="auto"
-        spaceBetween={10}
-        className="stories-swiper"
-      >
-        {/* ✅ Upload Story Button */}
-        <SwiperSlide className="story upload" onClick={() => document.getElementById("fileInput").click()}>
-          <div className="add-story">
-            <span>+</span>
-            <p>Add Story</p>
-          </div>
-        </SwiperSlide>
-
-        {/* ✅ File Input for Upload */}
-        <input
-          id="fileInput"
-          type="file"
-          accept="image/*,video/*,audio/*"
-          onChange={handleFileChange}
-          style={{ display: "none" }}
+    <div className="stories">
+      {/* ✅ Upload New Story */}
+      <div className="story upload-story" onClick={() => fileInputRef.current.click()}>
+        <img
+          src={
+            currentUser.profilePic
+              ? `/upload/${currentUser.profilePic}`
+              : "/default-avatar.png"
+          }
+          alt="profile"
         />
-        {file && (
-          <button className="upload-btn" onClick={handleStoryUpload} disabled={uploading}>
-            {uploading ? "Uploading..." : "Upload Story"}
-          </button>
-        )}
+        <span>{currentUser.name}</span>
+        <button>+</button>
+      </div>
 
-        {/* ✅ Display Stories */}
-        {error ? (
-          <p>Something went wrong!</p>
-        ) : isLoading ? (
-          <p>Loading...</p>
-        ) : (
-          data.map((story) => (
-            <SwiperSlide className="story" key={story.id}>
-              {story.img.includes(".mp4") || story.img.includes(".webm") ? (
-                <video src={story.img} controls />
-              ) : story.img.includes(".mp3") || story.img.includes(".wav") ? (
-                <audio src={story.img} controls />
-              ) : (
-                <img src={story.img} alt="story" />
+      {/* ✅ Hidden File Input for Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*, video/*"
+        onChange={handleStoryUpload}
+        style={{ display: "none" }}
+      />
+
+      {uploading && <p>Uploading...</p>}
+
+      {/* ✅ Display Stories */}
+      {error
+        ? "Something went wrong"
+        : isLoading
+        ? "Loading..."
+        : data?.map((story) => (
+            <div className="story" key={story.id}>
+              <img src={story.img} alt="story" />
+              <span>{story.name}</span>
+              {story.userId === currentUser.id && (
+                <button className="delete-btn" onClick={() => handleDeleteStory(story.id)}>
+                  ❌
+                </button>
               )}
-              <span>{story.name || "Your Story"}</span>
-            </SwiperSlide>
-          ))
-        )}
-      </Swiper>
+            </div>
+          ))}
     </div>
   );
 };
