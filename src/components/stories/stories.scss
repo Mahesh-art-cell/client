@@ -1,164 +1,150 @@
-// @import "../../style.scss";
 
+
+// .stories-container {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 10px;
+//   padding: 10px;
+//   overflow-x: auto;
+//   background-color: #f5f5f5;
+//   border-radius: 10px;
+// }
+
+// // ✅ Container for all stories
 // .stories {
 //   display: flex;
 //   gap: 10px;
-//   height: 250px;
-//   margin-bottom: 30px;
+//   padding: 10px;
+//   overflow-x: auto;
+//   background-color: #f5f5f5;
+//   border-radius: 10px;
+// }
 
-//   @include mobile {
-//     height: 50px;
-//     margin-bottom: 0;
-//     justify-content: space-between;
+// // ✅ Individual story card
+// .story {
+//   width: 120px;
+//   height: 200px;
+//   position: relative;
+//   cursor: pointer;
+//   border-radius: 10px;
+//   overflow: hidden;
+//   background-color: #fff;
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+//   img,
+//   video {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
 //   }
 
-//   @include tablet{
-//     height: 150px;
-//     gap: 20px;
+//   span {
+//     position: absolute;
+//     bottom: 5px;
+//     left: 5px;
+//     font-size: 12px;
+//     color: #fff;
+//     background-color: rgba(0, 0, 0, 0.5);
+//     padding: 2px 5px;
+//     border-radius: 5px;
 //   }
 
-//   .story {
-//     flex: 1;
-//     border-radius: 10px;
-//     overflow: hidden;
-//     position: relative;
+//   .delete-btn {
+//     position: absolute;
+//     top: 5px;
+//     right: 5px;
+//     background-color: red;
+//     color: white;
+//     border: none;
+//     border-radius: 50%;
+//     width: 20px;
+//     height: 20px;
+//     font-size: 12px;
+//     cursor: pointer;
+//   }
+// }
 
-//     @include mobile {
-//       flex: none;
-//       width: 50px;
-//       height: 50px;
-//       border-radius: 50%;
-//     }
+// // ✅ Upload story button
+// .upload-story {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   width: 120px;
+//   height: 200px;
+//   background-color: #d3d3d3;
+//   border-radius: 10px;
+//   gap: 5px;
+//   cursor: pointer;
 
-//     img {
-//       width: 100%;
-//       height: 100%;
-//       object-fit: cover;
-//     }
-//     span {
-//       position: absolute;
-//       bottom: 10px;
-//       left: 10px;
-//       color: white;
-//       font-weight: 500;
-//       @include mobile {
-//         display: none;
-//       }
-//     }
-
-//     button {
-//       position: absolute;
-//       bottom: 40px;
-//       left: 10px;
-//       color: white;
-//       background-color: #5271ff;
-//       border: none;
-//       border-radius: 50%;
-//       width: 30px;
-//       height: 30px;
-//       cursor: pointer;
-//       font-size: 30px;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-
-//       @include mobile {
-//        left: 0;
-//        right: 0;
-//        top: 0;
-//        bottom: 0;
-//        margin: auto;
-//       }
-//     }
+//   button {
+//     background-color: #4caf50;
+//     width: 30px;
+//     height: 30px;
+//     font-size: 18px;
+//     color: white;
+//     border: none;
+//     border-radius: 50%;
+//     cursor: pointer;
 //   }
 // }
 
 
-.stories-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  overflow-x: auto;
-  background-color: #f5f5f5;
-  border-radius: 10px;
-}
 
-// ✅ Container for all stories
 .stories {
   display: flex;
   gap: 10px;
-  padding: 10px;
-  overflow-x: auto;
-  background-color: #f5f5f5;
-  border-radius: 10px;
-}
+  padding: 20px;
 
-// ✅ Individual story card
-.story {
-  width: 120px;
-  height: 200px;
-  position: relative;
-  cursor: pointer;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  img,
-  video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  span {
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    font-size: 12px;
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 2px 5px;
-    border-radius: 5px;
-  }
-
-  .delete-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
+  .story {
+    width: 150px;
+    height: 250px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
     cursor: pointer;
-  }
-}
 
-// ✅ Upload story button
-.upload-story {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 120px;
-  height: 200px;
-  background-color: #d3d3d3;
-  border-radius: 10px;
-  gap: 5px;
-  cursor: pointer;
+    img,
+    video,
+    audio {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-  button {
-    background-color: #4caf50;
-    width: 30px;
-    height: 30px;
-    font-size: 18px;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
+    span {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 14px;
+      color: white;
+      font-weight: bold;
+    }
+
+    &.upload {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px dashed #ccc;
+      cursor: pointer;
+
+      input {
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+
+        &:disabled {
+          background-color: #ccc;
+        }
+      }
+    }
   }
 }

@@ -39,7 +39,7 @@
 
 
 
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import "./stories.scss";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -47,124 +47,77 @@ import { makeRequest } from "../../axios";
 
 const Stories = () => {
   const { currentUser } = useContext(AuthContext);
-  const fileInputRef = useRef(null);
+  const queryClient = useQueryClient();
+
+  // ✅ State for File Upload and Loading
+  const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Fetch Stories Query
+  // ✅ Fetch Stories
   const { isLoading, error, data } = useQuery(["stories"], () =>
     makeRequest.get("/stories").then((res) => res.data)
   );
 
-  const queryClient = useQueryClient();
-
-  // ✅ Add Story Mutation
-  const addMutation = useMutation(
-    async (formData) => {
-      return makeRequest.post("/stories", formData);
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["stories"]);
-      },
-    }
-  );
-
-  // ✅ Delete Story Mutation
-  const deleteMutation = useMutation(
-    async (storyId) => {
-      return makeRequest.delete(`/stories/${storyId}`);
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["stories"]);
-      },
-    }
-  );
-
   // ✅ Handle Story Upload
-  const handleStoryUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleStoryUpload = async () => {
+    if (!file) {
+      alert("Please select a file to upload!");
+      return;
+    }
 
     setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const res = await makeRequest.post("/stories", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      // ✅ Upload to Backend
-      await addMutation.mutateAsync(formData);
+      alert("✅ Story uploaded successfully!");
+      queryClient.invalidateQueries("stories"); // Refresh stories after upload
     } catch (err) {
       console.error("❌ Error uploading story:", err);
+      alert("Error uploading story. Please try again.");
     } finally {
       setUploading(false);
+      setFile(null);
     }
   };
 
-  // ✅ Handle Story Deletion
-  const handleDeleteStory = async (storyId) => {
-    if (window.confirm("Are you sure you want to delete this story?")) {
-      await deleteMutation.mutateAsync(storyId);
-    }
+  // ✅ Handle File Change
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
   return (
-    <div className="stories-container">
-      {/* ✅ Single Story Upload Container */}
-      <div className="story upload-story" onClick={() => fileInputRef.current.click()}>
-        <img
-          src={
-            currentUser.profilePic
-              ? `/upload/${currentUser.profilePic}`
-              : "/default-avatar.png"
-          }
-          alt="profile"
-        />
-        <span>{currentUser.name}</span>
-        <button>+</button>
+    <div className="stories">
+      <div className="story upload">
+        <input type="file" accept="image/*,video/*,audio/*" onChange={handleFileChange} />
+        <button onClick={handleStoryUpload} disabled={uploading}>
+          {uploading ? "Uploading..." : "Upload Story"}
+        </button>
       </div>
-
-      {/* ✅ Hidden File Input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        accept="image/*, video/*"
-        onChange={handleStoryUpload}
-        style={{ display: "none" }}
-      />
-
-      {uploading && <p>Uploading...</p>}
 
       {/* ✅ Display Stories */}
-      <div className="stories">
-        {error
-          ? "Something went wrong"
-          : isLoading
-          ? "Loading..."
-          : data?.map((story) => (
-              <div className="story" key={story.id}>
-                {/* ✅ Check if the story is an image or a video */}
-                {story.img.endsWith(".mp4") || story.img.endsWith(".webm") ? (
-                  <video controls className="story-media">
-                    <source src={story.img} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <img className="story-media" src={story.img} alt="story" />
-                )}
-
-                <span>{story.name}</span>
-                {story.userId === currentUser.id && (
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteStory(story.id)}
-                  >
-                    ❌
-                  </button>
-                )}
-              </div>
-            ))}
-      </div>
+      {error
+        ? "Something went wrong!"
+        : isLoading
+        ? "Loading..."
+        : data.map((story) => (
+            <div className="story" key={story.id}>
+              {story.img.includes(".mp4") || story.img.includes(".webm") ? (
+                <video src={story.img} controls></video>
+              ) : story.img.includes(".mp3") || story.img.includes(".wav") ? (
+                <audio src={story.img} controls></audio>
+              ) : (
+                <img src={story.img} alt="story" />
+              )}
+              <span>{story.name}</span>
+            </div>
+          ))}
     </div>
   );
 };
