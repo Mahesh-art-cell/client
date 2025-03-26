@@ -160,7 +160,7 @@ import { useLocation } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
-import Share from "../../components/share/Share"; // ✅ Import Share
+import Share from "../../components/share/Share";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
@@ -193,16 +193,18 @@ const Profile = () => {
         formData
       );
 
+      console.log("✅ Uploaded URL:", res.data[type === "profile" ? "profilePic" : "coverPic"]);
+
       const updateData =
         type === "profile"
-          ? { profilePic: res.data.filename }
-          : { coverPic: res.data.filename };
-      await makeRequest.put(`/users/${currentUser.id}`, updateData);
+          ? { profilePic: res.data.profilePic }
+          : { coverPic: res.data.coverPic };
 
-      setRefreshKey(Date.now()); // Force profile refresh
+      await makeRequest.put(`/users/${currentUser.id}`, updateData);
+      setRefreshKey(Date.now()); // ✅ Force refresh
       queryClient.invalidateQueries(["user", userId]);
     } catch (err) {
-      console.error("Upload error:", err.message);
+      console.error("❌ Upload error:", err.message);
     }
   };
 
@@ -215,7 +217,7 @@ const Profile = () => {
       <div className="images">
         {/* Cover Image */}
         <img
-          src={`/upload/${data?.coverPic || "default-cover.png"}`}
+          src={data?.coverPic || "/default-cover.png"} // ✅ Cloudinary URL
           alt="Cover"
           className="cover"
         />
@@ -234,13 +236,13 @@ const Profile = () => {
 
         {/* Profile Image */}
         <img
-          src={`/upload/${data?.profilePic || "default-avatar.png"}`}
+          src={data?.profilePic || "/default-avatar.png"} // ✅ Cloudinary URL
           alt="Profile"
           className="profilePic"
         />
         {userId === currentUser.id && (
           <label htmlFor="profileUpload" className="upload-button">
-            Change
+            Change Profile
             <input
               type="file"
               id="profileUpload"
