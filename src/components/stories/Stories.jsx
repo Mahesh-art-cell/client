@@ -50,7 +50,7 @@ const Stories = () => {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Query to Fetch Stories
+  // ✅ Fetch Stories Query
   const { isLoading, error, data } = useQuery(["stories"], () =>
     makeRequest.get("/stories").then((res) => res.data)
   );
@@ -92,7 +92,7 @@ const Stories = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // ✅ Upload the file
+      // ✅ Upload to Backend
       await addMutation.mutateAsync(formData);
     } catch (err) {
       console.error("❌ Error uploading story:", err);
@@ -109,8 +109,8 @@ const Stories = () => {
   };
 
   return (
-    <div className="stories">
-      {/* ✅ Upload New Story */}
+    <div className="stories-container">
+      {/* ✅ Single Story Upload Container */}
       <div className="story upload-story" onClick={() => fileInputRef.current.click()}>
         <img
           src={
@@ -124,7 +124,7 @@ const Stories = () => {
         <button>+</button>
       </div>
 
-      {/* ✅ Hidden File Input for Upload */}
+      {/* ✅ Hidden File Input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -136,21 +136,35 @@ const Stories = () => {
       {uploading && <p>Uploading...</p>}
 
       {/* ✅ Display Stories */}
-      {error
-        ? "Something went wrong"
-        : isLoading
-        ? "Loading..."
-        : data?.map((story) => (
-            <div className="story" key={story.id}>
-              <img src={story.img} alt="story" />
-              <span>{story.name}</span>
-              {story.userId === currentUser.id && (
-                <button className="delete-btn" onClick={() => handleDeleteStory(story.id)}>
-                  ❌
-                </button>
-              )}
-            </div>
-          ))}
+      <div className="stories">
+        {error
+          ? "Something went wrong"
+          : isLoading
+          ? "Loading..."
+          : data?.map((story) => (
+              <div className="story" key={story.id}>
+                {/* ✅ Check if the story is an image or a video */}
+                {story.img.endsWith(".mp4") || story.img.endsWith(".webm") ? (
+                  <video controls className="story-media">
+                    <source src={story.img} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img className="story-media" src={story.img} alt="story" />
+                )}
+
+                <span>{story.name}</span>
+                {story.userId === currentUser.id && (
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeleteStory(story.id)}
+                  >
+                    ❌
+                  </button>
+                )}
+              </div>
+            ))}
+      </div>
     </div>
   );
 };

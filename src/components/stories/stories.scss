@@ -74,6 +74,17 @@
 // }
 
 
+.stories-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  overflow-x: auto;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+
+// ✅ Container for all stories
 .stories {
   display: flex;
   gap: 10px;
@@ -81,76 +92,73 @@
   overflow-x: auto;
   background-color: #f5f5f5;
   border-radius: 10px;
+}
 
-  .story {
-    width: 100px;
-    height: 150px;
-    position: relative;
+// ✅ Individual story card
+.story {
+  width: 120px;
+  height: 200px;
+  position: relative;
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  span {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 12px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 5px;
+    border-radius: 5px;
+  }
+
+  .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
     cursor: pointer;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+// ✅ Upload story button
+.upload-story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 200px;
+  background-color: #d3d3d3;
+  border-radius: 10px;
+  gap: 5px;
+  cursor: pointer;
 
-    span {
-      position: absolute;
-      bottom: 5px;
-      left: 5px;
-      font-size: 12px;
-      color: #fff;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 2px 5px;
-      border-radius: 5px;
-    }
-
-    button {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background-color: #ff4d4f;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    &.upload-story {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background-color: #d3d3d3;
-      gap: 5px;
-
-      button {
-        background-color: #4caf50;
-        width: 30px;
-        height: 30px;
-        font-size: 18px;
-      }
-    }
-
-    .delete-btn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background-color: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      cursor: pointer;
-    }
+  button {
+    background-color: #4caf50;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
   }
 }
