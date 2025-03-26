@@ -93,58 +93,88 @@
 
 .stories {
   display: flex;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px;
   gap: 10px;
-  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
 
   .story {
-    width: 150px;
-    height: 250px;
-    border-radius: 10px;
-    overflow: hidden;
+    width: 120px;
+    height: 200px;
+    border-radius: 12px;
     position: relative;
     cursor: pointer;
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+
+    &:hover {
+      transform: scale(1.05);
+    }
 
     img,
-    video,
-    audio {
+    video {
       width: 100%;
-      height: 100%;
+      height: 80%;
       object-fit: cover;
     }
 
     span {
       position: absolute;
-      bottom: 10px;
-      left: 10px;
-      font-size: 14px;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 5px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
       color: white;
-      font-weight: bold;
-    }
-
-    &.upload {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      border: 2px dashed #ccc;
+      border: none;
+      border-radius: 50%;
       cursor: pointer;
-
-      input {
-        margin-bottom: 10px;
-      }
-
-      button {
-        padding: 8px 16px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-
-        &:disabled {
-          background-color: #ccc;
-        }
-      }
+      padding: 5px;
     }
+  }
+
+  .upload-story {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    background-color: #f9f9f9;
+
+    .plus-btn {
+      background-color: #4caf50;
+      color: #fff;
+      font-size: 20px;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+  }
+
+  // ✅ Swiper container
+  .swiper-container {
+    width: 100%;
+    height: 220px;
+  }
+
+  .story-slide {
+    width: 120px;
   }
 }
