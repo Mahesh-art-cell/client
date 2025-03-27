@@ -1,28 +1,24 @@
 
 // .share {
 //   width: 100%;
-//   margin-top: 20px;
-//   background-color: white;
+//   max-width: 600px;
+//   margin: 20px auto;
 //   border-radius: 10px;
-//   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-//   padding: 20px;
-
+//   background-color: #fff;
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
 //   .container {
-//     display: flex;
-//     // flex-direction: row; // ✅ Display horizontally (row-wise)
-//     align-items: flex-start;
-//     justify-content: space-between;
-    
+//     padding: 15px;
+
 //     .top {
 //       display: flex;
-//       align-items: center;
-//       width: 100%;
+//       align-items: flex-start;
+//       gap: 10px;
 
 //       .left {
 //         display: flex;
-//         align-items: center;
-//         flex: 1;
 //         gap: 10px;
+//         width: 100%;
 
 //         img {
 //           width: 40px;
@@ -33,28 +29,48 @@
 
 //         textarea {
 //           width: 100%;
+//           height: 60px;
 //           border: none;
 //           outline: none;
-//           padding: 10px;
 //           resize: none;
-//           border-radius: 10px;
-//           background-color: #f0f2f5;
+//           font-size: 14px;
+//           padding: 8px;
+//           background-color: #f3f3f3;
+//           border-radius: 8px;
 //         }
 //       }
+//     }
 
-//       .right {
+//     // ✅ Corrected Preview Container
+//     .right {
+//       margin-top: 10px;
+
+//       .preview-container {
+//         margin-top: 10px;
+//         border: 1px solid #ddd;
+//         border-radius: 8px;
+//         overflow: hidden;
+
 //         .file {
-//           width: 80px;
-//           height: 80px;
-//           object-fit: cover;
-//           margin-left: 10px;
+//           width: 100%;
+//           height: auto;
+//           max-height: 500px; // ✅ Limit height to avoid large images
+//           object-fit: contain; // ✅ Ensures entire image fits inside container
+//           display: block;
+//         }
+
+//         .post-text {
+//           padding: 10px;
+//           font-size: 14px;
+//           background-color: #fff;
+//           border-top: 1px solid #ddd;
 //         }
 //       }
 //     }
 
 //     hr {
 //       margin: 10px 0;
-//       border: 0.5px solid #eee;
+//       border: 1px solid #f0f0f0;
 //     }
 
 //     .bottom {
@@ -86,45 +102,23 @@
 
 //       .right {
 //         button {
-//           padding: 8px 16px;
+//           padding: 8px 15px;
+//           border: none;
+//           border-radius: 20px;
 //           background-color: #1877f2;
 //           color: white;
-//           border: none;
-//           border-radius: 5px;
+//           font-size: 14px;
 //           cursor: pointer;
+
 //           &:disabled {
-//             background-color: #b0c4de;
+//             background-color: #ccc;
 //             cursor: not-allowed;
 //           }
 //         }
 //       }
 //     }
 //   }
-
-//   .posts {
-//     margin-top: 20px;
-
-//     .post {
-//       padding: 10px;
-//       border-bottom: 1px solid #eee;
-
-//       .postContent {
-//         margin-top: 10px;
-
-//         p {
-//           margin: 5px 0;
-//         }
-
-//         img {
-//           width: 100%;
-//           border-radius: 10px;
-//           margin-top: 10px;
-//         }
-//       }
-//     }
-//   }
 // }
-
 
 
 
@@ -180,12 +174,14 @@
         border-radius: 8px;
         overflow: hidden;
 
+        // ✅ Fix for Full Image Display Without Cropping
         .file {
           width: 100%;
-          height: auto;
-          max-height: 500px; // ✅ Limit height to avoid large images
-          object-fit: contain; // ✅ Ensures entire image fits inside container
+          height: 100%;
+          max-height: 500px;
           display: block;
+          object-fit: contain; // ✅ Ensures full image fits inside container
+          background-color: #f0f0f0; // Fallback background
         }
 
         .post-text {
@@ -248,3 +244,4 @@
     }
   }
 }
+

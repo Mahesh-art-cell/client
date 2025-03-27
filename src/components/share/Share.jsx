@@ -46,7 +46,10 @@
 //         alert("✅ Post shared successfully!");
 //       },
 //       onError: (error) => {
-//         console.error("❌ Error sharing post:", error.response?.data || error.message);
+//         console.error(
+//           "❌ Error sharing post:",
+//           error.response?.data || error.message
+//         );
 //         alert("❌ Error sharing post. Please try again.");
 //       },
 //     }
@@ -100,8 +103,8 @@
 //           </div>
 //         </div>
 
+//         {/* ✅ Correct Preview Container */}
 //         <div className="right">
-//           {/* ✅ Show Image Preview if File is Selected */}
 //           {file && (
 //             <div className="preview-container">
 //               <img
@@ -109,7 +112,7 @@
 //                 alt="Preview"
 //                 src={URL.createObjectURL(file)}
 //               />
-//               <p className="post-text">{content}</p>
+//               {content && <p className="post-text">{content}</p>}
 //             </div>
 //           )}
 //         </div>
@@ -255,7 +258,7 @@ const Share = () => {
           </div>
         </div>
 
-        {/* ✅ Correct Preview Container */}
+        {/* ✅ Corrected Preview Section */}
         <div className="right">
           {file && (
             <div className="preview-container">
