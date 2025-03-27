@@ -1,8 +1,6 @@
 
 // import "./share.scss";
 // import Image from "../../assets/img.png";
-// import Map from "../../assets/map.png";
-// import Friend from "../../assets/friend.png";
 // import { useContext, useState } from "react";
 // import { AuthContext } from "../../context/authContext";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,16 +22,15 @@
 //         formData.append("file", newPost.file);
 //       }
 
-//       // ✅ Log FormData Content to Debug
+//       console.log("📢 FormData Content Before API:");
 //       for (let [key, value] of formData.entries()) {
-//         console.log(`📢 FormData Entry - ${key}:`, value);
+//         console.log(`${key}:`, value);
 //       }
 
 //       console.log("📢 Sending FormData to API...");
 //       const res = await makeRequest.post("/posts", formData, {
 //         headers: {
 //           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${localStorage.getItem("token")}`, // ✅ Auth token
 //         },
 //       });
 
@@ -66,15 +63,22 @@
 
 //     setUploading(true);
 
-//     // ✅ Check Content & File Before Mutation
-//     console.log("📢 Preparing to Send Data:", { content, file });
-
+//     // ✅ Send Post Data to API
 //     mutation.mutate({
 //       content,
 //       file,
 //     });
 
 //     setUploading(false);
+//   };
+
+//   // ✅ Handle File Change (Upload Image)
+//   const handleFileChange = (e) => {
+//     const selectedFile = e.target.files[0];
+//     if (!selectedFile) return;
+
+//     console.log("📢 Selected File:", selectedFile);
+//     setFile(selectedFile);
 //   };
 
 //   return (
@@ -94,39 +98,39 @@
 //               value={content}
 //             />
 //           </div>
-//           <div className="right">
-//             {file && (
+//         </div>
+
+//         <div className="right">
+//           {/* ✅ Show Image Preview if File is Selected */}
+//           {file && (
+//             <div className="preview-container">
 //               <img
 //                 className="file"
 //                 alt="Preview"
 //                 src={URL.createObjectURL(file)}
 //               />
-//             )}
-//           </div>
+//               <p className="post-text">{content}</p>
+//             </div>
+//           )}
 //         </div>
+
 //         <hr />
 //         <div className="bottom">
 //           <div className="left">
-//             {/* <input
+//             {/* ✅ File Input for Image Upload */}
+//             <input
 //               type="file"
 //               id="file"
 //               accept="image/*"
-//               onChange={(e) => setFile(e.target.files[0])}
-//             /> */}
+//               onChange={handleFileChange}
+//               style={{ display: "none" }}
+//             />
 //             <label htmlFor="file">
 //               <div className="item">
 //                 <img src={Image} alt="Add" />
 //                 <span>Add Image</span>
 //               </div>
 //             </label>
-//             {/* <div className="item">
-//               <img src={Map} alt="Location" />
-//               <span>Add Place</span>
-//             </div> */}
-//             {/* <div className="item">
-//               <img src={Friend} alt="Friends" />
-//               <span>Tag Friends</span>
-//             </div> */}
 //           </div>
 //           <div className="right">
 //             <button
@@ -143,7 +147,6 @@
 // };
 
 // export default Share;
-
 
 
 
@@ -195,7 +198,10 @@ const Share = () => {
         alert("✅ Post shared successfully!");
       },
       onError: (error) => {
-        console.error("❌ Error sharing post:", error.response?.data || error.message);
+        console.error(
+          "❌ Error sharing post:",
+          error.response?.data || error.message
+        );
         alert("❌ Error sharing post. Please try again.");
       },
     }
@@ -249,8 +255,8 @@ const Share = () => {
           </div>
         </div>
 
+        {/* ✅ Correct Preview Container */}
         <div className="right">
-          {/* ✅ Show Image Preview if File is Selected */}
           {file && (
             <div className="preview-container">
               <img
@@ -258,7 +264,7 @@ const Share = () => {
                 alt="Preview"
                 src={URL.createObjectURL(file)}
               />
-              <p className="post-text">{content}</p>
+              {content && <p className="post-text">{content}</p>}
             </div>
           )}
         </div>

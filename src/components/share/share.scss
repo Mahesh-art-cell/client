@@ -170,7 +170,7 @@
       }
     }
 
-    // ✅ Preview Container for Image + Content
+    // ✅ Corrected Preview Container
     .right {
       margin-top: 10px;
 
@@ -182,8 +182,10 @@
 
         .file {
           width: 100%;
-          max-height: 300px;
-          object-fit: cover;
+          height: auto;
+          max-height: 500px; // ✅ Limit height to avoid large images
+          object-fit: contain; // ✅ Ensures entire image fits inside container
+          display: block;
         }
 
         .post-text {
