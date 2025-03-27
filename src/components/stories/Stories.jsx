@@ -171,6 +171,8 @@ const Stories = () => {
                 <img src={story.img} alt="story" className="story-media" />
               )}
               <span>{story.name}</span>
+
+              {/* ✅ Show Delete Button for User's Own Story */}
               {story.userId === currentUser.id && (
                 <button
                   className="delete-btn"
