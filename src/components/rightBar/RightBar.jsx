@@ -219,11 +219,12 @@ const RightBar = () => {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const res = await axios.get("/api/relationships/suggestions", {
-          withCredentials: true,
-        });
-        console.log("✅ Suggestions Data:", res.data); // Debugging response
-        setSuggestions(res.data);
+        const res = await axios.get(
+          "http://localhost:8800/api/relationships/suggestions", // ✅ Correct URL
+          { withCredentials: true }
+        );
+        console.log("✅ Suggestions Data:", res.data);
+        setSuggestions(res.data); // ✅ Set fetched users
       } catch (err) {
         console.error("❌ Error fetching suggestions:", err);
       }
@@ -239,7 +240,8 @@ const RightBar = () => {
         { followedUserId: userId },
         { withCredentials: true }
       );
-      setSuggestions((prev) => prev.filter((user) => user.id !== userId)); // Remove from suggestions
+      // ✅ Remove followed user from suggestions
+      setSuggestions((prev) => prev.filter((user) => user.id !== userId));
     } catch (err) {
       console.error("❌ Error following user:", err);
     }
@@ -275,6 +277,32 @@ const RightBar = () => {
           ) : (
             <p>No suggestions available!</p>
           )}
+        </div>
+
+        {/* ✅ Latest Activities Section */}
+        <div className="item">
+          <span>Latest Activities</span>
+          <div className="user">
+            <div className="userInfo">
+              <img src="https://via.placeholder.com/50" alt="activity" />
+              <p>
+                <span>John Doe</span> changed their cover picture
+              </p>
+            </div>
+            <span>1 min ago</span>
+          </div>
+        </div>
+
+        {/* ✅ Online Friends Section */}
+        <div className="item">
+          <span>Online Friends</span>
+          <div className="user">
+            <div className="userInfo">
+              <img src="https://via.placeholder.com/50" alt="friend" />
+              <div className="online" />
+              <span>Jane Doe</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
