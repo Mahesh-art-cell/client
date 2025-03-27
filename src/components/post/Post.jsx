@@ -1,4 +1,5 @@
 
+
 // import "./post.scss";
 // import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 // import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
@@ -6,7 +7,7 @@
 // import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 // import { Link } from "react-router-dom";
 // import Comments from "../comments/Comments";
-// import { useState, useContext } from "react";
+// import { useState, useContext, useEffect } from "react";
 // import moment from "moment";
 // import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 // import { makeRequest } from "../../axios";
@@ -26,16 +27,29 @@
 //   const { currentUser } = useContext(AuthContext);
 //   const queryClient = useQueryClient();
 
+//   // ✅ State to Store Like Count Locally
+//   const [likeCount, setLikeCount] = useState(0);
+//   const [liked, setLiked] = useState(false);
+
 //   // ✅ Fetch Likes
 //   const { isLoading, data } = useQuery(["likes", post.id], async () => {
 //     try {
 //       const res = await makeRequest.get(`/likes?postId=${post.id}`);
+//       console.log("✅ Likes fetched:", res.data);
 //       return res.data;
 //     } catch (err) {
 //       console.error("❌ Error fetching likes:", err);
 //       throw new Error("Failed to load likes");
 //     }
 //   });
+
+//   // ✅ Update Like Count When Data is Available
+//   useEffect(() => {
+//     if (data) {
+//       setLikeCount(data.length);
+//       setLiked(data.includes(currentUser.id));
+//     }
+//   }, [data, currentUser.id]);
 
 //   // ✅ Define Mutation for Like/Unlike
 //   const mutation = useMutation(
@@ -55,7 +69,17 @@
 
 //   // ✅ Handle Like Click
 //   const handleLike = () => {
-//     const liked = data?.includes(currentUser.id);
+//     const newLiked = !liked;
+//     setLiked(newLiked);
+
+//     // ✅ Update Local Like Count
+//     if (newLiked) {
+//       setLikeCount((prev) => prev + 1);
+//     } else {
+//       setLikeCount((prev) => prev - 1);
+//     }
+
+//     // ✅ Mutate to Update Backend
 //     mutation.mutate(liked);
 //   };
 
@@ -79,7 +103,7 @@
 //             </div>
 //           </div>
 //         </div>
-
+            
 //         {/* ✅ Display Media Content from Cloudinary (img column) */}
 //         {post.img && (
 //           <div className="media-container">
@@ -103,15 +127,18 @@
 //           <div className="item">
 //             {isLoading ? (
 //               "Loading..."
-//             ) : data?.includes(currentUser.id) ? (
+//             ) : liked ? (
 //               <FavoriteOutlinedIcon
-//                 style={{ color: "red" }}
+//                 style={{ color: "red", cursor: "pointer" }}
 //                 onClick={handleLike}
 //               />
 //             ) : (
-//               <FavoriteBorderOutlinedIcon onClick={handleLike} />
+//               <FavoriteBorderOutlinedIcon
+//                 style={{ cursor: "pointer" }}
+//                 onClick={handleLike}
+//               />
 //             )}
-//             {data?.length || 0} Likes
+//             {likeCount} Likes
 //           </div>
 //           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
 //             <TextsmsOutlinedIcon />
@@ -141,6 +168,7 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
 import { useState, useContext, useEffect } from "react";
@@ -188,7 +216,7 @@ const Post = ({ post }) => {
   }, [data, currentUser.id]);
 
   // ✅ Define Mutation for Like/Unlike
-  const mutation = useMutation(
+  const likeMutation = useMutation(
     (liked) => {
       if (liked) {
         return makeRequest.delete(`/likes?postId=${post.id}`);
@@ -216,7 +244,26 @@ const Post = ({ post }) => {
     }
 
     // ✅ Mutate to Update Backend
-    mutation.mutate(liked);
+    likeMutation.mutate(liked);
+  };
+
+  // ✅ Delete Post Mutation
+  const deleteMutation = useMutation(
+    async () => {
+      return makeRequest.delete(`/posts/${post.id}`);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["posts"]);
+      },
+    }
+  );
+
+  // ✅ Handle Post Deletion
+  const handleDeletePost = () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      deleteMutation.mutate();
+    }
   };
 
   return (
@@ -238,41 +285,49 @@ const Post = ({ post }) => {
               <span className="date">{moment(post.createdAt).fromNow()}</span>
             </div>
           </div>
+
+          {/* ✅ Delete Button (Show Only for Owner of Post) */}
+          {post.userId === currentUser.id && (
+            <DeleteOutlineIcon
+              className="delete-btn"
+              onClick={handleDeletePost}
+            />
+          )}
         </div>
 
-        {/* ✅ Display Media Content from Cloudinary (img column) */}
-        {post.img && (
-          <div className="media-container">
-            {isImage(post.img) ? (
-              <img
-                src={post.img} // ✅ Direct Cloudinary URL
-                alt="Post Media"
-                className="post-image"
-              />
-            ) : isVideo(post.img) ? (
-              <video width="100%" controls>
-                <source src={post.img} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ) : null}
-          </div>
-        )}
+        {/* ✅ Post Content and Media */}
+        <div className="content">
+          <p className="post-text">{post.desc}</p>
 
-        {/* ✅ Like and Comment Section */}
+          {post.img && (
+            <div className="media-container">
+              {isImage(post.img) ? (
+                <img
+                  src={post.img} // ✅ Cloudinary Image URL
+                  alt="Post Media"
+                  className="post-image"
+                />
+              ) : isVideo(post.img) ? (
+                <video width="100%" controls>
+                  <source src={post.img} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : null}
+            </div>
+          )}
+        </div>
+
+        {/* ✅ Like, Comment, and Share Section */}
         <div className="info">
-          <div className="item">
+          <div className="item" onClick={handleLike}>
             {isLoading ? (
               "Loading..."
             ) : liked ? (
               <FavoriteOutlinedIcon
                 style={{ color: "red", cursor: "pointer" }}
-                onClick={handleLike}
               />
             ) : (
-              <FavoriteBorderOutlinedIcon
-                style={{ cursor: "pointer" }}
-                onClick={handleLike}
-              />
+              <FavoriteBorderOutlinedIcon style={{ cursor: "pointer" }} />
             )}
             {likeCount} Likes
           </div>
