@@ -242,12 +242,12 @@ const Share = () => {
         <hr />
         <div className="bottom">
           <div className="left">
-            <input
+            {/* <input
               type="file"
               id="file"
               accept="image/*"
               onChange={(e) => setFile(e.target.files[0])}
-            />
+            /> */}
             <label htmlFor="file">
               <div className="item">
                 <img src={Image} alt="Add" />
