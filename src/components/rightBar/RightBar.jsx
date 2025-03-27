@@ -222,6 +222,7 @@ const RightBar = () => {
         const res = await axios.get("/api/relationships/suggestions", {
           withCredentials: true,
         });
+        console.log("✅ Suggestions Data:", res.data); // Debugging response
         setSuggestions(res.data);
       } catch (err) {
         console.error("❌ Error fetching suggestions:", err);
@@ -274,32 +275,6 @@ const RightBar = () => {
           ) : (
             <p>No suggestions available!</p>
           )}
-        </div>
-
-        {/* ✅ Latest Activities Section */}
-        <div className="item">
-          <span>Latest Activities</span>
-          <div className="user">
-            <div className="userInfo">
-              <img src="https://via.placeholder.com/50" alt="activity" />
-              <p>
-                <span>Jane Doe</span> changed their cover picture
-              </p>
-            </div>
-            <span>1 min ago</span>
-          </div>
-        </div>
-
-        {/* ✅ Online Friends Section */}
-        <div className="item">
-          <span>Online Friends</span>
-          <div className="user">
-            <div className="userInfo">
-              <img src="https://via.placeholder.com/50" alt="friend" />
-              <div className="online" />
-              <span>John Doe</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
