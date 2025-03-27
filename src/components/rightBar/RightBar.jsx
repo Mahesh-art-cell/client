@@ -210,7 +210,7 @@
 
 import "./rightBar.scss";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { makeRequest } from "../../axios"; // ✅ Correct import
 
 const RightBar = () => {
   const [suggestions, setSuggestions] = useState([]);
@@ -219,12 +219,9 @@ const RightBar = () => {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:8800/api/relationships/suggestions", // ✅ Correct URL
-          { withCredentials: true }
-        );
+        const res = await makeRequest.get("/relationships/suggestions"); // ✅ Use makeRequest
         console.log("✅ Suggestions Data:", res.data);
-        setSuggestions(res.data); // ✅ Set fetched users
+        setSuggestions(res.data);
       } catch (err) {
         console.error("❌ Error fetching suggestions:", err);
       }
@@ -235,11 +232,9 @@ const RightBar = () => {
   // ✅ Handle Follow User
   const handleFollow = async (userId) => {
     try {
-      await axios.post(
-        "/api/relationships",
-        { followedUserId: userId },
-        { withCredentials: true }
-      );
+      await makeRequest.post("/relationships", {
+        followedUserId: userId,
+      });
       // ✅ Remove followed user from suggestions
       setSuggestions((prev) => prev.filter((user) => user.id !== userId));
     } catch (err) {

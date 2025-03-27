@@ -304,10 +304,10 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState({
     cover: 0,
-    profile: 0
+    profile: 0,
   });
 
-  // Reset form if user data changes
+  // ✅ Reset form if user data changes
   useEffect(() => {
     if (user) {
       setTexts({
@@ -318,35 +318,35 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
     }
   }, [user]);
 
-  // Improved upload function with progress tracking and type parameter
+  // ✅ Improved upload function with progress tracking
   const upload = async (file, type) => {
     if (!file) return null;
     setError(null);
-    
+
     try {
       const formData = new FormData();
-      formData.append("file", file);
-      
+      formData.append(type === "profile" ? "profilePic" : "coverPic", file);
+
       console.log(`📤 Uploading ${type} file: ${file.name}, size: ${file.size} bytes`);
-      
-      // Add type parameter to URL for better file naming
-      const res = await makeRequest.post(`/users/upload/${user.id}?type=${type}`, formData, {
-        headers: { 
+
+      // ✅ Upload API
+      const res = await makeRequest.put(`/users/${user.id}/upload`, formData, {
+        headers: {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
           );
-          setUploadProgress(prev => ({
+          setUploadProgress((prev) => ({
             ...prev,
-            [type]: percentCompleted
+            [type]: percentCompleted,
           }));
-        }
+        },
       });
-      
-      console.log(`📸 ${type} Upload Successful:`, res.data);
-      return res.data.filename; // Return just the filename
+
+      console.log(`✅ ${type} Upload Successful:`, res.data);
+      return res.data.url; // ✅ Return uploaded image URL
     } catch (err) {
       console.error(`❌ ${type} Upload Error:`, err);
       setError(err.response?.data?.error || `Failed to upload ${type} image. Please try again.`);
@@ -354,32 +354,25 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
     }
   };
 
-  // Improved mutation for updating user profile
+  // ✅ Mutation for updating user profile
   const mutation = useMutation(
     async (updatedUser) => {
       console.log("🔄 Sending update with data:", updatedUser);
       return makeRequest.put(`/users/${user.id}`, updatedUser);
     },
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         console.log("✅ Profile updated successfully!");
-        // Force refetch to ensure data is fresh
-        queryClient.invalidateQueries(["user", user.id]);
-        
-        // Explicitly refetch queries
-        queryClient.refetchQueries(["user", user.id]);
-        
-        // Trigger parent component refresh if provided
-        if (typeof refreshProfile === 'function') {
-          console.log("🔄 Calling parent refresh function");
-          refreshProfile();
+        // ✅ Update parent profile immediately
+        if (typeof refreshProfile === "function") {
+          refreshProfile(data.data);
         }
-        
-        // Short delay to ensure data is refreshed
+
+        queryClient.invalidateQueries(["user", user.id]);
         setTimeout(() => {
-          setOpenUpdate(true); // Pass true to indicate successful update
+          setOpenUpdate(false);
           setIsSubmitting(false);
-        }, 1000);
+        }, 500);
       },
       onError: (error) => {
         console.error("❌ Update Failed:", error);
@@ -389,56 +382,35 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
     }
   );
 
-  // Improved form submission with better error handling and sequential uploads
+  // ✅ Form submission with sequential uploads
   const handleClick = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
-      // Create a new object that will hold the updated user data
-      const updatedUser = {};
-      
-      // Only include fields that have changed
-      if (texts.name !== user.name) updatedUser.name = texts.name;
-      if (texts.email !== user.email) updatedUser.email = texts.email;
-      if (texts.username !== user.username) updatedUser.username = texts.username;
-      
-      console.log("🔄 Starting update process...");
-      
-      // Handle cover image upload if a new file is selected
+      const updatedUser = { ...texts };
+
+      // ✅ Upload cover image if selected
       if (cover) {
-        console.log("📤 Uploading new cover image...");
-        const coverFilename = await upload(cover, "cover");
-        if (coverFilename) {
-          console.log(`✅ Cover uploaded: ${coverFilename}`);
-          updatedUser.coverPic = coverFilename;
-        } else if (error) {
-          // If upload failed and error is set, return early
-          setIsSubmitting(false);
-          return;
+        const coverUrl = await upload(cover, "cover");
+        if (coverUrl) {
+          updatedUser.coverPic = coverUrl;
         }
       }
-      
-      // Handle profile image upload if a new file is selected
+
+      // ✅ Upload profile image if selected
       if (profile) {
-        console.log("📤 Uploading new profile image...");
-        const profileFilename = await upload(profile, "profile");
-        if (profileFilename) {
-          console.log(`✅ Profile uploaded: ${profileFilename}`);
-          updatedUser.profilePic = profileFilename;
-        } else if (error) {
-          // If upload failed and error is set, return early
-          setIsSubmitting(false);
-          return;
+        const profileUrl = await upload(profile, "profile");
+        if (profileUrl) {
+          updatedUser.profilePic = profileUrl;
         }
       }
-      
+
       console.log("🔄 Final update payload:", updatedUser);
-      
-      // Only proceed with update if we have data to update
+
+      // ✅ Send update only if there are changes
       if (Object.keys(updatedUser).length > 0) {
-        // Send the update request with the new data
         mutation.mutate(updatedUser);
       } else {
         console.log("ℹ️ No changes to update");
@@ -452,12 +424,10 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
     }
   };
 
-  // Helper function to get image URL with cache busting
+  // ✅ Helper function to get image URL
   const getImageUrl = (imagePath, defaultPath) => {
     if (!imagePath) return defaultPath;
-    // If it's a full URL, use it directly
-    if (imagePath.startsWith('http')) return imagePath;
-    // Otherwise, assume it's a filename in the upload folder
+    if (imagePath.startsWith("http")) return imagePath;
     return `/upload/${imagePath}?t=${Date.now()}`;
   };
 
@@ -467,15 +437,15 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
         <h1>Update Your Profile</h1>
         {error && <div className="error-message">{error}</div>}
         <form>
-          {/* Cover Upload */}
+          {/* ✅ Cover Upload */}
           <div className="image-upload-container">
             <label>Cover Picture</label>
             <label htmlFor="cover" className="image-upload-label">
               <div className="imgContainer">
                 <img
                   src={
-                    cover 
-                      ? URL.createObjectURL(cover) 
+                    cover
+                      ? URL.createObjectURL(cover)
                       : getImageUrl(user.coverPic, "/default-cover.png")
                   }
                   alt="Cover"
@@ -494,28 +464,26 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                
                 if (file.size > 10 * 1024 * 1024) {
                   setError("File too large! Max size is 10MB.");
                   return;
                 }
                 setCover(file);
                 setError(null);
-                setUploadProgress(prev => ({...prev, cover: 0}));
               }}
               accept="image/jpeg,image/png,image/gif"
             />
           </div>
 
-          {/* Profile Upload */}
+          {/* ✅ Profile Upload */}
           <div className="image-upload-container">
             <label>Profile Picture</label>
             <label htmlFor="profile" className="image-upload-label">
               <div className="imgContainer profile-container">
                 <img
                   src={
-                    profile 
-                      ? URL.createObjectURL(profile) 
+                    profile
+                      ? URL.createObjectURL(profile)
                       : getImageUrl(user.profilePic, "/default-avatar.png")
                   }
                   alt="Profile"
@@ -534,20 +502,18 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                
                 if (file.size > 10 * 1024 * 1024) {
                   setError("File too large! Max size is 10MB.");
                   return;
                 }
                 setProfile(file);
                 setError(null);
-                setUploadProgress(prev => ({...prev, profile: 0}));
               }}
               accept="image/jpeg,image/png,image/gif"
             />
           </div>
 
-          {/* Name */}
+          {/* ✅ Name */}
           <label>Name</label>
           <input
             type="text"
@@ -556,16 +522,16 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
             onChange={(e) => setTexts((prev) => ({ ...prev, name: e.target.value }))}
           />
 
-          {/* Email */}
+          {/* ✅ Email */}
           <label>Email</label>
           <input
-            type="email" 
+            type="email"
             value={texts.email}
             name="email"
             onChange={(e) => setTexts((prev) => ({ ...prev, email: e.target.value }))}
           />
 
-          {/* Username */}
+          {/* ✅ Username */}
           <label>Username</label>
           <input
             type="text"
@@ -574,10 +540,10 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
             onChange={(e) => setTexts((prev) => ({ ...prev, username: e.target.value }))}
           />
 
-          {/* Submit Button */}
-          <button 
-            type="button" 
-            onClick={handleClick} 
+          {/* ✅ Submit Button */}
+          <button
+            type="button"
+            onClick={handleClick}
             disabled={isSubmitting}
             className="update-button"
           >
@@ -594,5 +560,3 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
 };
 
 export default Update;
-
-

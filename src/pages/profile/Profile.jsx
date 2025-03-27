@@ -1,6 +1,4 @@
 
-
-
 // import "./profile.scss";
 // import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
 // import InstagramIcon from "@mui/icons-material/Instagram";
@@ -18,6 +16,7 @@
 // import { useContext, useState, useEffect } from "react";
 // import { AuthContext } from "../../context/authContext";
 // import Update from "../../components/update/Update";
+// import Share from "../../components/share/Share";
 
 // const Profile = () => {
 //   const [openUpdate, setOpenUpdate] = useState(false);
@@ -50,24 +49,34 @@
 //         formData
 //       );
 
-//       const updateData = type === "profile" ? { profilePic: res.data.filename } : { coverPic: res.data.filename };
-//       await makeRequest.put(`/users/${currentUser.id}`, updateData);
+//       console.log("✅ Uploaded URL:", res.data[type === "profile" ? "profilePic" : "coverPic"]);
 
-//       setRefreshKey(Date.now()); // Force profile refresh
+//       const updateData =
+//         type === "profile"
+//           ? { profilePic: res.data.profilePic }
+//           : { coverPic: res.data.coverPic };
+
+//       await makeRequest.put(`/users/${currentUser.id}`, updateData);
+//       setRefreshKey(Date.now()); // ✅ Force refresh
 //       queryClient.invalidateQueries(["user", userId]);
 //     } catch (err) {
-//       console.error("Upload error:", err.message);
+//       console.error("❌ Upload error:", err.message);
 //     }
 //   };
 
 //   if (isLoading) return <div className="loading">Loading profile...</div>;
-//   if (error) return <div className="error">Error loading profile: {error.message}</div>;
+//   if (error)
+//     return <div className="error">Error loading profile: {error.message}</div>;
 
 //   return (
 //     <div className="profile">
 //       <div className="images">
 //         {/* Cover Image */}
-//         <img src={`/upload/${data?.coverPic || "default-cover.png"}`} alt="Cover" className="cover" />
+//         <img
+//           src={data?.coverPic || "/default-cover.png"} // ✅ Cloudinary URL
+//           alt="Cover"
+//           className="cover"
+//         />
 //         {userId === currentUser.id && (
 //           <label htmlFor="coverUpload" className="upload-button">
 //             Change Cover
@@ -82,10 +91,14 @@
 //         )}
 
 //         {/* Profile Image */}
-//         <img src={`/upload/${data?.profilePic || "default-avatar.png"}`} alt="Profile" className="profilePic" />
+//         <img
+//           src={data?.profilePic || "/default-avatar.png"} // ✅ Cloudinary URL
+//           alt="Profile"
+//           className="profilePic"
+//         />
 //         {userId === currentUser.id && (
 //           <label htmlFor="profileUpload" className="upload-button">
-//             Change
+//             Change Profile
 //             <input
 //               type="file"
 //               id="profileUpload"
@@ -100,11 +113,21 @@
 //       <div className="profileContainer">
 //         <div className="uInfo">
 //           <div className="left">
-//             <a href={data?.facebook}><FacebookTwoToneIcon fontSize="large" /></a>
-//             <a href={data?.instagram}><InstagramIcon fontSize="large" /></a>
-//             <a href={data?.twitter}><TwitterIcon fontSize="large" /></a>
-//             <a href={data?.linkedin}><LinkedInIcon fontSize="large" /></a>
-//             <a href={data?.pinterest}><PinterestIcon fontSize="large" /></a>
+//             <a href={data?.facebook}>
+//               <FacebookTwoToneIcon fontSize="large" />
+//             </a>
+//             <a href={data?.instagram}>
+//               <InstagramIcon fontSize="large" />
+//             </a>
+//             <a href={data?.twitter}>
+//               <TwitterIcon fontSize="large" />
+//             </a>
+//             <a href={data?.linkedin}>
+//               <LinkedInIcon fontSize="large" />
+//             </a>
+//             <a href={data?.pinterest}>
+//               <PinterestIcon fontSize="large" />
+//             </a>
 //           </div>
 
 //           <div className="center">
@@ -131,6 +154,10 @@
 //           </div>
 //         </div>
 
+//         {/* ✅ Show Share only if visiting own profile */}
+//         {userId === currentUser.id && <Share />}
+
+//         {/* ✅ Render Posts */}
 //         <Posts userId={userId} />
 //       </div>
 
@@ -140,6 +167,7 @@
 // };
 
 // export default Profile;
+
 
 
 
@@ -164,14 +192,14 @@ import Share from "../../components/share/Share";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setCurrentUser } = useContext(AuthContext); // ✅ Update Context State
   const queryClient = useQueryClient();
   const userId = Number(useLocation().pathname.split("/")[2]);
-  const [refreshKey, setRefreshKey] = useState(Date.now());
+  const [profileData, setProfileData] = useState(null); // ✅ State to hold user data
 
-  // ✅ Fetch user data with error handling
+  // ✅ Fetch User Data with Error Handling
   const { isLoading, error, data } = useQuery(
-    ["user", userId, refreshKey],
+    ["user", userId],
     async () => {
       const res = await makeRequest.get(`/users/find/${userId}`);
       return res.data;
@@ -179,32 +207,51 @@ const Profile = () => {
     { enabled: !isNaN(userId), refetchOnWindowFocus: false }
   );
 
-  // ✅ Upload Handler (Profile/Cover Image)
+  useEffect(() => {
+    if (data) {
+      setProfileData(data); // ✅ Set initial data
+    }
+  }, [data]);
+
+  // ✅ Upload Handler for Profile & Cover Image
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append(type === "profile" ? "profilePic" : "coverPic", file);
 
-      const res = await makeRequest.post(
-        `/users/upload/${currentUser.id}?type=${type}`,
-        formData
+      // ✅ Upload to Backend
+      const res = await makeRequest.put(
+        `/users/${currentUser.id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
-      console.log("✅ Uploaded URL:", res.data[type === "profile" ? "profilePic" : "coverPic"]);
+      console.log(`✅ ${type === "profile" ? "Profile" : "Cover"} Pic Updated!`);
+      
+      // ✅ Update Profile Data with New URLs
+      const updatedData = {
+        ...profileData,
+        profilePic: type === "profile" ? res.data.profilePic : profileData.profilePic,
+        coverPic: type === "cover" ? res.data.coverPic : profileData.coverPic,
+      };
 
-      const updateData =
-        type === "profile"
-          ? { profilePic: res.data.profilePic }
-          : { coverPic: res.data.coverPic };
+      setProfileData(updatedData); // ✅ Update Profile Data
+      setCurrentUser({
+        ...currentUser,
+        profilePic: res.data.profilePic || currentUser.profilePic,
+        coverPic: res.data.coverPic || currentUser.coverPic,
+      });
 
-      await makeRequest.put(`/users/${currentUser.id}`, updateData);
-      setRefreshKey(Date.now()); // ✅ Force refresh
-      queryClient.invalidateQueries(["user", userId]);
+      queryClient.invalidateQueries(["user", userId]); // ✅ Invalidate Cache
     } catch (err) {
-      console.error("❌ Upload error:", err.message);
+      console.error("❌ Upload Error:", err.message);
     }
   };
 
@@ -215,9 +262,9 @@ const Profile = () => {
   return (
     <div className="profile">
       <div className="images">
-        {/* Cover Image */}
+        {/* ✅ Cover Image */}
         <img
-          src={data?.coverPic || "/default-cover.png"} // ✅ Cloudinary URL
+          src={profileData?.coverPic || "/default-cover.png"}
           alt="Cover"
           className="cover"
         />
@@ -234,9 +281,9 @@ const Profile = () => {
           </label>
         )}
 
-        {/* Profile Image */}
+        {/* ✅ Profile Image */}
         <img
-          src={data?.profilePic || "/default-avatar.png"} // ✅ Cloudinary URL
+          src={profileData?.profilePic || "/default-avatar.png"}
           alt="Profile"
           className="profilePic"
         />
@@ -257,35 +304,35 @@ const Profile = () => {
       <div className="profileContainer">
         <div className="uInfo">
           <div className="left">
-            <a href={data?.facebook}>
+            <a href={profileData?.facebook || "#"}>
               <FacebookTwoToneIcon fontSize="large" />
             </a>
-            <a href={data?.instagram}>
+            <a href={profileData?.instagram || "#"}>
               <InstagramIcon fontSize="large" />
             </a>
-            <a href={data?.twitter}>
+            {/* <a href={profileData?.twitter || "#"}>
               <TwitterIcon fontSize="large" />
-            </a>
-            <a href={data?.linkedin}>
+            </a> */}
+            <a href={profileData?.linkedin || "#"}>
               <LinkedInIcon fontSize="large" />
             </a>
-            <a href={data?.pinterest}>
+            {/* <a href={profileData?.pinterest || "#"}>
               <PinterestIcon fontSize="large" />
-            </a>
+            </a> */}
           </div>
 
           <div className="center">
-            <span>{data?.name}</span>
-            <div className="info">
+            <span>{profileData?.name || "User"}</span>
+            {/* <div className="info">
               <div className="item">
                 <PlaceIcon />
-                <span>{data?.city || "Not Available"}</span>
+                <span>{profileData?.city || "Not Available"}</span>
               </div>
               <div className="item">
                 <LanguageIcon />
-                <span>{data?.website || "No Website"}</span>
+                <span>{profileData?.website || "No Website"}</span>
               </div>
-            </div>
+            </div> */}
 
             {userId === currentUser.id && (
               <button onClick={() => setOpenUpdate(true)}>Update</button>
@@ -298,14 +345,15 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* ✅ Show Share only if visiting own profile */}
+        {/* ✅ Show Share only for Own Profile */}
         {userId === currentUser.id && <Share />}
 
         {/* ✅ Render Posts */}
         <Posts userId={userId} />
       </div>
 
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
+      {/* ✅ Open Update Modal */}
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={profileData} />}
     </div>
   );
 };
