@@ -288,7 +288,6 @@
 import "./update.scss";
 import { useState, useContext } from "react";
 import { makeRequest } from "../../axios";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useMutation } from "@tanstack/react-query";
 import { AuthContext } from "../../context/authContext";
 
@@ -301,31 +300,16 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
     username: user.username,
   });
 
-  // ✅ Cloudinary Upload Function
-  const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "mern-social");
-
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/dza9q1jql/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    const data = await res.json();
-    if (!data.secure_url) {
-      throw new Error("Cloudinary Upload Failed!");
-    }
-    return data.secure_url;
-  };
-
-  // ✅ Mutation to Update User
   const mutation = useMutation(
     async (updatedUser) => {
-      const res = await makeRequest.put(`/users/${user.id}`, updatedUser);
+      const formData = new FormData();
+      formData.append("name", texts.name);
+      formData.append("email", texts.email);
+      formData.append("username", texts.username);
+      if (cover) formData.append("coverPic", cover);
+      if (profile) formData.append("profilePic", profile);
+
+      const res = await makeRequest.put(`/users/${user.id}`, formData);
       return res.data;
     },
     {
@@ -336,25 +320,9 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
     }
   );
 
-  // ✅ Handle Submit
-  const handleClick = async (e) => {
+  const handleClick = (e) => {
     e.preventDefault();
-    let coverUrl = user.coverPic;
-    let profileUrl = user.profilePic;
-
-    try {
-      if (cover) coverUrl = await uploadToCloudinary(cover);
-      if (profile) profileUrl = await uploadToCloudinary(profile);
-    } catch (err) {
-      console.error("❌ Upload Error:", err.message);
-      return;
-    }
-
-    mutation.mutate({
-      ...texts,
-      coverPic: coverUrl,
-      profilePic: profileUrl,
-    });
+    mutation.mutate();
   };
 
   return (
@@ -364,46 +332,22 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
         <form>
           <div className="files">
             <label htmlFor="cover">
-              <span>Cover Picture</span>
-              <div className="imgContainer">
-                <img
-                  src={
-                    cover
-                      ? URL.createObjectURL(cover)
-                      : user.coverPic || "/default-cover.png"
-                  }
-                  alt="Cover"
-                />
-                <CloudUploadIcon className="icon" />
-              </div>
+              Cover Picture
+              <input
+                type="file"
+                id="cover"
+                onChange={(e) => setCover(e.target.files[0])}
+              />
             </label>
-            <input
-              type="file"
-              id="cover"
-              style={{ display: "none" }}
-              onChange={(e) => setCover(e.target.files[0])}
-            />
 
             <label htmlFor="profile">
-              <span>Profile Picture</span>
-              <div className="imgContainer">
-                <img
-                  src={
-                    profile
-                      ? URL.createObjectURL(profile)
-                      : user.profilePic || "/default-avatar.png"
-                  }
-                  alt="Profile"
-                />
-                <CloudUploadIcon className="icon" />
-              </div>
+              Profile Picture
+              <input
+                type="file"
+                id="profile"
+                onChange={(e) => setProfile(e.target.files[0])}
+              />
             </label>
-            <input
-              type="file"
-              id="profile"
-              style={{ display: "none" }}
-              onChange={(e) => setProfile(e.target.files[0])}
-            />
           </div>
 
           <input
@@ -422,7 +366,9 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
             type="text"
             placeholder="Username"
             value={texts.username}
-            onChange={(e) => setTexts({ ...texts, username: e.target.value })}
+            onChange={(e) =>
+              setTexts({ ...texts, username: e.target.value })
+            }
           />
           <button onClick={handleClick}>Update</button>
         </form>

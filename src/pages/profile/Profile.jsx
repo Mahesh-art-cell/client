@@ -201,13 +201,6 @@ import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
 import Share from "../../components/share/Share";
 import Posts from "../../components/posts/Posts";
-import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import PlaceIcon from "@mui/icons-material/Place";
-import LanguageIcon from "@mui/icons-material/Language";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
@@ -216,7 +209,7 @@ const Profile = () => {
   const userId = Number(useLocation().pathname.split("/")[2]);
   const [profileData, setProfileData] = useState(null);
 
-  // ✅ Fetch User Details
+  // ✅ Fetch User Data
   const { isLoading, error, data } = useQuery(
     ["user", userId],
     async () => {
@@ -232,10 +225,10 @@ const Profile = () => {
     }
   }, [data]);
 
-  // ✅ Update Profile Callback to Refresh Data
+  // ✅ Profile Update Callback to Refresh Data
   const handleProfileUpdate = (updatedUser) => {
     setProfileData(updatedUser);
-    login(updatedUser); // ✅ Refresh user context after profile update
+    login(updatedUser); // ✅ Update Context
     queryClient.invalidateQueries(["user", userId]);
   };
 
@@ -246,19 +239,11 @@ const Profile = () => {
   return (
     <div className="profile">
       <div className="images">
-        {/* ✅ Cover Picture */}
         <img
           src={profileData?.coverPic || "/default-cover.png"}
           alt="Cover"
           className="cover"
         />
-        {userId === currentUser?.id && (
-          <label htmlFor="coverUpload" className="upload-button">
-            Change Cover
-          </label>
-        )}
-
-        {/* ✅ Profile Picture */}
         <img
           src={profileData?.profilePic || "/default-avatar.png"}
           alt="Profile"
@@ -268,38 +253,11 @@ const Profile = () => {
 
       <div className="profileContainer">
         <div className="uInfo">
-          <div className="left">
-            <a href={profileData?.facebook || "#"}>
-              <FacebookTwoToneIcon fontSize="large" />
-            </a>
-            <a href={profileData?.instagram || "#"}>
-              <InstagramIcon fontSize="large" />
-            </a>
-            <a href={profileData?.linkedin || "#"}>
-              <LinkedInIcon fontSize="large" />
-            </a>
-          </div>
-
           <div className="center">
             <span>{profileData?.name || "User"}</span>
-            <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>{profileData?.city || "Not Available"}</span>
-              </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>{profileData?.website || "No Website"}</span>
-              </div>
-            </div>
             {userId === currentUser?.id && (
               <button onClick={() => setOpenUpdate(true)}>Update</button>
             )}
-          </div>
-
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
           </div>
         </div>
 
@@ -307,7 +265,6 @@ const Profile = () => {
         <Posts userId={userId} />
       </div>
 
-      {/* ✅ Open Update Modal */}
       {openUpdate && (
         <Update
           setOpenUpdate={setOpenUpdate}
