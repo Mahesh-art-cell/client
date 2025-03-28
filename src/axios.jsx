@@ -11,6 +11,9 @@
 
 
 // // axios.js
+
+
+
 import axios from "axios";
 
 // ✅ Get token from localStorage or cookies
@@ -24,9 +27,6 @@ export const makeRequest = axios.create({
     Authorization: token ? `Bearer ${token}` : "", // ✅ Add token dynamically
   },
 });
-
-
-
 // import axios from "axios";
 
 // export const makeRequest = axios.create({
