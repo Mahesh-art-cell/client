@@ -196,8 +196,6 @@ import "./profile.scss";
 import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import PlaceIcon from "@mui/icons-material/Place";
-import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Posts from "../../components/posts/Posts";
@@ -215,9 +213,8 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const userId = Number(useLocation().pathname.split("/")[2]);
   const [profileData, setProfileData] = useState(null);
-  const [uploading, setUploading] = useState(false); // ✅ Show loader during upload
 
-  // ✅ Fetch User Data
+  // ✅ Fetch User Data with Cloudinary URLs
   const { isLoading, error, data } = useQuery(
     ["user", userId],
     async () => {
@@ -233,55 +230,15 @@ const Profile = () => {
     }
   }, [data]);
 
-  // ✅ Handle File Upload to Cloudinary
-  const handleFileUpload = async (e, type) => {
-    setUploading(true);
-    const file = e.target.files[0];
-    if (!file) {
-      setUploading(false);
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "mern-social"); // ✅ Cloudinary Upload Preset Name
-
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload`, // ✅ Replace YOUR_CLOUD_NAME
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await res.json();
-      if (!data.secure_url) {
-        throw new Error("Cloudinary Upload Failed!");
-      }
-
-      // ✅ Update User with Cloudinary URL
-      await makeRequest.put(`/users/${currentUser.id}`, {
-        [type === "profile" ? "profilePic" : "coverPic"]: data.secure_url,
-      });
-
-      // ✅ Update State with New URL
-      setProfileData({
-        ...profileData,
-        [type === "profile" ? "profilePic" : "coverPic"]: data.secure_url,
-      });
-      setCurrentUser({
-        ...currentUser,
-        [type === "profile" ? "profilePic" : "coverPic"]: data.secure_url,
-      });
-
-      queryClient.invalidateQueries(["user", userId]);
-    } catch (err) {
-      console.error("❌ Upload Error:", err);
-      alert("❌ Failed to upload. Please try again.");
-    } finally {
-      setUploading(false);
-    }
+  // ✅ Refresh Data after Update
+  const handleProfileUpdate = (updatedUser) => {
+    setProfileData(updatedUser);
+    setCurrentUser({
+      ...currentUser,
+      profilePic: updatedUser.profilePic,
+      coverPic: updatedUser.coverPic,
+    });
+    queryClient.invalidateQueries(["user", userId]);
   };
 
   if (isLoading) return <div className="loading">Loading profile...</div>;
@@ -291,7 +248,7 @@ const Profile = () => {
   return (
     <div className="profile">
       <div className="images">
-        {/* ✅ Cover Image */}
+        {/* ✅ Cover Image from Cloudinary */}
         <img
           src={profileData?.coverPic || "/default-cover.png"}
           alt="Cover"
@@ -304,33 +261,18 @@ const Profile = () => {
               type="file"
               id="coverUpload"
               style={{ display: "none" }}
-              onChange={(e) => handleFileUpload(e, "cover")}
-              accept="image/*"
+              disabled
             />
           </label>
         )}
 
-        {/* ✅ Profile Image */}
+        {/* ✅ Profile Image from Cloudinary */}
         <img
           src={profileData?.profilePic || "/default-avatar.png"}
           alt="Profile"
           className="profilePic"
         />
-        {userId === currentUser.id && (
-          <label htmlFor="profileUpload" className="upload-button">
-            Change Profile
-            <input
-              type="file"
-              id="profileUpload"
-              style={{ display: "none" }}
-              onChange={(e) => handleFileUpload(e, "profile")}
-              accept="image/*"
-            />
-          </label>
-        )}
       </div>
-
-      {uploading && <div className="loading">Uploading...</div>}
 
       <div className="profileContainer">
         <div className="uInfo">
@@ -360,10 +302,18 @@ const Profile = () => {
         </div>
 
         {userId === currentUser.id && <Share />}
+
         <Posts userId={userId} />
       </div>
 
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={profileData} />}
+      {/* ✅ Open Update Modal */}
+      {openUpdate && (
+        <Update
+          setOpenUpdate={setOpenUpdate}
+          user={profileData}
+          onProfileUpdate={handleProfileUpdate}
+        />
+      )}
     </div>
   );
 };
