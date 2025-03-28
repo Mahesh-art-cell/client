@@ -1,10 +1,10 @@
 
-
 // import "./post.scss";
 // import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 // import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 // import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 // import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+// import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 // import { Link } from "react-router-dom";
 // import Comments from "../comments/Comments";
 // import { useState, useContext, useEffect } from "react";
@@ -52,7 +52,7 @@
 //   }, [data, currentUser.id]);
 
 //   // ✅ Define Mutation for Like/Unlike
-//   const mutation = useMutation(
+//   const likeMutation = useMutation(
 //     (liked) => {
 //       if (liked) {
 //         return makeRequest.delete(`/likes?postId=${post.id}`);
@@ -80,7 +80,26 @@
 //     }
 
 //     // ✅ Mutate to Update Backend
-//     mutation.mutate(liked);
+//     likeMutation.mutate(liked);
+//   };
+
+//   // ✅ Delete Post Mutation
+//   const deleteMutation = useMutation(
+//     async () => {
+//       return makeRequest.delete(`/posts/${post.id}`);
+//     },
+//     {
+//       onSuccess: () => {
+//         queryClient.invalidateQueries(["posts"]);
+//       },
+//     }
+//   );
+
+//   // ✅ Handle Post Deletion
+//   const handleDeletePost = () => {
+//     if (window.confirm("Are you sure you want to delete this post?")) {
+//       deleteMutation.mutate();
+//     }
 //   };
 
 //   return (
@@ -102,41 +121,49 @@
 //               <span className="date">{moment(post.createdAt).fromNow()}</span>
 //             </div>
 //           </div>
-//         </div>
-            
-//         {/* ✅ Display Media Content from Cloudinary (img column) */}
-//         {post.img && (
-//           <div className="media-container">
-//             {isImage(post.img) ? (
-//               <img
-//                 src={post.img} // ✅ Direct Cloudinary URL
-//                 alt="Post Media"
-//                 className="post-image"
-//               />
-//             ) : isVideo(post.img) ? (
-//               <video width="100%" controls>
-//                 <source src={post.img} type="video/mp4" />
-//                 Your browser does not support the video tag.
-//               </video>
-//             ) : null}
-//           </div>
-//         )}
 
-//         {/* ✅ Like and Comment Section */}
+//           {/* ✅ Delete Button (Show Only for Owner of Post) */}
+//           {post.userId === currentUser.id && (
+//             <DeleteOutlineIcon
+//               className="delete-btn"
+//               onClick={handleDeletePost}
+//             />
+//           )}
+//         </div>
+
+//         {/* ✅ Post Content and Media */}
+//         <div className="content">
+//           <p className="post-text">{post.desc}</p>
+
+//           {post.img && (
+//             <div className="media-container">
+//               {isImage(post.img) ? (
+//                 <img
+//                   src={post.img} // ✅ Cloudinary Image URL
+//                   alt="Post Media"
+//                   className="post-image"
+//                 />
+//               ) : isVideo(post.img) ? (
+//                 <video width="100%" controls>
+//                   <source src={post.img} type="video/mp4" />
+//                   Your browser does not support the video tag.
+//                 </video>
+//               ) : null}
+//             </div>
+//           )}
+//         </div>
+
+//         {/* ✅ Like, Comment, and Share Section */}
 //         <div className="info">
-//           <div className="item">
+//           <div className="item" onClick={handleLike}>
 //             {isLoading ? (
 //               "Loading..."
 //             ) : liked ? (
 //               <FavoriteOutlinedIcon
 //                 style={{ color: "red", cursor: "pointer" }}
-//                 onClick={handleLike}
 //               />
 //             ) : (
-//               <FavoriteBorderOutlinedIcon
-//                 style={{ cursor: "pointer" }}
-//                 onClick={handleLike}
-//               />
+//               <FavoriteBorderOutlinedIcon style={{ cursor: "pointer" }} />
 //             )}
 //             {likeCount} Likes
 //           </div>
@@ -161,8 +188,6 @@
 
 
 
-
-
 import "./post.scss";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
@@ -178,20 +203,15 @@ import { makeRequest } from "../../axios";
 import { AuthContext } from "../../context/authContext";
 
 // ✅ Function to Check File Type
-const isImage = (url) => {
-  return /\.(jpeg|jpg|png|gif|bmp|webp)$/i.test(url);
-};
-
-const isVideo = (url) => {
-  return /\.(mp4|webm|ogg|avi|mov)$/i.test(url);
-};
+const isImage = (url) => /\.(jpeg|jpg|png|gif|bmp|webp)$/i.test(url);
+const isVideo = (url) => /\.(mp4|webm|ogg|avi|mov)$/i.test(url);
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // ✅ State to Store Like Count Locally
+  // ✅ State to Store Like Count and Like Status
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
 
@@ -199,7 +219,6 @@ const Post = ({ post }) => {
   const { isLoading, data } = useQuery(["likes", post.id], async () => {
     try {
       const res = await makeRequest.get(`/likes?postId=${post.id}`);
-      console.log("✅ Likes fetched:", res.data);
       return res.data;
     } catch (err) {
       console.error("❌ Error fetching likes:", err);
@@ -207,7 +226,7 @@ const Post = ({ post }) => {
     }
   });
 
-  // ✅ Update Like Count When Data is Available
+  // ✅ Update Like Count and Status
   useEffect(() => {
     if (data) {
       setLikeCount(data.length);
@@ -215,7 +234,7 @@ const Post = ({ post }) => {
     }
   }, [data, currentUser.id]);
 
-  // ✅ Define Mutation for Like/Unlike
+  // ✅ Like/Unlike Mutation
   const likeMutation = useMutation(
     (liked) => {
       if (liked) {
@@ -235,15 +254,7 @@ const Post = ({ post }) => {
   const handleLike = () => {
     const newLiked = !liked;
     setLiked(newLiked);
-
-    // ✅ Update Local Like Count
-    if (newLiked) {
-      setLikeCount((prev) => prev + 1);
-    } else {
-      setLikeCount((prev) => prev - 1);
-    }
-
-    // ✅ Mutate to Update Backend
+    setLikeCount((prev) => (newLiked ? prev + 1 : prev - 1));
     likeMutation.mutate(liked);
   };
 
@@ -286,7 +297,7 @@ const Post = ({ post }) => {
             </div>
           </div>
 
-          {/* ✅ Delete Button (Show Only for Owner of Post) */}
+          {/* ✅ Delete Button (Only Post Owner) */}
           {post.userId === currentUser.id && (
             <DeleteOutlineIcon
               className="delete-btn"
@@ -295,18 +306,13 @@ const Post = ({ post }) => {
           )}
         </div>
 
-        {/* ✅ Post Content and Media */}
+        {/* ✅ Post Content & Media */}
         <div className="content">
-          <p className="post-text">{post.desc}</p>
-
+          <p className="post-text">{post.content}</p>
           {post.img && (
             <div className="media-container">
               {isImage(post.img) ? (
-                <img
-                  src={post.img} // ✅ Cloudinary Image URL
-                  alt="Post Media"
-                  className="post-image"
-                />
+                <img src={post.img} alt="Post Media" className="post-image" />
               ) : isVideo(post.img) ? (
                 <video width="100%" controls>
                   <source src={post.img} type="video/mp4" />
@@ -320,12 +326,8 @@ const Post = ({ post }) => {
         {/* ✅ Like, Comment, and Share Section */}
         <div className="info">
           <div className="item" onClick={handleLike}>
-            {isLoading ? (
-              "Loading..."
-            ) : liked ? (
-              <FavoriteOutlinedIcon
-                style={{ color: "red", cursor: "pointer" }}
-              />
+            {liked ? (
+              <FavoriteOutlinedIcon style={{ color: "red", cursor: "pointer" }} />
             ) : (
               <FavoriteBorderOutlinedIcon style={{ cursor: "pointer" }} />
             )}
