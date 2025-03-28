@@ -193,63 +193,34 @@
 
 
 import "./profile.scss";
-import { useState, useEffect, useContext } from "react";
-import { useLocation } from "react-router-dom";
-import { AuthContext } from "../../context/authContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
+import { useLocation } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
+import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
-import Posts from "../../components/posts/Posts";
-import Share from "../../components/share/Share";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
-  const queryClient = useQueryClient();
+  const { currentUser } = useContext(AuthContext);
   const userId = Number(useLocation().pathname.split("/")[2]);
-  const [profileData, setProfileData] = useState(null);
 
-  // ✅ Fetch User Profile Data
-  const { isLoading, error, data } = useQuery(
-    ["user", userId],
-    async () => {
-      const res = await makeRequest.get(`/users/find/${userId}`);
-      return res.data;
-    },
-    { enabled: !isNaN(userId), refetchOnWindowFocus: false }
-  );
+  // ✅ Fetch User Data
+  const { data: profileData, isLoading } = useQuery(["user", userId], async () => {
+    const res = await makeRequest.get(`/users/find/${userId}`);
+    return res.data;
+  });
 
-  useEffect(() => {
-    if (data) {
-      setProfileData(data);
-    }
-  }, [data]);
-
-  // ✅ Refresh Profile After Update
-  const refreshProfile = (updatedData) => {
-    setProfileData(updatedData);
-    setCurrentUser((prev) => ({
-      ...prev,
-      profilePic: updatedData.profilePic,
-      coverPic: updatedData.coverPic,
-    }));
-
-    queryClient.invalidateQueries(["user", userId]);
-  };
-
-  if (isLoading) return <div>Loading profile...</div>;
-  if (error) return <div>Error loading profile!</div>;
+  if (isLoading) return <div className="loading">Loading profile...</div>;
 
   return (
     <div className="profile">
       <div className="images">
-        {/* ✅ Cover Picture */}
         <img
           src={profileData?.coverPic || "/default-cover.png"}
           alt="Cover"
           className="cover"
         />
-        {/* ✅ Profile Picture */}
         <img
           src={profileData?.profilePic || "/default-avatar.png"}
           alt="Profile"
@@ -258,21 +229,21 @@ const Profile = () => {
       </div>
 
       <div className="profileContainer">
-        <div className="uInfo">
-          <div className="center">
-            <span>{profileData?.name || "User"}</span>
-            {userId === currentUser.id && (
-              <button onClick={() => setOpenUpdate(true)}>Update</button>
-            )}
-          </div>
-        </div>
-
-        {userId === currentUser.id && <Share />}
-        <Posts userId={userId} />
+        <h2>{profileData?.name}</h2>
+        <p>@{profileData?.username}</p>
+        {userId === currentUser.id && (
+          <button onClick={() => setOpenUpdate(true)}>Update Profile</button>
+        )}
       </div>
 
       {openUpdate && (
-        <Update setOpenUpdate={setOpenUpdate} user={profileData} refreshProfile={refreshProfile} />
+        <Update
+          setOpenUpdate={setOpenUpdate}
+          user={profileData}
+          refreshProfile={(updatedData) => {
+            queryClient.setQueryData(["user", userId], updatedData);
+          }}
+        />
       )}
     </div>
   );

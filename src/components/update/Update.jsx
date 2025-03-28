@@ -303,67 +303,45 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ Reset Form if user data changes
-  useEffect(() => {
-    if (user) {
-      setTexts({
-        email: user.email || "",
-        name: user.name || "",
-        username: user.username || "",
-      });
-    }
-  }, [user]);
-
-  // ✅ Upload Function to Cloudinary and Update API
+  // ✅ Upload to Cloudinary
   const upload = async (file, type) => {
     if (!file) return null;
+
     try {
       const formData = new FormData();
-      formData.append(type === "profile" ? "profilePic" : "coverPic", file);
+      formData.append("file", file);
+      formData.append("type", type);
 
-      console.log(`📤 Uploading ${type}...`);
-      const res = await makeRequest.put(`/users/upload`, formData, {
+      // ✅ Upload API to Cloudinary
+      const res = await makeRequest.post("/users/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      console.log(`✅ ${type} Uploaded:`, res.data);
-      return res.data.url;
+      return res.data.url; // ✅ Cloudinary URL
     } catch (err) {
       console.error(`❌ ${type} Upload Failed:`, err);
+      setError(`Failed to upload ${type}.`);
       return null;
     }
   };
 
-  // ✅ Mutation to Update User
+  // ✅ Mutation for Profile Update
   const mutation = useMutation(
     async (updatedUser) => {
-      console.log("🔄 Updating user:", updatedUser);
       return makeRequest.put(`/users/${user.id}`, updatedUser);
     },
     {
       onSuccess: (data) => {
         console.log("✅ User updated successfully:", data.data);
-        
-        // ✅ Refresh parent profile after update
-        if (typeof refreshProfile === "function") {
+        if (refreshProfile) {
           refreshProfile(data.data);
         }
-
-        // ✅ Update user state with new image URLs
-        queryClient.setQueryData(["user", user.id], (prevUser) => ({
-          ...prevUser,
-          profilePic: data.data.profilePic,
-          coverPic: data.data.coverPic,
-        }));
-
+        queryClient.invalidateQueries(["user", user.id]);
         setOpenUpdate(false);
-        setIsSubmitting(false);
       },
       onError: (error) => {
-        console.error("❌ Update Failed:", error);
-        setError(error.response?.data?.error || "Failed to update profile.");
+        setError("Failed to update profile. Please try again.");
         setIsSubmitting(false);
       },
     }
@@ -373,27 +351,32 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
   const handleClick = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const updatedUser = { ...texts };
 
-    // ✅ Upload Cover Pic if available
-    if (cover) {
-      const coverUrl = await upload(cover, "cover");
-      if (coverUrl) {
-        updatedUser.coverPic = coverUrl;
-        console.log(`🌐 Cover Pic URL: ${coverUrl}`);
+    try {
+      const updatedUser = { ...texts };
+
+      // ✅ Upload cover image
+      if (cover) {
+        const coverUrl = await upload(cover, "cover");
+        if (coverUrl) {
+          updatedUser.coverPic = coverUrl;
+        }
       }
-    }
 
-    // ✅ Upload Profile Pic if available
-    if (profile) {
-      const profileUrl = await upload(profile, "profile");
-      if (profileUrl) {
-        updatedUser.profilePic = profileUrl;
-        console.log(`🌐 Profile Pic URL: ${profileUrl}`);
+      // ✅ Upload profile image
+      if (profile) {
+        const profileUrl = await upload(profile, "profile");
+        if (profileUrl) {
+          updatedUser.profilePic = profileUrl;
+        }
       }
-    }
 
-    mutation.mutate(updatedUser);
+      // ✅ Send updated data
+      mutation.mutate(updatedUser);
+    } catch (err) {
+      setError("Update process failed. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -401,55 +384,19 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
       <div className="wrapper">
         <h1>Update Your Profile</h1>
         {error && <div className="error-message">{error}</div>}
-
         <form>
-          {/* ✅ Cover Upload */}
           <label>Cover Picture</label>
-          <div className="imgContainer">
-            <img
-              src={
-                cover
-                  ? URL.createObjectURL(cover)
-                  : user.coverPic || "/default-cover.png"
-              }
-              alt="Cover"
-            />
-            <label htmlFor="cover">
-              <CloudUploadIcon className="icon" />
-              <input
-                type="file"
-                id="cover"
-                style={{ display: "none" }}
-                onChange={(e) => setCover(e.target.files[0])}
-                accept="image/*"
-              />
-            </label>
-          </div>
-
-          {/* ✅ Profile Upload */}
+          <input
+            type="file"
+            onChange={(e) => setCover(e.target.files[0])}
+            accept="image/*"
+          />
           <label>Profile Picture</label>
-          <div className="imgContainer">
-            <img
-              src={
-                profile
-                  ? URL.createObjectURL(profile)
-                  : user.profilePic || "/default-avatar.png"
-              }
-              alt="Profile"
-            />
-            <label htmlFor="profile">
-              <CloudUploadIcon className="icon" />
-              <input
-                type="file"
-                id="profile"
-                style={{ display: "none" }}
-                onChange={(e) => setProfile(e.target.files[0])}
-                accept="image/*"
-              />
-            </label>
-          </div>
-
-          {/* ✅ Name, Email, and Username */}
+          <input
+            type="file"
+            onChange={(e) => setProfile(e.target.files[0])}
+            accept="image/*"
+          />
           <label>Name</label>
           <input
             type="text"
@@ -458,7 +405,6 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
               setTexts((prev) => ({ ...prev, name: e.target.value }))
             }
           />
-
           <label>Email</label>
           <input
             type="email"
@@ -467,7 +413,6 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
               setTexts((prev) => ({ ...prev, email: e.target.value }))
             }
           />
-
           <label>Username</label>
           <input
             type="text"
@@ -476,8 +421,6 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
               setTexts((prev) => ({ ...prev, username: e.target.value }))
             }
           />
-
-          {/* ✅ Submit Button */}
           <button
             type="button"
             onClick={handleClick}
@@ -486,7 +429,6 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
             {isSubmitting ? "Updating..." : "Update"}
           </button>
         </form>
-
         <button className="close" onClick={() => setOpenUpdate(false)}>
           Close
         </button>
