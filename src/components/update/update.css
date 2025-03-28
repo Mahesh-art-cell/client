@@ -1,124 +1,4 @@
-
-
-
-
-// @import "../../style.scss";
-
-// .update {
-//   @include themify($themes) {
-//     position: fixed;
-//     top: 0;
-//     left: 0;
-//     width: 100vw;
-//     height: 100%;
-//     background-color: rgba(0, 0, 0, 0.5);
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     z-index: 999;
-
-//     .wrapper {
-//       margin: auto;
-//       width: 40%;
-//       max-height: 90vh; // ✅ Ensures it doesn't exceed viewport height
-//       overflow-y: auto;  // ✅ Allows scrolling if content overflows
-//       background-color: themed("bg");
-//       padding: 50px;
-//       z-index: 999;
-//       display: flex;
-//       flex-direction: column;
-//       gap: 20px;
-//       box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
-//       position: relative;
-
-//       @include mobile {
-//         width: 100%;
-//         height: 100%;
-//       }
-
-//       h1 {
-//         color: lightgrey;
-
-//         @include mobile {
-//           font-size: 20px;
-//         }
-//       }
-
-//       form {
-//         display: flex;
-//         flex-direction: column;
-//         gap: 20px;
-
-//         .files {
-//           display: flex;
-//           flex-wrap: wrap;
-//           gap: 50px;
-//         }
-
-//         label {
-//           display: flex;
-//           flex-direction: column;
-//           gap: 10px;
-//           color: gray;
-//           font-size: 14px;
-
-//           .imgContainer {
-//             position: relative;
-//             img {
-//               width: 100px;
-//               height: 100px;
-//               object-fit: cover;
-//             }
-
-//             .icon {
-//               position: absolute;
-//               top: 0;
-//               bottom: 0;
-//               left: 0;
-//               right: 0;
-//               margin: auto;
-//               font-size: 30px;
-//               color: lightgray;
-//               cursor: pointer;
-//             }
-//           }
-//         }
-
-//         input {
-//           padding: 8px; // ✅ Increased padding for better visibility
-//           font-size: 16px; // ✅ Increased font size for better readability
-//           border: none;
-//           border-bottom: 1px solid themed("border");
-//           color: gray;
-//           background-color: transparent;
-//         }
-
-//         button {
-//           border: none;
-//           padding: 12px; // ✅ Increased button size
-//           cursor: pointer;
-//           color: white;
-//           background-color: #5271ff;
-//           font-size: 16px;
-//         }
-//       }
-
-//       .close {
-//         position: absolute;
-//         top: 10px;
-//         right: 20px;
-//         border: none;
-//         background-color: #f0544f;
-//         padding: 5px;
-//         cursor: pointer;
-//         color: white;
-//       }
-//     }
-//   }
-// }
-
-
-
+/* 
 .update {
   position: fixed;
   top: 0;
@@ -269,4 +149,173 @@
     margin: 0 auto;
     text-align: center;
   }
+} */
+
+
+.update {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Wrapper */
+.update .wrapper {
+  margin: auto;
+  width: 90%;
+  max-width: 500px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Heading */
+.update .wrapper h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Form */
+.update .wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Label */
+.update .wrapper form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: gray;
+  font-size: 14px;
+}
+
+/* Image Container */
+.update .wrapper form label .imgContainer {
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 150px;
+  border: 1px dashed #ccc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect on Image Container */
+.update .wrapper form label .imgContainer:hover {
+  border-color: #5271ff;
+}
+
+.update .wrapper form label .imgContainer:hover .icon {
+  opacity: 1;
+}
+
+/* Image in Container */
+.update .wrapper form label .imgContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Icon in Container */
+.update .wrapper form label .imgContainer .icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  color: #5271ff;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 50%;
+}
+
+/* Input Fields */
+.update .wrapper form input {
+  padding: 10px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Focus Effect on Input */
+.update .wrapper form input:focus {
+  outline: none;
+  border-color: #5271ff;
+}
+
+/* Submit Button */
+.update .wrapper form button {
+  border: none;
+  background-color: #5271ff;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+/* Button Hover Effect */
+.update .wrapper form button:hover {
+  background-color: #4561e8;
+}
+
+/* Disabled Button */
+.update .wrapper form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Close Button */
+.update .wrapper .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Close Button Hover Effect */
+.update .wrapper .close:hover {
+  background-color: #e0e0e0;
+}
+
+/* Error Message */
+.update .error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 0 auto;
+  text-align: center;
 }

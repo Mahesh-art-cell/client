@@ -40,7 +40,7 @@
 
 
 import { useContext, useRef, useState } from "react";
-import "./stories.scss";
+import "./stories.css";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";

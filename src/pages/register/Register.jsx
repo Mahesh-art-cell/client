@@ -1,5 +1,6 @@
+
 // import { useState } from "react";
-// import { Link } from "react-router-dom";
+// import { Link, useNavigate } from "react-router-dom";
 // import "./register.scss";
 // import axios from "axios";
 
@@ -11,6 +12,7 @@
 //     name: "",
 //   });
 //   const [err, setErr] = useState(null);
+//   const navigate = useNavigate(); // ✅ Use navigate for redirection after registration
 
 //   const handleChange = (e) => {
 //     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -20,13 +22,12 @@
 //     e.preventDefault();
 
 //     try {
-//       await axios.post("http://localhost:8800/api/auth/register", inputs);
+//       await axios.post("https://server-wi41.onrender.com/api/auth/register", inputs);
+//       navigate("/login"); // ✅ Redirect to login page after successful registration
 //     } catch (err) {
-//       setErr(err.response.data);
+//       setErr(err.response?.data?.message || "Registration failed. Try again.");
 //     }
 //   };
-
-//   console.log(err)
 
 //   return (
 //     <div className="register">
@@ -70,7 +71,7 @@
 //               name="name"
 //               onChange={handleChange}
 //             />
-//             {err && err}
+//             {err && <span className="error">{err}</span>} {/* ✅ Proper error display */}
 //             <button onClick={handleClick}>Register</button>
 //           </form>
 //         </div>
@@ -82,10 +83,15 @@
 // export default Register;
 
 
+
+
+// 📌 Import Required Modules
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./register.scss";
+import "./register.css";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify"; // ✅ Import Toast
+import "react-toastify/dist/ReactToastify.css"; // ✅ Import Toast CSS
 
 const Register = () => {
   const [inputs, setInputs] = useState({
@@ -97,23 +103,43 @@ const Register = () => {
   const [err, setErr] = useState(null);
   const navigate = useNavigate(); // ✅ Use navigate for redirection after registration
 
+  // 📌 Handle Input Change
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // 📌 Handle Form Submission
   const handleClick = async (e) => {
     e.preventDefault();
 
     try {
+      // ✅ Make POST Request to Register API
       await axios.post("https://server-wi41.onrender.com/api/auth/register", inputs);
-      navigate("/login"); // ✅ Redirect to login page after successful registration
+
+      // 🎉 Show Success Toast
+      toast.success("✅ Registration successful! Redirecting to login...", {
+        position: "top-center",
+        autoClose: 3000, // Close after 3 seconds
+      });
+
+      // ⏳ Delay Redirection to Login Page After 3 Seconds
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     } catch (err) {
-      setErr(err.response?.data?.message || "Registration failed. Try again.");
+      // ❌ Show Error Toast if Registration Fails
+      toast.error(err.response?.data?.message || "❌ Registration failed. Try again.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
     }
   };
 
   return (
     <div className="register">
+      {/* ✅ Toast Container to Render Toasts */}
+      <ToastContainer />
+
       <div className="card">
         <div className="left">
           <h1>Lama Social.</h1>
@@ -154,7 +180,6 @@ const Register = () => {
               name="name"
               onChange={handleChange}
             />
-            {err && <span className="error">{err}</span>} {/* ✅ Proper error display */}
             <button onClick={handleClick}>Register</button>
           </form>
         </div>

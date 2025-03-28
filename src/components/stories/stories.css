@@ -1,0 +1,221 @@
+/* 
+.stories {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px;
+  gap: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+
+  // ✅ Swiper container
+  .swiper-container {
+    width: 100%;
+    height: 220px;
+  }
+
+  .story-slide {
+    width: 120px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    overflow: hidden;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    // ✅ Story media (image/video)
+    .story-media {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    span {
+      margin-top: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    // ✅ Delete Button
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  // ✅ Upload Story Box
+  .upload-story {
+    width: 120px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    cursor: pointer;
+
+    img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+
+    span {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .plus-btn {
+      background-color: #4caf50;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+  }
+}
+
+ */
+
+
+
+
+ .stories {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px;
+  gap: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+/* Swiper Container */
+.stories .swiper-container {
+  width: 100%;
+  height: 220px;
+}
+
+/* Story Slide */
+.stories .story-slide {
+  width: 120px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  transition: 0.3s;
+  overflow: hidden;
+}
+
+/* Hover Effect on Story Slide */
+.stories .story-slide:hover {
+  transform: scale(1.05);
+}
+
+/* Story Media (Image/Video) */
+.stories .story-slide .story-media {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+/* Story Slide Text */
+.stories .story-slide span {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Delete Button */
+.stories .story-slide .delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Upload Story Box */
+.stories .upload-story {
+  width: 120px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* Upload Story Image */
+.stories .upload-story img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 5px;
+}
+
+/* Upload Story Text */
+.stories .upload-story span {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Plus Button */
+.stories .upload-story .plus-btn {
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 18px;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}

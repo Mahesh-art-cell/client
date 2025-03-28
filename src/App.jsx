@@ -92,7 +92,7 @@ import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import MediaList from "./components/media/MediaList";
 import Friends from "./pages/friends/Friends"; // ✅ Import Friends Page
-import "./style.scss";
+import "./style.css";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";

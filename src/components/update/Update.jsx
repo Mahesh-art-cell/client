@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { makeRequest } from "../../axios";
-import "./update.scss";
+import "./update.css";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 

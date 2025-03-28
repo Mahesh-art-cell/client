@@ -1,0 +1,40 @@
+/* @import "../../style.scss";
+
+.home{
+  @include themify($themes) {
+    padding: 20px 70px;
+    background-color: themed("bgSoft");
+    min-height: 100vh;
+
+    @include mobile {
+      padding: 10px;
+    }
+
+    @include tablet{
+      padding: 20px;
+    }
+  }
+ } */
+
+ @import "../../style.css";
+
+/* Home Container */
+.home {
+  padding: 20px 70px;
+  background-color: var(--bgSoft);
+  min-height: 100vh;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .home {
+    padding: 10px;
+  }
+}
+
+/* Tablet Responsiveness */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .home {
+    padding: 20px;
+  }
+}

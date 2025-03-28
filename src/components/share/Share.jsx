@@ -1,5 +1,5 @@
 
-import "./share.scss";
+import "./share.css";
 import Image from "../../assets/img.png";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";

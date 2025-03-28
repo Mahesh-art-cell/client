@@ -1,0 +1,204 @@
+/* .friends {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  .container {
+    width: 60%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    .counts {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+
+      .count-item {
+        text-align: center;
+
+        .label {
+          font-size: 14px;
+          color: #777;
+        }
+
+        .value {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+        }
+      }
+    }
+
+    .suggestions {
+      margin-top: 20px;
+
+      h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+
+        .suggestion-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 10px;
+          padding: 10px;
+          border: 1px solid #e1e1e1;
+          border-radius: 8px;
+
+          .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+          }
+
+          .info {
+            flex-grow: 1;
+
+            .username {
+              font-weight: bold;
+              font-size: 14px;
+            }
+          }
+
+          .follow-btn {
+            background-color: #1877f2;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: #145db2;
+            }
+          }
+        }
+      }
+    }
+
+    .loading {
+      text-align: center;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+  }
+} */
+
+
+
+.friends {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Container */
+.friends .container {
+  width: 60%;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Counts Section */
+.friends .container .counts {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* Count Item */
+.friends .container .counts .count-item {
+  text-align: center;
+}
+
+/* Label */
+.friends .container .counts .count-item .label {
+  font-size: 14px;
+  color: #777;
+}
+
+/* Value */
+.friends .container .counts .count-item .value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Suggestions Section */
+.friends .container .suggestions {
+  margin-top: 20px;
+}
+
+/* Suggestions Heading */
+.friends .container .suggestions h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* Suggestions List */
+.friends .container .suggestions ul {
+  list-style: none;
+  padding: 0;
+}
+
+/* Suggestion Item */
+.friends .container .suggestions ul .suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+}
+
+/* Profile Picture */
+.friends .container .suggestions ul .suggestion-item .profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* Info Section */
+.friends .container .suggestions ul .suggestion-item .info {
+  flex-grow: 1;
+}
+
+/* Username */
+.friends .container .suggestions ul .suggestion-item .info .username {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Follow Button */
+.friends .container .suggestions ul .suggestion-item .follow-btn {
+  background-color: #1877f2;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Follow Button Hover Effect */
+.friends .container .suggestions ul .suggestion-item .follow-btn:hover {
+  background-color: #145db2;
+}
+
+/* Loading Text */
+.friends .container .loading {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 20px;
+}

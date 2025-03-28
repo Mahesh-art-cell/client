@@ -1,4 +1,4 @@
-import "./friends.scss";
+import "./friends.css";
 import { useState, useEffect } from "react";
 import { makeRequest } from "../../axios"; // ✅ Use the configured axios instance
 

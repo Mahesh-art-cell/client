@@ -1,4 +1,4 @@
-$themes: (
+/* $themes: (
   light: (
     textColor: #000,
     bg: white,
@@ -48,5 +48,60 @@ $themes: (
 @mixin tablet {
   @media (max-width: 960px) {
     @content;
+  }
+} */
+
+
+
+/* Light Theme */
+.theme-light {
+  --textColor: #000;
+  --bg: white;
+  --logo: darkblue;
+  --bgSoft: #f6f3f3;
+  --textColorSoft: #555;
+  --border: lightgray;
+}
+
+/* Dark Theme */
+.theme-dark {
+  --textColor: whitesmoke;
+  --bg: #222;
+  --logo: white;
+  --bgSoft: #333;
+  --textColorSoft: lightgray;
+  --border: #444;
+}
+
+/* Utility Classes */
+body {
+  color: var(--textColor);
+  background-color: var(--bg);
+}
+
+/* Mobile Media Query */
+@media (max-width: 480px) {
+  .mobile-hide {
+    display: none;
+  }
+}
+
+/* Tablet Media Query */
+@media (max-width: 960px) {
+  .tablet-hide {
+    display: none;
+  }
+}
+
+/* Additional Mobile and Tablet Rules (Optional) */
+@media (max-width: 480px) {
+  .mobile-container {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 960px) {
+  .tablet-container {
+    padding: 15px;
   }
 }

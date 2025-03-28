@@ -1,6 +1,6 @@
 
 import Post from "../post/Post";
-import "./posts.scss";
+import "./posts.css";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { useContext } from "react";

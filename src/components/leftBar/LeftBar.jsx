@@ -1,5 +1,5 @@
 
-import "./leftBar.scss";
+import "./leftBar.css";
 import Friends from "../../assets/1.png";
 import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";

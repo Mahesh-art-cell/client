@@ -208,7 +208,7 @@
 
 
 
-import "./rightBar.scss";
+import "./rightBar.css";
 import { useEffect, useState } from "react";
 import { makeRequest } from "../../axios"; // ✅ Correct import
 

@@ -1,6 +1,6 @@
 
 
-import "./profile.scss";
+import "./profile.css";
 import { useContext, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
