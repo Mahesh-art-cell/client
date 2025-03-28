@@ -362,13 +362,23 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
     },
     {
       onSuccess: (data) => {
-        console.log("✅ Profile updated successfully!");
-        // ✅ Update parent profile immediately
+        console.log("✅ Profile updated successfully! Response:", data.data);
+
+        // ✅ Update parent profile immediately after success
         if (typeof refreshProfile === "function") {
           refreshProfile(data.data);
         }
 
-        queryClient.invalidateQueries(["user", user.id]);
+        // ✅ Update user state with new image URLs
+        queryClient.setQueryData(["user", user.id], (prevUser) => ({
+          ...prevUser,
+          profilePic: data.data.profilePic,
+          coverPic: data.data.coverPic,
+        }));
+
+        console.log(`🌐 Updated Profile Pic URL: ${data.data.profilePic}`);
+        console.log(`🌐 Updated Cover Pic URL: ${data.data.coverPic}`);
+
         setTimeout(() => {
           setOpenUpdate(false);
           setIsSubmitting(false);
@@ -396,6 +406,7 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
         const coverUrl = await upload(cover, "cover");
         if (coverUrl) {
           updatedUser.coverPic = coverUrl;
+          console.log(`🌐 New Cover Pic URL: ${coverUrl}`);
         }
       }
 
@@ -404,6 +415,7 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
         const profileUrl = await upload(profile, "profile");
         if (profileUrl) {
           updatedUser.profilePic = profileUrl;
+          console.log(`🌐 New Profile Pic URL: ${profileUrl}`);
         }
       }
 
