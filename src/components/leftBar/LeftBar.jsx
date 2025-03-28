@@ -38,23 +38,28 @@
 import "./leftBar.scss";
 import Friends from "../../assets/1.png";
 import { AuthContext } from "../../context/authContext";
-import { useContext, useState } from "react";
-import Profile from "../../pages/profile/Profile"; // Import Profile Page
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 
 const LeftBar = () => {
   const { currentUser } = useContext(AuthContext);
-  const [showProfile, setShowProfile] = useState(false);
+  const navigate = useNavigate();
 
+  // ✅ Handle Profile Click and Navigate to Profile
   const handleProfileClick = () => {
-    setShowProfile((prev) => !prev); // Toggle Profile Visibility
+    navigate(`/profile/${currentUser.id}`); // Dynamically navigate to profile
   };
 
   return (
     <div className="leftBar">
       <div className="container">
         <div className="menu">
-          {/* ✅ User Profile Section */}
-          <div className="user" onClick={handleProfileClick} style={{ cursor: "pointer" }}>
+          {/* ✅ User Profile Click to Navigate */}
+          <div
+            className="user"
+            onClick={handleProfileClick}
+            style={{ cursor: "pointer" }}
+          >
             <img
               src={currentUser.profilePic || "/default-avatar.png"}
               alt="User Profile"
@@ -62,16 +67,13 @@ const LeftBar = () => {
             <span>{currentUser.name}</span>
           </div>
 
-          {/* ✅ Profile Menu */}
+          {/* ✅ Friends Section */}
           <div className="item">
             <img src={Friends} alt="Friends" />
             <span>Friends</span>
           </div>
         </div>
       </div>
-
-      {/* ✅ Show Profile Page when clicked */}
-      {showProfile && <Profile />}
     </div>
   );
 };
