@@ -20,14 +20,14 @@
 
 // const Profile = () => {
 //   const [openUpdate, setOpenUpdate] = useState(false);
-//   const { currentUser } = useContext(AuthContext);
+//   const { currentUser, setCurrentUser } = useContext(AuthContext); // ✅ Update Context State
 //   const queryClient = useQueryClient();
 //   const userId = Number(useLocation().pathname.split("/")[2]);
-//   const [refreshKey, setRefreshKey] = useState(Date.now());
+//   const [profileData, setProfileData] = useState(null); // ✅ State to hold user data
 
-//   // ✅ Fetch user data with error handling
+//   // ✅ Fetch User Data with Error Handling
 //   const { isLoading, error, data } = useQuery(
-//     ["user", userId, refreshKey],
+//     ["user", userId],
 //     async () => {
 //       const res = await makeRequest.get(`/users/find/${userId}`);
 //       return res.data;
@@ -35,32 +35,51 @@
 //     { enabled: !isNaN(userId), refetchOnWindowFocus: false }
 //   );
 
-//   // ✅ Upload Handler (Profile/Cover Image)
+//   useEffect(() => {
+//     if (data) {
+//       setProfileData(data); // ✅ Set initial data
+//     }
+//   }, [data]);
+
+//   // ✅ Upload Handler for Profile & Cover Image
 //   const handleFileUpload = async (e, type) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
 
 //     try {
 //       const formData = new FormData();
-//       formData.append("file", file);
+//       formData.append(type === "profile" ? "profilePic" : "coverPic", file);
 
-//       const res = await makeRequest.post(
-//         `/users/upload/${currentUser.id}?type=${type}`,
-//         formData
+//       // ✅ Upload to Backend
+//       const res = await makeRequest.put(
+//         `/users/${currentUser.id}`,
+//         formData,
+//         {
+//           headers: {
+//             "Content-Type": "multipart/form-data",
+//           },
+//         }
 //       );
 
-//       console.log("✅ Uploaded URL:", res.data[type === "profile" ? "profilePic" : "coverPic"]);
+//       console.log(`✅ ${type === "profile" ? "Profile" : "Cover"} Pic Updated!`);
+      
+//       // ✅ Update Profile Data with New URLs
+//       const updatedData = {
+//         ...profileData,
+//         profilePic: type === "profile" ? res.data.profilePic : profileData.profilePic,
+//         coverPic: type === "cover" ? res.data.coverPic : profileData.coverPic,
+//       };
 
-//       const updateData =
-//         type === "profile"
-//           ? { profilePic: res.data.profilePic }
-//           : { coverPic: res.data.coverPic };
+//       setProfileData(updatedData); // ✅ Update Profile Data
+//       setCurrentUser({
+//         ...currentUser,
+//         profilePic: res.data.profilePic || currentUser.profilePic,
+//         coverPic: res.data.coverPic || currentUser.coverPic,
+//       });
 
-//       await makeRequest.put(`/users/${currentUser.id}`, updateData);
-//       setRefreshKey(Date.now()); // ✅ Force refresh
-//       queryClient.invalidateQueries(["user", userId]);
+//       queryClient.invalidateQueries(["user", userId]); // ✅ Invalidate Cache
 //     } catch (err) {
-//       console.error("❌ Upload error:", err.message);
+//       console.error("❌ Upload Error:", err.message);
 //     }
 //   };
 
@@ -71,9 +90,9 @@
 //   return (
 //     <div className="profile">
 //       <div className="images">
-//         {/* Cover Image */}
+//         {/* ✅ Cover Image */}
 //         <img
-//           src={data?.coverPic || "/default-cover.png"} // ✅ Cloudinary URL
+//           src={profileData?.coverPic || "/default-cover.png"}
 //           alt="Cover"
 //           className="cover"
 //         />
@@ -90,9 +109,9 @@
 //           </label>
 //         )}
 
-//         {/* Profile Image */}
+//         {/* ✅ Profile Image */}
 //         <img
-//           src={data?.profilePic || "/default-avatar.png"} // ✅ Cloudinary URL
+//           src={profileData?.profilePic || "/default-avatar.png"}
 //           alt="Profile"
 //           className="profilePic"
 //         />
@@ -113,35 +132,35 @@
 //       <div className="profileContainer">
 //         <div className="uInfo">
 //           <div className="left">
-//             <a href={data?.facebook}>
+//             <a href={profileData?.facebook || "#"}>
 //               <FacebookTwoToneIcon fontSize="large" />
 //             </a>
-//             <a href={data?.instagram}>
+//             <a href={profileData?.instagram || "#"}>
 //               <InstagramIcon fontSize="large" />
 //             </a>
-//             <a href={data?.twitter}>
+//             {/* <a href={profileData?.twitter || "#"}>
 //               <TwitterIcon fontSize="large" />
-//             </a>
-//             <a href={data?.linkedin}>
+//             </a> */}
+//             <a href={profileData?.linkedin || "#"}>
 //               <LinkedInIcon fontSize="large" />
 //             </a>
-//             <a href={data?.pinterest}>
+//             {/* <a href={profileData?.pinterest || "#"}>
 //               <PinterestIcon fontSize="large" />
-//             </a>
+//             </a> */}
 //           </div>
 
 //           <div className="center">
-//             <span>{data?.name}</span>
-//             <div className="info">
+//             <span>{profileData?.name || "User"}</span>
+//             {/* <div className="info">
 //               <div className="item">
 //                 <PlaceIcon />
-//                 <span>{data?.city || "Not Available"}</span>
+//                 <span>{profileData?.city || "Not Available"}</span>
 //               </div>
 //               <div className="item">
 //                 <LanguageIcon />
-//                 <span>{data?.website || "No Website"}</span>
+//                 <span>{profileData?.website || "No Website"}</span>
 //               </div>
-//             </div>
+//             </div> */}
 
 //             {userId === currentUser.id && (
 //               <button onClick={() => setOpenUpdate(true)}>Update</button>
@@ -154,14 +173,15 @@
 //           </div>
 //         </div>
 
-//         {/* ✅ Show Share only if visiting own profile */}
+//         {/* ✅ Show Share only for Own Profile */}
 //         {userId === currentUser.id && <Share />}
 
 //         {/* ✅ Render Posts */}
 //         <Posts userId={userId} />
 //       </div>
 
-//       {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
+//       {/* ✅ Open Update Modal */}
+//       {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={profileData} />}
 //     </div>
 //   );
 // };
@@ -171,33 +191,25 @@
 
 
 
+
 import "./profile.scss";
-import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import PinterestIcon from "@mui/icons-material/Pinterest";
-import PlaceIcon from "@mui/icons-material/Place";
-import LanguageIcon from "@mui/icons-material/Language";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Posts from "../../components/posts/Posts";
+import { useState, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
-import { useLocation } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
+import Posts from "../../components/posts/Posts";
 import Share from "../../components/share/Share";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
-  const { currentUser, setCurrentUser } = useContext(AuthContext); // ✅ Update Context State
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const userId = Number(useLocation().pathname.split("/")[2]);
-  const [profileData, setProfileData] = useState(null); // ✅ State to hold user data
+  const [profileData, setProfileData] = useState(null);
 
-  // ✅ Fetch User Data with Error Handling
+  // ✅ Fetch User Profile Data
   const { isLoading, error, data } = useQuery(
     ["user", userId],
     async () => {
@@ -209,151 +221,59 @@ const Profile = () => {
 
   useEffect(() => {
     if (data) {
-      setProfileData(data); // ✅ Set initial data
+      setProfileData(data);
     }
   }, [data]);
 
-  // ✅ Upload Handler for Profile & Cover Image
-  const handleFileUpload = async (e, type) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // ✅ Refresh Profile After Update
+  const refreshProfile = (updatedData) => {
+    setProfileData(updatedData);
+    setCurrentUser((prev) => ({
+      ...prev,
+      profilePic: updatedData.profilePic,
+      coverPic: updatedData.coverPic,
+    }));
 
-    try {
-      const formData = new FormData();
-      formData.append(type === "profile" ? "profilePic" : "coverPic", file);
-
-      // ✅ Upload to Backend
-      const res = await makeRequest.put(
-        `/users/${currentUser.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log(`✅ ${type === "profile" ? "Profile" : "Cover"} Pic Updated!`);
-      
-      // ✅ Update Profile Data with New URLs
-      const updatedData = {
-        ...profileData,
-        profilePic: type === "profile" ? res.data.profilePic : profileData.profilePic,
-        coverPic: type === "cover" ? res.data.coverPic : profileData.coverPic,
-      };
-
-      setProfileData(updatedData); // ✅ Update Profile Data
-      setCurrentUser({
-        ...currentUser,
-        profilePic: res.data.profilePic || currentUser.profilePic,
-        coverPic: res.data.coverPic || currentUser.coverPic,
-      });
-
-      queryClient.invalidateQueries(["user", userId]); // ✅ Invalidate Cache
-    } catch (err) {
-      console.error("❌ Upload Error:", err.message);
-    }
+    queryClient.invalidateQueries(["user", userId]);
   };
 
-  if (isLoading) return <div className="loading">Loading profile...</div>;
-  if (error)
-    return <div className="error">Error loading profile: {error.message}</div>;
+  if (isLoading) return <div>Loading profile...</div>;
+  if (error) return <div>Error loading profile!</div>;
 
   return (
     <div className="profile">
       <div className="images">
-        {/* ✅ Cover Image */}
+        {/* ✅ Cover Picture */}
         <img
           src={profileData?.coverPic || "/default-cover.png"}
           alt="Cover"
           className="cover"
         />
-        {userId === currentUser.id && (
-          <label htmlFor="coverUpload" className="upload-button">
-            Change Cover
-            <input
-              type="file"
-              id="coverUpload"
-              style={{ display: "none" }}
-              onChange={(e) => handleFileUpload(e, "cover")}
-              accept="image/*"
-            />
-          </label>
-        )}
-
-        {/* ✅ Profile Image */}
+        {/* ✅ Profile Picture */}
         <img
           src={profileData?.profilePic || "/default-avatar.png"}
           alt="Profile"
           className="profilePic"
         />
-        {userId === currentUser.id && (
-          <label htmlFor="profileUpload" className="upload-button">
-            Change Profile
-            <input
-              type="file"
-              id="profileUpload"
-              style={{ display: "none" }}
-              onChange={(e) => handleFileUpload(e, "profile")}
-              accept="image/*"
-            />
-          </label>
-        )}
       </div>
 
       <div className="profileContainer">
         <div className="uInfo">
-          <div className="left">
-            <a href={profileData?.facebook || "#"}>
-              <FacebookTwoToneIcon fontSize="large" />
-            </a>
-            <a href={profileData?.instagram || "#"}>
-              <InstagramIcon fontSize="large" />
-            </a>
-            {/* <a href={profileData?.twitter || "#"}>
-              <TwitterIcon fontSize="large" />
-            </a> */}
-            <a href={profileData?.linkedin || "#"}>
-              <LinkedInIcon fontSize="large" />
-            </a>
-            {/* <a href={profileData?.pinterest || "#"}>
-              <PinterestIcon fontSize="large" />
-            </a> */}
-          </div>
-
           <div className="center">
             <span>{profileData?.name || "User"}</span>
-            {/* <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>{profileData?.city || "Not Available"}</span>
-              </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>{profileData?.website || "No Website"}</span>
-              </div>
-            </div> */}
-
             {userId === currentUser.id && (
               <button onClick={() => setOpenUpdate(true)}>Update</button>
             )}
           </div>
-
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
-          </div>
         </div>
 
-        {/* ✅ Show Share only for Own Profile */}
         {userId === currentUser.id && <Share />}
-
-        {/* ✅ Render Posts */}
         <Posts userId={userId} />
       </div>
 
-      {/* ✅ Open Update Modal */}
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={profileData} />}
+      {openUpdate && (
+        <Update setOpenUpdate={setOpenUpdate} user={profileData} refreshProfile={refreshProfile} />
+      )}
     </div>
   );
 };
