@@ -193,16 +193,17 @@
 
 
 import "./profile.scss";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { useLocation } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import Update from "../../components/update/Update";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const queryClient = useQueryClient(); // ✅ Corrected here
   const userId = Number(useLocation().pathname.split("/")[2]);
 
   // ✅ Fetch User Data
@@ -241,7 +242,7 @@ const Profile = () => {
           setOpenUpdate={setOpenUpdate}
           user={profileData}
           refreshProfile={(updatedData) => {
-            queryClient.setQueryData(["user", userId], updatedData);
+            queryClient.setQueryData(["user", userId], updatedData); // ✅ Correctly updates cache
           }}
         />
       )}
