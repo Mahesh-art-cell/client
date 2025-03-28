@@ -288,6 +288,7 @@
 import "./update.scss";
 import { useState, useContext } from "react";
 import { makeRequest } from "../../axios";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useMutation } from "@tanstack/react-query";
 import { AuthContext } from "../../context/authContext";
 
@@ -300,29 +301,69 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
     username: user.username,
   });
 
+  // ✅ Cloudinary Upload Check
+  const uploadToCloudinary = async (file, type) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "mern-social");
+
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/YOUR_CLOUDINARY_NAME/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+    if (!data.secure_url) {
+      throw new Error(`Cloudinary Upload Failed for ${type}`);
+    }
+    console.log(`✅ Uploaded ${type} to Cloudinary: ${data.secure_url}`);
+    return data.secure_url;
+  };
+
+  // ✅ Mutation to Update User
   const mutation = useMutation(
     async (updatedUser) => {
-      const formData = new FormData();
-      formData.append("name", texts.name);
-      formData.append("email", texts.email);
-      formData.append("username", texts.username);
-      if (cover) formData.append("coverPic", cover);
-      if (profile) formData.append("profilePic", profile);
+      if (!user?.id) {
+        console.error("❌ User ID is missing!");
+        return;
+      }
 
-      const res = await makeRequest.put(`/users/${user.id}`, formData);
+      const res = await makeRequest.put(`/users/${user.id}`, updatedUser);
+      console.log("✅ Update Response:", res.data);
       return res.data;
     },
     {
       onSuccess: (data) => {
+        console.log(`🌐 Updated Profile Pic URL: ${data.profilePic}`);
+        console.log(`🌐 Updated Cover Pic URL: ${data.coverPic}`);
         onProfileUpdate(data);
         setOpenUpdate(false);
       },
     }
   );
 
-  const handleClick = (e) => {
+  // ✅ Handle Click
+  const handleClick = async (e) => {
     e.preventDefault();
-    mutation.mutate();
+    let coverUrl = user.coverPic;
+    let profileUrl = user.profilePic;
+
+    try {
+      if (cover) coverUrl = await uploadToCloudinary(cover, "coverPic");
+      if (profile) profileUrl = await uploadToCloudinary(profile, "profilePic");
+    } catch (err) {
+      console.error("❌ Upload Error:", err.message);
+      return;
+    }
+
+    mutation.mutate({
+      ...texts,
+      coverPic: coverUrl,
+      profilePic: profileUrl,
+    });
   };
 
   return (
@@ -331,23 +372,49 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
         <h1>Update Your Profile</h1>
         <form>
           <div className="files">
+            {/* ✅ Cover Upload */}
             <label htmlFor="cover">
-              Cover Picture
-              <input
-                type="file"
-                id="cover"
-                onChange={(e) => setCover(e.target.files[0])}
-              />
+              <span>Cover Picture</span>
+              <div className="imgContainer">
+                <img
+                  src={
+                    cover
+                      ? URL.createObjectURL(cover)
+                      : user.coverPic || "/default-cover.png"
+                  }
+                  alt="Cover"
+                />
+                <CloudUploadIcon className="icon" />
+              </div>
             </label>
+            <input
+              type="file"
+              id="cover"
+              style={{ display: "none" }}
+              onChange={(e) => setCover(e.target.files[0])}
+            />
 
+            {/* ✅ Profile Upload */}
             <label htmlFor="profile">
-              Profile Picture
-              <input
-                type="file"
-                id="profile"
-                onChange={(e) => setProfile(e.target.files[0])}
-              />
+              <span>Profile Picture</span>
+              <div className="imgContainer">
+                <img
+                  src={
+                    profile
+                      ? URL.createObjectURL(profile)
+                      : user.profilePic || "/default-avatar.png"
+                  }
+                  alt="Profile"
+                />
+                <CloudUploadIcon className="icon" />
+              </div>
             </label>
+            <input
+              type="file"
+              id="profile"
+              style={{ display: "none" }}
+              onChange={(e) => setProfile(e.target.files[0])}
+            />
           </div>
 
           <input
@@ -366,9 +433,7 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
             type="text"
             placeholder="Username"
             value={texts.username}
-            onChange={(e) =>
-              setTexts({ ...texts, username: e.target.value })
-            }
+            onChange={(e) => setTexts({ ...texts, username: e.target.value })}
           />
           <button onClick={handleClick}>Update</button>
         </form>
