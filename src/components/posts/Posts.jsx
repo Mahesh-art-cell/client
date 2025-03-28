@@ -42,30 +42,26 @@
 
 
 
-import Post from "../post/Post";
 import "./posts.scss";
 import { useQuery } from "@tanstack/react-query";
+import Post from "../post/Post";
 import { makeRequest } from "../../axios";
 
 const Posts = ({ userId }) => {
-  // ✅ Fetch Posts for All or Specific User
-  const { isLoading, error, data } = useQuery(["posts", userId], async () => {
-    const endpoint = userId
-      ? `/posts/user/${userId}` // ✅ Specific user posts
-      : `/posts`; // ✅ All posts
-    const res = await makeRequest.get(endpoint);
-    return res.data;
-  });
+  // ✅ Fetch Posts - Home or Profile
+  const { isLoading, error, data } = useQuery(["posts", userId], () =>
+    makeRequest
+      .get(`/posts?userId=${userId || ""}`)
+      .then((res) => res.data)
+  );
 
   return (
     <div className="posts">
-      {isLoading ? (
-        <div className="loading">Loading posts...</div>
-      ) : error ? (
-        <div className="error">Error loading posts: {error.message}</div>
-      ) : (
-        data?.map((post) => <Post post={post} key={post.id} />)
-      )}
+      {isLoading
+        ? "Loading..."
+        : error
+        ? "Error fetching posts!"
+        : data.map((post) => <Post post={post} key={post.id} />)}
     </div>
   );
 };

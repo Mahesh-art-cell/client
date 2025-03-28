@@ -189,80 +189,19 @@
 
 
 import "./post.scss";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
-import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
-import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Link } from "react-router-dom";
-import Comments from "../comments/Comments";
-import { useState, useContext, useEffect } from "react";
-import moment from "moment";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
-import { AuthContext } from "../../context/authContext";
-
-// ✅ Function to Check File Type
-const isImage = (url) => /\.(jpeg|jpg|png|gif|bmp|webp)$/i.test(url);
-const isVideo = (url) => /\.(mp4|webm|ogg|avi|mov)$/i.test(url);
+import moment from "moment";
+import { useState } from "react";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const Post = ({ post }) => {
-  const [commentOpen, setCommentOpen] = useState(false);
-  const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
-
-  // ✅ State to Store Like Count and Like Status
-  const [likeCount, setLikeCount] = useState(0);
-  const [liked, setLiked] = useState(false);
-
-  // ✅ Fetch Likes
-  const { isLoading, data } = useQuery(["likes", post.id], async () => {
-    try {
-      const res = await makeRequest.get(`/likes?postId=${post.id}`);
-      return res.data;
-    } catch (err) {
-      console.error("❌ Error fetching likes:", err);
-      throw new Error("Failed to load likes");
-    }
-  });
-
-  // ✅ Update Like Count and Status
-  useEffect(() => {
-    if (data) {
-      setLikeCount(data.length);
-      setLiked(data.includes(currentUser.id));
-    }
-  }, [data, currentUser.id]);
-
-  // ✅ Like/Unlike Mutation
-  const likeMutation = useMutation(
-    (liked) => {
-      if (liked) {
-        return makeRequest.delete(`/likes?postId=${post.id}`);
-      } else {
-        return makeRequest.post("/likes", { postId: post.id });
-      }
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["likes", post.id]);
-      },
-    }
-  );
-
-  // ✅ Handle Like Click
-  const handleLike = () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    setLikeCount((prev) => (newLiked ? prev + 1 : prev - 1));
-    likeMutation.mutate(liked);
-  };
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // ✅ Delete Post Mutation
   const deleteMutation = useMutation(
-    async () => {
-      return makeRequest.delete(`/posts/${post.id}`);
-    },
+    (postId) => makeRequest.delete(`/posts/${postId}`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["posts"]);
@@ -271,80 +210,40 @@ const Post = ({ post }) => {
   );
 
   // ✅ Handle Post Deletion
-  const handleDeletePost = () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      deleteMutation.mutate();
-    }
+  const handleDelete = () => {
+    deleteMutation.mutate(post.id);
   };
 
   return (
     <div className="post">
-      <div className="container">
-        <div className="user">
-          <div className="userInfo">
-            <img
-              src={post.profilePic || "/defaultProfilePic.jpg"}
-              alt="Profile"
-            />
-            <div className="details">
-              <Link
-                to={`/profile/${post.userId}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <span className="name">{post.name}</span>
-              </Link>
-              <span className="date">{moment(post.createdAt).fromNow()}</span>
-            </div>
-          </div>
-
-          {/* ✅ Delete Button (Only Post Owner) */}
-          {post.userId === currentUser.id && (
-            <DeleteOutlineIcon
-              className="delete-btn"
-              onClick={handleDeletePost}
-            />
-          )}
-        </div>
-
-        {/* ✅ Post Content & Media */}
-        <div className="content">
-          <p className="post-text">{post.content}</p>
-          {post.img && (
-            <div className="media-container">
-              {isImage(post.img) ? (
-                <img src={post.img} alt="Post Media" className="post-image" />
-              ) : isVideo(post.img) ? (
-                <video width="100%" controls>
-                  <source src={post.img} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              ) : null}
+      <div className="postWrapper">
+        <div className="postTop">
+          <img
+            src={post.profilePic || "/assets/default-avatar.png"}
+            alt="Profile"
+            className="postProfileImg"
+          />
+          <span className="postUsername">{post.name}</span>
+          <span className="postDate">{moment(post.createdAt).fromNow()}</span>
+          <MoreVertIcon onClick={() => setMenuOpen(!menuOpen)} />
+          {menuOpen && (
+            <div className="postMenu">
+              <button onClick={handleDelete}>Delete</button>
             </div>
           )}
         </div>
-
-        {/* ✅ Like, Comment, and Share Section */}
-        <div className="info">
-          <div className="item" onClick={handleLike}>
-            {liked ? (
-              <FavoriteOutlinedIcon style={{ color: "red", cursor: "pointer" }} />
-            ) : (
-              <FavoriteBorderOutlinedIcon style={{ cursor: "pointer" }} />
-            )}
-            {likeCount} Likes
-          </div>
-          <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
-            <TextsmsOutlinedIcon />
-            See Comments
-          </div>
-          <div className="item">
-            <ShareOutlinedIcon />
-            Share
-          </div>
+        <div className="postCenter">
+          <p className="postText">{post.content}</p>
+          {post.mediaUrl && (
+            <div className="postMedia">
+              {post.mediaType === "image" ? (
+                <img src={post.mediaUrl} alt="Post Media" />
+              ) : (
+                <video src={post.mediaUrl} controls />
+              )}
+            </div>
+          )}
         </div>
-
-        {/* ✅ Comments Section */}
-        {commentOpen && <Comments postId={post.id} />}
       </div>
     </div>
   );

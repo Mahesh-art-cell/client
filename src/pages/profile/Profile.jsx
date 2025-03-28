@@ -90,69 +90,37 @@
 
 
 import "./profile.scss";
-import { useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
 import { useLocation } from "react-router-dom";
-import { AuthContext } from "../../context/authContext";
-import Update from "../../components/update/Update";
-import Share from "../../components/share/Share";
+import { makeRequest } from "../../axios";
 import Posts from "../../components/posts/Posts";
 
 const Profile = () => {
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const { currentUser } = useContext(AuthContext);
-  const userId = Number(useLocation().pathname.split("/")[2]);
-  const [profileData, setProfileData] = useState(null);
+  const userId = parseInt(useLocation().pathname.split("/")[2]);
 
-  // ✅ Fetch User Data
-  const { isLoading, error, data } = useQuery(["user", userId], async () => {
-    const res = await makeRequest.get(`/users/find/${userId}`);
-    return res.data;
-  });
-
-  useEffect(() => {
-    if (data) {
-      setProfileData(data);
-    }
-  }, [data]);
-
-  if (isLoading) return <div className="loading">Loading profile...</div>;
-  if (error)
-    return <div className="error">Error loading profile: {error.message}</div>;
+  // ✅ Fetch User Profile Info
+  const { isLoading, error, data } = useQuery(["userProfile", userId], () =>
+    makeRequest.get(`/users/${userId}`).then((res) => {
+      return res.data;
+    })
+  );
 
   return (
     <div className="profile">
-      <div className="images">
-        <img
-          src={profileData?.coverPic || "/default-cover.png"}
-          alt="Cover"
-          className="cover"
-        />
-        <img
-          src={profileData?.profilePic || "/default-avatar.png"}
-          alt="Profile"
-          className="profilePic"
-        />
-      </div>
-
-      <div className="profileContainer">
-        <div className="uInfo">
-          <span>{profileData?.name || "User"}</span>
-          {userId === currentUser?.id && (
-            <button onClick={() => setOpenUpdate(true)}>Update</button>
-          )}
-        </div>
-
-        {userId === currentUser?.id && <Share />}
-        <Posts userId={userId} />
-      </div>
-
-      {openUpdate && (
-        <Update
-          setOpenUpdate={setOpenUpdate}
-          user={profileData}
-        />
+      {isLoading ? (
+        "Loading..."
+      ) : error ? (
+        "Error loading profile."
+      ) : (
+        <>
+          <div className="profileHeader">
+            <img src={data.profilePic} alt="Profile" className="profilePic" />
+            <h1>{data.name}</h1>
+            <p>{data.bio || "No bio available"}</p>
+          </div>
+          {/* ✅ Show Posts from User */}
+          <Posts userId={userId} />
+        </>
       )}
     </div>
   );
