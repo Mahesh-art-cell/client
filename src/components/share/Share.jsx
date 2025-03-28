@@ -164,79 +164,58 @@ import { makeRequest } from "../../axios";
 const Share = () => {
   const [file, setFile] = useState(null);
   const [content, setContent] = useState("");
-  const [uploading, setUploading] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  // ✅ Post Mutation
+  // ✅ Post Creation Mutation
   const mutation = useMutation(
     async (newPost) => {
       const formData = new FormData();
-      formData.append("content", newPost.content);
+      formData.append("desc", newPost.desc);
+      formData.append("userId", currentUser.id);
       if (newPost.file) {
-        formData.append("file", newPost.file);
+        formData.append("img", newPost.file);
       }
 
-      console.log("📢 FormData Content Before API:");
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
-      console.log("📢 Sending FormData to API...");
       const res = await makeRequest.post("/posts", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      console.log("✅ API Response:", res.data);
       return res.data;
     },
     {
-      onSuccess: (data) => {
-        console.log("✅ Post Added Successfully:", data);
-        queryClient.invalidateQueries(["posts"]); // ✅ Refetch posts after success
+      onSuccess: () => {
+        queryClient.invalidateQueries(["posts"]); // ✅ Invalidate Posts to Refetch
         setContent("");
         setFile(null);
         alert("✅ Post shared successfully!");
       },
       onError: (error) => {
-        console.error(
-          "❌ Error sharing post:",
-          error.response?.data || error.message
-        );
+        console.error("❌ Error sharing post:", error.response?.data || error.message);
         alert("❌ Error sharing post. Please try again.");
       },
     }
   );
 
-  // ✅ Handle Share Button
-  const handleClick = async (e) => {
+  // ✅ Handle Share Button Click
+  const handleClick = (e) => {
     e.preventDefault();
-
     if (!content.trim() && !file) {
       alert("Please add some content or an image before sharing.");
       return;
     }
 
-    setUploading(true);
-
-    // ✅ Send Post Data to API
     mutation.mutate({
-      content,
+      desc: content,
       file,
     });
-
-    setUploading(false);
   };
 
-  // ✅ Handle File Change (Upload Image)
+  // ✅ Handle File Change
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    console.log("📢 Selected File:", selectedFile);
-    setFile(selectedFile);
+    setFile(e.target.files[0]);
   };
 
   return (
@@ -258,7 +237,7 @@ const Share = () => {
           </div>
         </div>
 
-        {/* ✅ Corrected Preview Section */}
+        {/* ✅ File Upload Preview */}
         <div className="right">
           {file && (
             <div className="preview-container">
@@ -267,7 +246,6 @@ const Share = () => {
                 alt="Preview"
                 src={URL.createObjectURL(file)}
               />
-              {content && <p className="post-text">{content}</p>}
             </div>
           )}
         </div>
@@ -275,7 +253,7 @@ const Share = () => {
         <hr />
         <div className="bottom">
           <div className="left">
-            {/* ✅ File Input for Image Upload */}
+            {/* ✅ File Input */}
             <input
               type="file"
               id="file"
@@ -293,9 +271,9 @@ const Share = () => {
           <div className="right">
             <button
               onClick={handleClick}
-              disabled={mutation.isPending || uploading}
+              disabled={mutation.isPending}
             >
-              {mutation.isPending || uploading ? "Sharing..." : "Share"}
+              {mutation.isPending ? "Sharing..." : "Share"}
             </button>
           </div>
         </div>
