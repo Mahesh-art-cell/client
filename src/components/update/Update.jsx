@@ -285,64 +285,58 @@
 
 
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { makeRequest } from "../../axios";
 import "./update.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-const Update = ({ setOpenUpdate, user, refreshProfile }) => {
-  const queryClient = useQueryClient();
+const Update = ({ setOpenUpdate, user }) => {
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [texts, setTexts] = useState({
-    email: user?.email || "",
-    name: user?.name || "",
-    username: user?.username || "",
+    email: user.email,
+    name: user.name,
+    username: user.username,
+    city: user.city,
+    website: user.website,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
 
-  // ✅ Upload to Cloudinary
-  const upload = async (file, type) => {
-    if (!file) return null;
+  const queryClient = useQueryClient();
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("type", type);
+  // ✅ Upload to Cloudinary and Get URL
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "mern-social"); // ✅ Cloudinary Upload Preset
 
-      // ✅ Upload API to Cloudinary
-      const res = await makeRequest.post("/users/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return res.data.url; // ✅ Cloudinary URL
-    } catch (err) {
-      console.error(`❌ ${type} Upload Failed:`, err);
-      setError(`Failed to upload ${type}.`);
-      return null;
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload`, // ✅ Replace YOUR_CLOUD_NAME
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    const data = await res.json();
+    if (!data.secure_url) {
+      throw new Error("Cloudinary Upload Failed!");
     }
+    return data.secure_url;
   };
 
-  // ✅ Mutation for Profile Update
+  // ✅ Handle Update Form Submission
   const mutation = useMutation(
     async (updatedUser) => {
       return makeRequest.put(`/users/${user.id}`, updatedUser);
     },
     {
-      onSuccess: (data) => {
-        console.log("✅ User updated successfully:", data.data);
-        if (refreshProfile) {
-          refreshProfile(data.data);
-        }
+      onSuccess: () => {
         queryClient.invalidateQueries(["user", user.id]);
         setOpenUpdate(false);
       },
-      onError: (error) => {
-        setError("Failed to update profile. Please try again.");
-        setIsSubmitting(false);
+      onError: (err) => {
+        console.error("❌ Update Error:", err.response?.data || err.message);
+        alert("❌ Update failed. Please try again.");
       },
     }
   );
@@ -350,84 +344,105 @@ const Update = ({ setOpenUpdate, user, refreshProfile }) => {
   // ✅ Handle Form Submission
   const handleClick = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     try {
-      const updatedUser = { ...texts };
+      let coverUrl = cover ? await uploadToCloudinary(cover) : user.coverPic;
+      let profileUrl = profile ? await uploadToCloudinary(profile) : user.profilePic;
 
-      // ✅ Upload cover image
-      if (cover) {
-        const coverUrl = await upload(cover, "cover");
-        if (coverUrl) {
-          updatedUser.coverPic = coverUrl;
-        }
-      }
+      const updatedUser = {
+        ...texts,
+        coverPic: coverUrl,
+        profilePic: profileUrl,
+      };
 
-      // ✅ Upload profile image
-      if (profile) {
-        const profileUrl = await upload(profile, "profile");
-        if (profileUrl) {
-          updatedUser.profilePic = profileUrl;
-        }
-      }
-
-      // ✅ Send updated data
       mutation.mutate(updatedUser);
     } catch (err) {
-      setError("Update process failed. Please try again.");
-      setIsSubmitting(false);
+      console.error("❌ Upload Error:", err);
+      alert("❌ Image upload failed. Please try again.");
     }
+  };
+
+  // ✅ Handle Input Changes
+  const handleChange = (e) => {
+    setTexts((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   return (
     <div className="update">
       <div className="wrapper">
         <h1>Update Your Profile</h1>
-        {error && <div className="error-message">{error}</div>}
-        <form>
-          <label>Cover Picture</label>
+        <form onSubmit={handleClick}>
+          <label htmlFor="cover">
+            <div className="imgContainer">
+              <img
+                src={cover ? URL.createObjectURL(cover) : user.coverPic}
+                alt="Cover"
+              />
+              <CloudUploadIcon className="icon" />
+            </div>
+          </label>
           <input
             type="file"
+            id="cover"
+            style={{ display: "none" }}
             onChange={(e) => setCover(e.target.files[0])}
             accept="image/*"
           />
-          <label>Profile Picture</label>
+
+          <label htmlFor="profile">
+            <div className="imgContainer">
+              <img
+                src={profile ? URL.createObjectURL(profile) : user.profilePic}
+                alt="Profile"
+              />
+              <CloudUploadIcon className="icon" />
+            </div>
+          </label>
           <input
             type="file"
+            id="profile"
+            style={{ display: "none" }}
             onChange={(e) => setProfile(e.target.files[0])}
             accept="image/*"
           />
-          <label>Name</label>
+
           <input
             type="text"
+            name="name"
+            placeholder="Name"
             value={texts.name}
-            onChange={(e) =>
-              setTexts((prev) => ({ ...prev, name: e.target.value }))
-            }
+            onChange={handleChange}
           />
-          <label>Email</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={texts.username}
+            onChange={handleChange}
+          />
           <input
             type="email"
+            name="email"
+            placeholder="Email"
             value={texts.email}
-            onChange={(e) =>
-              setTexts((prev) => ({ ...prev, email: e.target.value }))
-            }
+            onChange={handleChange}
           />
-          <label>Username</label>
           <input
             type="text"
-            value={texts.username}
-            onChange={(e) =>
-              setTexts((prev) => ({ ...prev, username: e.target.value }))
-            }
+            name="city"
+            placeholder="City"
+            value={texts.city}
+            onChange={handleChange}
           />
-          <button
-            type="button"
-            onClick={handleClick}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Updating..." : "Update"}
-          </button>
+          <input
+            type="text"
+            name="website"
+            placeholder="Website"
+            value={texts.website}
+            onChange={handleChange}
+          />
+
+          <button type="submit">Update</button>
         </form>
         <button className="close" onClick={() => setOpenUpdate(false)}>
           Close
