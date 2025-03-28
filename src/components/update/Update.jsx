@@ -302,60 +302,45 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
 
   const queryClient = useQueryClient();
 
-  // ✅ Upload to Cloudinary
-  const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "mern-social");
-
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    const data = await res.json();
-    if (!data.secure_url) {
-      throw new Error("Cloudinary Upload Failed!");
-    }
-    return data.secure_url;
-  };
-
-  // ✅ Update User API
+  // ✅ Update User API with File Uploads
   const mutation = useMutation(
-    async (updatedUser) => {
-      return makeRequest.put(`/users/${user.id}`, updatedUser);
+    async (formData) => {
+      return makeRequest.put(`/users/${user.id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // ✅ Set correct headers
+        },
+      });
     },
     {
       onSuccess: (data) => {
+        console.log("✅ Profile Updated Successfully!");
         onProfileUpdate(data.data);
+        queryClient.invalidateQueries(["user", user.id]);
         setOpenUpdate(false);
       },
     }
   );
 
-  // ✅ Handle Submit
+  // ✅ Handle Update Click
   const handleClick = async (e) => {
     e.preventDefault();
-    let coverUrl = user.coverPic;
-    let profileUrl = user.profilePic;
+    const formData = new FormData();
 
-    try {
-      // ✅ Upload to Cloudinary if New Image Selected
-      if (cover) coverUrl = await uploadToCloudinary(cover);
-      if (profile) profileUrl = await uploadToCloudinary(profile);
-    } catch (err) {
-      console.error("❌ Upload Error:", err.message);
-      return;
+    // ✅ Add Text Fields to FormData
+    formData.append("name", texts.name);
+    formData.append("email", texts.email);
+    formData.append("username", texts.username);
+
+    // ✅ Add Profile and Cover Pics to FormData
+    if (profile) {
+      formData.append("profilePic", profile);
+    }
+    if (cover) {
+      formData.append("coverPic", cover);
     }
 
-    mutation.mutate({
-      ...texts,
-      coverPic: coverUrl,
-      profilePic: profileUrl,
-    });
+    // ✅ Send to Backend API
+    mutation.mutate(formData);
   };
 
   return (
