@@ -286,10 +286,11 @@
 
 
 import "./update.scss";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { makeRequest } from "../../axios";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { AuthContext } from "../../context/authContext";
 
 const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
   const [cover, setCover] = useState(null);
@@ -300,47 +301,60 @@ const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
     username: user.username,
   });
 
-  const queryClient = useQueryClient();
+  // ✅ Cloudinary Upload Function
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "mern-social");
 
-  // ✅ Update User API with File Uploads
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/dza9q1jql/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+    if (!data.secure_url) {
+      throw new Error("Cloudinary Upload Failed!");
+    }
+    return data.secure_url;
+  };
+
+  // ✅ Mutation to Update User
   const mutation = useMutation(
-    async (formData) => {
-      return makeRequest.put(`/users/${user.id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // ✅ Set correct headers
-        },
-      });
+    async (updatedUser) => {
+      const res = await makeRequest.put(`/users/${user.id}`, updatedUser);
+      return res.data;
     },
     {
       onSuccess: (data) => {
-        console.log("✅ Profile Updated Successfully!");
-        onProfileUpdate(data.data);
-        queryClient.invalidateQueries(["user", user.id]);
+        onProfileUpdate(data);
         setOpenUpdate(false);
       },
     }
   );
 
-  // ✅ Handle Update Click
+  // ✅ Handle Submit
   const handleClick = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
+    let coverUrl = user.coverPic;
+    let profileUrl = user.profilePic;
 
-    // ✅ Add Text Fields to FormData
-    formData.append("name", texts.name);
-    formData.append("email", texts.email);
-    formData.append("username", texts.username);
-
-    // ✅ Add Profile and Cover Pics to FormData
-    if (profile) {
-      formData.append("profilePic", profile);
-    }
-    if (cover) {
-      formData.append("coverPic", cover);
+    try {
+      if (cover) coverUrl = await uploadToCloudinary(cover);
+      if (profile) profileUrl = await uploadToCloudinary(profile);
+    } catch (err) {
+      console.error("❌ Upload Error:", err.message);
+      return;
     }
 
-    // ✅ Send to Backend API
-    mutation.mutate(formData);
+    mutation.mutate({
+      ...texts,
+      coverPic: coverUrl,
+      profilePic: profileUrl,
+    });
   };
 
   return (
