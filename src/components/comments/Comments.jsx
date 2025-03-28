@@ -1,6 +1,6 @@
 
 import { useContext, useState } from "react";
-import "./comments.scss";
+import "./comments.css";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
