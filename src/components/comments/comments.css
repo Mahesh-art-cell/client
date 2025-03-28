@@ -105,7 +105,9 @@
 } */
 
 
-/* Comments Section */
+
+
+/* comments.css */
 .comments {
   width: 100%;
   margin-top: 20px;
@@ -114,14 +116,13 @@
   gap: 20px;
 }
 
-/* Write Comment Section */
 .comments .write {
   display: flex;
   align-items: center;
   gap: 10px;
+
 }
 
-/* User Profile Image */
 .comments .write img {
   width: 40px;
   height: 40px;
@@ -129,7 +130,6 @@
   object-fit: cover;
 }
 
-/* Input Field */
 .comments .write input {
   flex: 1;
   padding: 10px;
@@ -139,7 +139,6 @@
   outline: none;
 }
 
-/* Submit Button */
 .comments .write button {
   padding: 10px 15px;
   background-color: #1877f2;
@@ -147,27 +146,25 @@
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+      font-size: 14px;
+      transition: background-color 0.3s;
 }
 
-/* Button Hover Effect */
 .comments .write button:hover {
   background-color: #165cbb;
 }
 
-/* Individual Comment */
 .comments .comment {
   display: flex;
-  gap: 10px;
-  position: relative;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    gap: 10px;
+    position: relative;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
 }
 
-/* Comment User Image */
 .comments .comment img {
   width: 40px;
   height: 40px;
@@ -175,50 +172,45 @@
   object-fit: cover;
 }
 
-/* Comment Info Section */
 .comments .comment .info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+      display: flex;
+      flex-direction: column;
 }
 
-/* Username in Comment */
 .comments .comment .info span {
   font-weight: bold;
-  font-size: 14px;
-  color: #333;
+        font-size: 14px;
+        color: #333;
 }
 
-/* Comment Text */
 .comments .comment .info p {
   font-size: 14px;
-  color: #555;
-  margin-top: 5px;
+        color: #555;
+        margin-top: 5px;
 }
 
-/* Comment Date */
 .comments .comment .date {
   font-size: 12px;
-  color: #888;
-  align-self: flex-start;
+      color: #888;
+      align-self: flex-start;
 }
 
-/* Delete Button Styles */
+/* ✅ Delete Button Styles */
 .comments .comment .deleteBtn {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 5px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.3s;
+      top: 5px;
+      right: 5px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.3s;
 }
 
-/* Delete Button Hover Effect */
 .comments .comment .deleteBtn:hover {
   background-color: #ff1a1a;
 }

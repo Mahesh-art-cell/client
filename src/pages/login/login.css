@@ -178,3 +178,20 @@
     cursor: pointer;
   }
   
+  /* Custom Toast Styles (Optional) */
+.Toastify__toast-container {
+  z-index: 9999;
+}
+
+.Toastify__toast {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.Toastify__toast--success {
+  background-color: #4caf50;
+}
+
+.Toastify__toast--error {
+  background-color: #f44336;
+}

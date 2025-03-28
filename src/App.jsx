@@ -1,4 +1,5 @@
 
+
 // import Login from "./pages/login/Login";
 // import Register from "./pages/register/Register";
 // import {
@@ -13,7 +14,8 @@
 // import Home from "./pages/home/Home";
 // import Profile from "./pages/profile/Profile";
 // import MediaList from "./components/media/MediaList";
-// import "./style.scss";
+// import Friends from "./pages/friends/Friends"; // ✅ Import Friends Page
+// import "./style.css";
 // import { useContext } from "react";
 // import { DarkModeContext } from "./context/darkModeContext";
 // import { AuthContext } from "./context/authContext";
@@ -60,7 +62,8 @@
 //       children: [
 //         { path: "/", element: <Home /> },
 //         { path: "/profile/:id", element: <Profile /> },
-//         { path: "/media", element: <MediaList /> }, // ✅ Media List Route Added
+//         { path: "/media", element: <MediaList /> },
+//         { path: "/friends", element: <Friends /> }, // ✅ Friends Page Route Added
 //       ],
 //     },
 //     { path: "/login", element: <Login /> },
@@ -75,28 +78,24 @@
 
 
 
-
-
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
-  Navigate,
-} from "react-router-dom";
+// 📌 src/App.jsx
+import { useContext } from "react";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import Navbar from "./components/navBar/Navbar";
 import LeftBar from "./components/leftBar/LeftBar";
 import RightBar from "./components/rightBar/RightBar";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import MediaList from "./components/media/MediaList";
-import Friends from "./pages/friends/Friends"; // ✅ Import Friends Page
-import "./style.css";
-import { useContext } from "react";
-import { DarkModeContext } from "./context/darkModeContext";
+import Friends from "./pages/friends/Friends";
+import Login from "./pages/login/Login";
+import Register from "./pages/register/Register";
 import { AuthContext } from "./context/authContext";
+import { DarkModeContext } from "./context/darkModeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./style.css";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -140,7 +139,7 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "/profile/:id", element: <Profile /> },
         { path: "/media", element: <MediaList /> },
-        { path: "/friends", element: <Friends /> }, // ✅ Friends Page Route Added
+        { path: "/friends", element: <Friends /> }, // ✅ Friends Page Route
       ],
     },
     { path: "/login", element: <Login /> },
@@ -148,7 +147,12 @@ function App() {
     { path: "*", element: <Navigate to="/" /> }, // ✅ Handle invalid routes
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <ToastContainer position="top-center" autoClose={3000} />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;
