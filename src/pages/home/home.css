@@ -1,4 +1,4 @@
-/* 
+
  @import "../../style.css";
 
 .home {
@@ -19,71 +19,4 @@
   .home {
     padding: 20px;
   }
-} */
-
-
-
-
-.home {
-  padding: 20px;
-  background-color: #f9f9f9;
-}
-
-.search-results {
-  max-width: 600px;
-  margin: 20px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.search-results h3 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
-}
-
-.results-list {
-  list-style: none;
-  padding: 0;
-}
-
-.result-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.result-item img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.info {
-  flex-grow: 1;
-}
-
-.username {
-  font-weight: bold;
-  color: #333;
-}
-
-.follow-btn {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.follow-btn:hover {
-  background-color: #45a049;
 }
