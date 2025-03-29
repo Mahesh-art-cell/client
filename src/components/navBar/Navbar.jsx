@@ -213,79 +213,53 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
 import { makeRequest } from "../../axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = () => {
   const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [allUsers, setAllUsers] = useState([]); // ✅ Store all users
+  const [searchTerm, setSearchTerm] = useState(""); // ✅ Search term
+  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ Filtered users
 
-  // ✅ State to Store and Filter Users
-  const [allUsers, setAllUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchActive, setSearchActive] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // ✅ Fetch Users on Component Mount
+  // ✅ Fetch All Users on Component Mount
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await makeRequest.get("/relationships/suggestions"); // ✅ Get all users
+        const res = await makeRequest.get("/users"); // ✅ API to fetch all users
         if (res.data && Array.isArray(res.data)) {
           setAllUsers(res.data);
-          setFilteredUsers(res.data); // ✅ Show all users initially
         } else {
           setAllUsers([]);
-          setFilteredUsers([]);
         }
       } catch (error) {
         console.error("❌ Error fetching users:", error);
-        setAllUsers([]);
-        setFilteredUsers([]);
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
-  // ✅ Handle Search Input
+  // ✅ Handle Search Input and Filter Results
   const handleSearch = (e) => {
     const input = e.target.value.toLowerCase();
     setSearchTerm(input);
-    setSearchActive(input.length > 0);
 
+    // ✅ Filter users based on search term
     const filtered = allUsers.filter((user) =>
       user.username.toLowerCase().includes(input)
     );
-    setFilteredUsers(filtered);
-  };
 
-  // ✅ Handle Follow/Unfollow
-  const handleFollow = async (userId, action) => {
-    try {
-      if (action === "follow") {
-        await makeRequest.post("/relationships/", {
-          followedUserId: userId,
-        });
-        toast.success("✅ Followed successfully!");
-      } else {
-        await makeRequest.delete(`/relationships/?userId=${userId}`);
-        toast.info("🚫 Unfollowed successfully.");
-      }
-    } catch (err) {
-      console.error(`❌ Error trying to ${action}:`, err.message);
-      toast.error(`❌ Failed to ${action}.`);
+    // ✅ Save filtered users in localStorage
+    if (filtered.length > 0) {
+      localStorage.setItem("filteredUsers", JSON.stringify(filtered));
+    } else {
+      localStorage.removeItem("filteredUsers");
     }
   };
 
@@ -304,16 +278,18 @@ const Navbar = () => {
     <div className={`navbar ${darkMode ? "dark" : "light"}`}>
       {/* ✅ Left Side of Navbar */}
       <div className="left">
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <span>lamasocial</span>
+        <Link to="/" className="logo">
+          MySocial
         </Link>
-        <HomeOutlinedIcon onClick={() => navigate("/Navbar")} style={{ cursor: "pointer" }} />
+        <HomeOutlinedIcon
+          onClick={() => navigate("/")}
+          style={{ cursor: "pointer" }}
+        />
         {darkMode ? (
           <WbSunnyOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         ) : (
           <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         )}
-
         {/* ✅ Search Box */}
         <div className="search">
           <SearchOutlinedIcon />
@@ -326,41 +302,12 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ✅ Display Search Results */}
-      {searchActive && (
-        <div className="search-results">
-          {loading ? (
-            <p>Loading...</p>
-          ) : filteredUsers.length === 0 ? (
-            <p>No users found</p>
-          ) : (
-            <ul>
-              {filteredUsers.map((user) => (
-                <li key={user.id} className="search-item">
-                  <img src={user.profilePic || "/default-avatar.png"} alt={user.username} />
-                  <div className="info">
-                    <span className="username">{user.username}</span>
-                    <button
-                      className="follow-btn"
-                      onClick={() => handleFollow(user.id, "follow")}
-                    >
-                      Follow
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
       {/* ✅ Right Side of Navbar */}
       <div className="right">
         <a
           href="https://mail.google.com"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "inherit" }}
         >
           <EmailOutlinedIcon style={{ cursor: "pointer" }} />
         </a>
@@ -368,7 +315,6 @@ const Navbar = () => {
           href="https://www.linkedin.com/in/mahesh-talluri-1b46b6279"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "inherit" }}
         >
           <LinkedInIcon style={{ cursor: "pointer" }} />
         </a>
@@ -376,21 +322,16 @@ const Navbar = () => {
           href="https://www.instagram.com/"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "inherit" }}
         >
           <InstagramIcon style={{ cursor: "pointer" }} />
         </a>
-
-        <PersonOutlinedIcon onClick={() => setDropdownOpen(!dropdownOpen)} style={{ cursor: "pointer" }} />
-        {dropdownOpen && (
-          <div className="dropdown" ref={dropdownRef}>
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-        )}
+        <PersonOutlinedIcon
+          onClick={handleLogout}
+          style={{ cursor: "pointer" }}
+        />
       </div>
     </div>
   );
 };
 
 export default Navbar;
-
