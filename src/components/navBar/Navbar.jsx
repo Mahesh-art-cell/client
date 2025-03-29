@@ -207,36 +207,32 @@ import "./navbar.css";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
+import { useSearch } from "../../context/SearchContext"; // ✅ Import Search Context
 import { makeRequest } from "../../axios";
-import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser, logout } = useContext(AuthContext);
+  const { setSearchResults } = useSearch(); // ✅ Get setSearchResults
   const navigate = useNavigate();
 
-  const [allUsers, setAllUsers] = useState([]); // ✅ Store all users
-  const [searchTerm, setSearchTerm] = useState(""); // ✅ Search term
-  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ Filtered users
+  const [allUsers, setAllUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // ✅ Fetch All Users on Component Mount
+  // ✅ Fetch All Users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await makeRequest.get("/users"); // ✅ API to fetch all users
+        const res = await makeRequest.get("/users/all");
         if (res.data && Array.isArray(res.data)) {
           setAllUsers(res.data);
-        } else {
-          setAllUsers([]);
         }
       } catch (error) {
         console.error("❌ Error fetching users:", error);
@@ -245,41 +241,25 @@ const Navbar = () => {
     fetchUsers();
   }, []);
 
-  // ✅ Handle Search Input and Filter Results
+  // ✅ Handle Search Input
   const handleSearch = (e) => {
     const input = e.target.value.toLowerCase();
     setSearchTerm(input);
 
-    // ✅ Filter users based on search term
+    // ✅ Filter Users Based on Search
     const filtered = allUsers.filter((user) =>
       user.username.toLowerCase().includes(input)
     );
 
-    // ✅ Save filtered users in localStorage
-    if (filtered.length > 0) {
-      localStorage.setItem("filteredUsers", JSON.stringify(filtered));
-    } else {
-      localStorage.removeItem("filteredUsers");
-    }
-  };
-
-  // ✅ Handle Logout
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success("✅ Logged out successfully!");
-      navigate("/login");
-    } catch (error) {
-      toast.error("❌ Error while logging out.");
-    }
+    // ✅ Update Search Results in Context
+    setSearchResults(filtered);
   };
 
   return (
     <div className={`navbar ${darkMode ? "dark" : "light"}`}>
-      {/* ✅ Left Side of Navbar */}
       <div className="left">
-        <Link to="/" className="logo">
-          MySocial
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <span>lamasocial</span>
         </Link>
         <HomeOutlinedIcon
           onClick={() => navigate("/")}
@@ -288,9 +268,11 @@ const Navbar = () => {
         {darkMode ? (
           <WbSunnyOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
         ) : (
-          <DarkModeOutlinedIcon onClick={toggle} style={{ cursor: "pointer" }} />
+          <DarkModeOutlinedIcon
+            onClick={toggle}
+            style={{ cursor: "pointer" }}
+          />
         )}
-        {/* ✅ Search Box */}
         <div className="search">
           <SearchOutlinedIcon />
           <input
@@ -302,33 +284,9 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ✅ Right Side of Navbar */}
       <div className="right">
-        <a
-          href="https://mail.google.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <EmailOutlinedIcon style={{ cursor: "pointer" }} />
-        </a>
-        <a
-          href="https://www.linkedin.com/in/mahesh-talluri-1b46b6279"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <LinkedInIcon style={{ cursor: "pointer" }} />
-        </a>
-        <a
-          href="https://www.instagram.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <InstagramIcon style={{ cursor: "pointer" }} />
-        </a>
-        <PersonOutlinedIcon
-          onClick={handleLogout}
-          style={{ cursor: "pointer" }}
-        />
+        <EmailOutlinedIcon style={{ cursor: "pointer" }} />
+        <PersonOutlinedIcon style={{ cursor: "pointer" }} />
       </div>
     </div>
   );

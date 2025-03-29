@@ -20,78 +20,34 @@
 import Stories from "../../components/stories/Stories";
 import Posts from "../../components/posts/Posts";
 import Share from "../../components/share/Share";
+import { useSearch } from "../../context/SearchContext"; // ✅ Import Search Context
 import "./home.css";
-import { useEffect, useState } from "react";
-import { makeRequest } from "../../axios";
 
 const Home = () => {
-  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ Store search results
-  const [searchActive, setSearchActive] = useState(false); // ✅ Check if search is active
-
-  // ✅ Check if there are filtered users in localStorage
-  useEffect(() => {
-    const storedUsers = localStorage.getItem("filteredUsers");
-    if (storedUsers) {
-      setFilteredUsers(JSON.parse(storedUsers));
-      setSearchActive(true); // ✅ Show results only after search
-    } else {
-      setFilteredUsers([]);
-      setSearchActive(false);
-    }
-  }, []);
-
-  // ✅ Handle Follow/Unfollow Action
-  const handleFollow = async (userId, action) => {
-    try {
-      if (action === "follow") {
-        await makeRequest.post("/relationships/", {
-          followedUserId: userId,
-        });
-        alert("✅ Followed successfully!");
-      } else {
-        await makeRequest.delete(`/relationships/?userId=${userId}`);
-        alert("🚫 Unfollowed successfully.");
-      }
-    } catch (err) {
-      console.error(`❌ Error trying to ${action}:`, err.message);
-      alert(`❌ Failed to ${action}.`);
-    }
-  };
+  const { searchResults } = useSearch(); // ✅ Get Search Results
 
   return (
     <div className="home">
-      {/* ✅ Show Search Results if Search is Active */}
-      {searchActive && filteredUsers.length > 0 ? (
+      <Stories />
+      <Share />
+      {/* ✅ Show Search Results If Available */}
+      {searchResults.length > 0 ? (
         <div className="search-results">
           <h3>Search Results</h3>
-          <ul className="results-list">
-            {filteredUsers.map((user) => (
-              <li key={user.id} className="result-item">
-                <img
-                  src={user.profilePic || "/default-avatar.png"}
-                  alt={user.username}
-                  className="profile-pic"
-                />
+          <ul>
+            {searchResults.map((user) => (
+              <li key={user.id} className="search-item">
+                <img src={user.profilePic || "/default-avatar.png"} alt={user.username} />
                 <div className="info">
                   <span className="username">{user.username}</span>
+                  <button className="follow-btn">Follow</button>
                 </div>
-                <button
-                  className="follow-btn"
-                  onClick={() => handleFollow(user.id, "follow")}
-                >
-                  Follow
-                </button>
               </li>
             ))}
           </ul>
         </div>
       ) : (
-        // ✅ Default Home Page Content (Stories, Share, Posts)
-        <>
-          <Stories />
-          <Share />
-          <Posts />
-        </>
+        <Posts />
       )}
     </div>
   );

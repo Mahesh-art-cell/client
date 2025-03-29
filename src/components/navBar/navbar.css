@@ -99,43 +99,69 @@
 
 
 
+
+
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background: white;
-  border-bottom: 1px solid #ddd;
+  background-color: #fff;
 }
 
-.left {
+.navbar.dark {
+  background-color: #333;
+  color: #fff;
+}
+
+.left,
+.right {
   display: flex;
   align-items: center;
-  gap: 20px;
-}
-
-.logo {
-  font-size: 18px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
 }
 
 .search {
   display: flex;
   align-items: center;
-  background: #f1f1f1;
-  padding: 5px 10px;
-  border-radius: 8px;
+  margin-left: 20px;
 }
 
 .search input {
+  padding: 5px 10px;
+  margin-left: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-results {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.search-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.follow-btn {
+  margin-left: auto;
+  padding: 5px 10px;
+  background: #1877f2;
+  color: #fff;
   border: none;
-  outline: none;
-  background: none;
-  padding: 5px;
-  font-size: 14px;
-  width: 200px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 
