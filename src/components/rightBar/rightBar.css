@@ -6,81 +6,96 @@
   height: calc(100vh - 70px);
   overflow-y: auto;
   background-color: #f5f5f5;
+}
 
-  .container {
-    padding: 20px;
 
-    .item {
-      margin-bottom: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.rightBar .container {
+  padding: 20px;
+}
 
-      span {
-        font-weight: bold;
-        color: #555;
-      }
 
-      .user {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
+.rightBar .container .item {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-        .userInfo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
 
-          img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-          }
+.rightBar .container .item span {
+  font-weight: bold;
+  color: #555;
+}
 
-          span {
-            font-size: 14px;
-            font-weight: 500;
-          }
 
-          .online {
-            width: 10px;
-            height: 10px;
-            background-color: green;
-            border-radius: 50%;
-            margin-left: -8px;
-          }
-        }
+.rightBar .container .item .user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
 
-        .buttons {
-          display: flex;
-          gap: 10px;
 
-          button {
-            padding: 5px 10px;
-            border: none;
-            background-color: #5271ff;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            &:hover {
-              background-color: #3f5ae5;
-            }
+.rightBar .container .item .user .userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-            &:nth-child(2) {
-              background-color: #ff4d4d;
-              &:hover {
-                background-color: #e63a3a;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+
+.rightBar .container .item .user .userInfo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+
+.rightBar .container .item .user .userInfo span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+.rightBar .container .item .user .userInfo .online {
+  width: 10px;
+  height: 10px;
+  background-color: green;
+  border-radius: 50%;
+  margin-left: -8px;
+}
+
+
+.rightBar .container .item .user .buttons {
+  display: flex;
+  gap: 10px;
+}
+
+
+.rightBar .container .item .user .buttons button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #5271ff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.rightBar .container .item .user .buttons button:hover {
+  background-color: #3f5ae5;
+}
+
+
+.rightBar .container .item .user .buttons button:nth-child(2) {
+  background-color: #ff4d4d;
+}
+
+
+.rightBar .container .item .user .buttons button:nth-child(2):hover {
+  background-color: #e63a3a;
 } */
-
 
 
 .rightBar {
@@ -90,11 +105,12 @@
   height: calc(100vh - 70px);
   overflow-y: auto;
   background-color: #f5f5f5;
+  padding: 10px;
 }
 
 /* Container */
 .rightBar .container {
-  padding: 20px;
+  padding: 15px;
 }
 
 /* Each Item */
@@ -107,37 +123,49 @@
 }
 
 /* Item Title */
-.rightBar .container .item span {
+.rightBar .container .item > span {
   font-weight: bold;
   color: #555;
+  display: block;
+  margin-bottom: 10px;
 }
 
-/* User Info Section */
+/* User Suggestion List */
 .rightBar .container .item .user {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  transition: background 0.3s ease-in-out;
+  margin-bottom: 10px;
+}
+
+.rightBar .container .item .user:hover {
+  background: #f1f1f1;
 }
 
 /* User Info - Avatar and Name */
 .rightBar .container .item .user .userInfo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* User Avatar */
 .rightBar .container .item .user .userInfo img {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 /* Username */
 .rightBar .container .item .user .userInfo span {
   font-size: 14px;
   font-weight: 500;
+  color: #333;
 }
 
 /* Online Status Dot */
@@ -149,34 +177,47 @@
   margin-left: -8px;
 }
 
-/* Button Container */
+/* Buttons Container */
 .rightBar .container .item .user .buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* Default Button */
+/* Follow Button */
 .rightBar .container .item .user .buttons button {
-  padding: 5px 10px;
+  padding: 6px 12px;
   border: none;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+}
+
+/* Follow Button */
+.rightBar .container .item .user .buttons button:first-child {
   background-color: #5271ff;
   color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-/* Button Hover State */
-.rightBar .container .item .user .buttons button:hover {
+.rightBar .container .item .user .buttons button:first-child:hover {
   background-color: #3f5ae5;
 }
 
-/* Second Button (Red) */
-.rightBar .container .item .user .buttons button:nth-child(2) {
+/* Dismiss Button */
+.rightBar .container .item .user .buttons button:last-child {
   background-color: #ff4d4d;
+  color: white;
 }
 
-/* Hover State for Second Button */
-.rightBar .container .item .user .buttons button:nth-child(2):hover {
+.rightBar .container .item .user .buttons button:last-child:hover {
   background-color: #e63a3a;
+}
+
+/* No Suggestions Text */
+.rightBar .container .item p {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-top: 10px;
 }
