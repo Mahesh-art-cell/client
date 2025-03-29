@@ -1,16 +1,4 @@
 
-// import axios from "axios";
-
-// export const makeRequest = axios.create({
-//   baseURL: "https://server-wi41.onrender.com",
-//   withCredentials: true,  // ✅ Ensures cookies are sent
-// });
-
-
-
-
-
-// // axios.js
 
 
 
@@ -27,12 +15,3 @@ export const makeRequest = axios.create({
     Authorization: token ? `Bearer ${token}` : "", // ✅ Add token dynamically
   },
 });
-// import axios from "axios";
-
-// export const makeRequest = axios.create({
-//   baseURL: "https://server-wi41.onrender.com/api", // ✅ Correct Backend URL
-//   withCredentials: true, // ✅ Include credentials (cookies/JWT)
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
