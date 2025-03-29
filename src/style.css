@@ -1,59 +1,4 @@
-/* $themes: (
-  light: (
-    textColor: #000,
-    bg: white,
-    logo: darkblue,
-    bgSoft: #f6f3f3,
-    textColorSoft: #555,
-    border: lightgray,
-  ),
-  dark: (
-    textColor: whitesmoke,
-    bg: #222,
-    logo: white,
-    bgSoft: #333,
-    textColorSoft: lightgray,
-    border: #444,
-  ),
-);
-
-@mixin themify($themes) {
-  @each $theme, $map in $themes {
-    .theme-#{$theme} & {
-      $theme-map: () !global;
-      @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), "#{$key}");
-        $theme-map: map-merge(
-          $theme-map,
-          (
-            $key: $value,
-          )
-        ) !global;
-      }
-      @content;
-      $theme-map: null !global;
-    }
-  }
-}
-
-@function themed($key) {
-  @return map-get($theme-map, $key);
-}
-
-@mixin mobile {
-  @media (max-width: 480px) {
-    @content;
-  }
-}
-@mixin tablet {
-  @media (max-width: 960px) {
-    @content;
-  }
-} */
-
-
-
-/* Light Theme */
+/* 
 .theme-light {
   --textColor: #000;
   --bg: white;
@@ -63,7 +8,7 @@
   --border: lightgray;
 }
 
-/* Dark Theme */
+
 .theme-dark {
   --textColor: whitesmoke;
   --bg: #222;
@@ -73,27 +18,26 @@
   --border: #444;
 }
 
-/* Utility Classes */
+
 body {
   color: var(--textColor);
   background-color: var(--bg);
 }
 
-/* Mobile Media Query */
+
 @media (max-width: 480px) {
   .mobile-hide {
     display: none;
   }
 }
 
-/* Tablet Media Query */
 @media (max-width: 960px) {
   .tablet-hide {
     display: none;
   }
 }
 
-/* Additional Mobile and Tablet Rules (Optional) */
+
 @media (max-width: 480px) {
   .mobile-container {
     padding: 10px;
@@ -104,4 +48,96 @@ body {
   .tablet-container {
     padding: 15px;
   }
+} */
+
+
+
+/* ✅ Light Mode (Default) */
+:root {
+  --bg-color: #f0f2f5;
+  --text-color: #333;
+  --card-bg: #fff;
+  --border-color: #ccc;
+}
+
+/* ✅ Dark Mode */
+.dark {
+  --bg-color: #18191a;
+  --text-color: #e4e6eb;
+  --card-bg: #242526;
+  --border-color: #3a3b3c;
+}
+
+/* ✅ Apply Global Styles */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ✅ Style Cards or Containers */
+.container {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+
+/* ✅ Light Mode (Default) */
+:root {
+  --bg-color: #f0f2f5;
+  --text-color: #333;
+  --card-bg: #fff;
+  --border-color: #ccc;
+}
+
+/* ✅ Dark Mode */
+.dark {
+  --bg-color: #18191a;
+  --text-color: #e4e6eb;
+  --card-bg: #242526;
+  --border-color: #3a3b3c;
+}
+
+/* ✅ Apply Global Styles */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ✅ Style for Navbar */
+.navbar {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 20px;
+}
+
+/* ✅ Search Box */
+.search input {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+/* ✅ Dropdown Styling */
+.dropdown {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+/* ✅ Light and Dark Mode Navbar */
+.navbar.light {
+  background-color: #fff;
+  color: #333;
+}
+
+.navbar.dark {
+  background-color: #242526;
+  color: #e4e6eb;
 }

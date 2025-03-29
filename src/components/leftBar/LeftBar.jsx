@@ -9,16 +9,18 @@ const LeftBar = () => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  console.log("✅ currentUser:", currentUser);
+
   // ✅ Navigate to Profile
   const handleProfileClick = () => {
-    navigate(`/profile/${currentUser.id}`);
+    navigate(`/profile/${currentUser?.id}`);
   };
 
   // ✅ Navigate to Friends Page
   const handleFriendsClick = () => {
     navigate(`/friends`);
   };
-console.log(currentUser.name)
+
   return (
     <div className="leftBar">
       <div className="container">
@@ -30,14 +32,18 @@ console.log(currentUser.name)
             style={{ cursor: "pointer" }}
           >
             <img
-              src={currentUser.profilePic || "/default-avatar.png"}
-              alt="User Profile"
+              src={currentUser?.profilePic || "/default-avatar.png"}
+              alt="Profile"
             />
-            <span>{currentUser.name}</span>
+            <span>{currentUser?.name || "Profile"}</span>
           </div>
 
           {/* ✅ Friends Section Click */}
-          <div className="item" onClick={handleFriendsClick} style={{ cursor: "pointer" }}>
+          <div
+            className="item"
+            onClick={handleFriendsClick}
+            style={{ cursor: "pointer" }}
+          >
             <img src={Friends} alt="Friends" />
             <span>Friends</span>
           </div>
@@ -48,3 +54,5 @@ console.log(currentUser.name)
 };
 
 export default LeftBar;
+
+

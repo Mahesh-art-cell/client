@@ -1,163 +1,76 @@
-/* @import "../../style.scss";
 
 .leftBar {
-  @include themify($themes) {
-    flex: 2;
-    position: sticky;
-    top: 70px;
-    height: calc(100vh - 70px);
-    overflow: scroll;
-    background-color: themed("bg");
-    color: themed("textColor");
-
-    @include mobile{
-      display: none;
-    }
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    .container {
-      padding: 20px;
-
-      hr {
-        margin: 20px 0px;
-        border: none;
-        height: 0.5px;
-        background-color: themed("border");
-      }
-
-      .menu {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-
-        span {
-          font-size: 12px;
-        }
-
-        .user {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-          }
-
-          span {
-            font-size: 14px;
-          }
-        }
-
-        .item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          img {
-            width: 30px;
-          }
-
-          span {
-            font-size: 14px;
-          }
-        }
-      }
-    }
-  }
-} */
-
-
-/* Left Bar Container */
-.leftBar {
-  flex: 2;
-  position: sticky;
-  top: 70px;
-  height: calc(100vh - 70px);
-  overflow-y: scroll;
-  background-color: #fff; /* Default background color */
-  color: #333; /* Default text color */
+  width: 250px;
+  background-color: #fff; 
+  border-right: 1px solid #ddd;
+  padding: 15px;
+  height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Hide scrollbar for Chrome, Safari, and Opera */
-.leftBar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide Left Bar on Mobile */
-@media (max-width: 768px) {
-  .leftBar {
-    display: none;
-  }
-}
-
-/* Container Styles */
 .leftBar .container {
-  padding: 20px;
-}
-
-/* Horizontal Line */
-.leftBar .container hr {
-  margin: 20px 0;
-  border: none;
-  height: 0.5px;
-  background-color: #ccc; /* Border color */
-}
-
-/* Menu Styles */
-.leftBar .container .menu {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-/* Menu Section Label */
-.leftBar .container .menu span {
-  font-size: 12px;
-  color: #888;
-}
-
-/* User Profile Section */
-.leftBar .container .menu .user {
-  display: flex;
-  align-items: center;
   gap: 10px;
 }
 
-/* User Profile Picture */
-.leftBar .container .menu .user img {
+.leftBar .menu {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.leftBar .user,
+.leftBar .item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.leftBar .user:hover,
+.leftBar .item:hover {
+  background-color: #f5f5f5;
+}
+
+
+.leftBar .user span,
+.leftBar .item span {
+  color: #333;
+}
+
+.leftBar .user img,
+.leftBar .item img {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-/* Username */
-.leftBar .container .menu .user span {
-  font-size: 14px;
-  color: #333;
+
+.dark .leftBar {
+  background-color: #242526; 
+  border-right: 1px solid #3a3b3c;
 }
 
-/* Menu Item Section */
-.leftBar .container .menu .item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
+.dark .leftBar .user span,
+.dark .leftBar .item span {
+  color: #fff; 
 }
 
-/* Menu Item Icon */
-.leftBar .container .menu .item img {
-  width: 30px;
+.dark .leftBar .user:hover,
+.dark .leftBar .item:hover {
+  background-color: #3a3b3c;
 }
 
-/* Menu Item Text */
-.leftBar .container .menu .item span {
-  font-size: 14px;
-  color: #333;
-}
+
+.dark .leftBar .user img,
+.dark .leftBar .item img {
+  border: 1px solid #555;
+} 
+
+
+
