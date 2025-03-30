@@ -179,6 +179,42 @@
   color: #333;
 }
 
+/* Following section styling */
+.following-section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.following-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.following-section ul,
+.suggestions ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.following-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.following-item:last-child {
+  border-bottom: none;
+}
+
 /* Suggestions section styling */
 .suggestions {
   background-color: white;
@@ -196,21 +232,17 @@
   padding-bottom: 10px;
 }
 
-.suggestions ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* User suggestion item styling */
-.suggestion-item {
+/* User item styling (common for both sections) */
+.suggestion-item,
+.following-item {
   display: flex;
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.suggestion-item:last-child {
+.suggestion-item:last-child,
+.following-item:last-child {
   border-bottom: none;
 }
 
@@ -274,6 +306,14 @@
   height: 200px;
   font-size: 18px;
   color: #666;
+}
+
+/* Empty state messages */
+.following-section p,
+.suggestions p {
+  color: #666;
+  text-align: center;
+  padding: 15px 0;
 }
 
 /* Responsive styling */
