@@ -113,7 +113,10 @@
 
 
 
- .friends {
+
+
+
+ /* .friends {
   padding: 20px;
 }
 
@@ -179,4 +182,100 @@
   padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
+} */
+
+
+
+
+
+
+
+
+/* friends.css */
+.friends {
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.container {
+  width: 90%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.counts {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.count-item {
+  font-size: 16px;
+}
+
+.suggestions {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.info {
+  flex: 1;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.name {
+  font-size: 14px;
+  color: #888;
+}
+
+.follow-btn,
+.following-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.follow-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.following-btn {
+  background-color: #ddd;
+  color: #555;
 }
