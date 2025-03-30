@@ -174,7 +174,7 @@ const Friends = () => {
   // ✅ Fetch All Users for Suggestions and Search
   const fetchAllUsers = async () => {
     try {
-      const res = await makeRequest.get("/relationships/allUsers"); // ✅ Correct API route
+      const res = await makeRequest.get("/relationships/suggestions");
       if (res.data && Array.isArray(res.data)) {
         setAllUsers(res.data);
         setFilteredUsers(res.data); // ✅ Show all users initially
@@ -183,15 +183,15 @@ const Friends = () => {
         setFilteredUsers([]);
       }
     } catch (err) {
-      console.error("❌ Error fetching all users:", err.message);
+      console.error("❌ Error fetching suggestions:", err.message);
     }
   };
 
   // ✅ Fetch Followed Users to Track Follow Status
   const fetchFollowedUsers = async () => {
     try {
-      const res = await makeRequest.get("/relationships/");
-      const followedSet = new Set(res.data.map((id) => parseInt(id)));
+      const res = await makeRequest.get("/relationships/followedUsers");
+      const followedSet = new Set(res.data.map((user) => user.id));
       setFollowedUsers(followedSet);
     } catch (err) {
       console.error("❌ Error fetching followed users:", err.message);
@@ -216,21 +216,15 @@ const Friends = () => {
           followedUserId: userId,
         });
         followedUsers.add(userId); // ✅ Add to followed list
-        setCounts((prev) => ({
-          ...prev,
-          following: prev.following + 1,
-        }));
       } else {
         await makeRequest.delete(`/relationships/?userId=${userId}`);
         followedUsers.delete(userId); // ✅ Remove from followed list
-        setCounts((prev) => ({
-          ...prev,
-          following: prev.following - 1,
-        }));
       }
 
       // ✅ Update Followed Users Set
       setFollowedUsers(new Set(followedUsers));
+      // ✅ Refresh Counts After Action
+      fetchCounts();
     } catch (err) {
       console.error(`❌ Error trying to ${action}:`, err.message);
     }
@@ -241,11 +235,9 @@ const Friends = () => {
     const input = e.target.value.toLowerCase();
     setSearchTerm(input);
 
-    // ✅ Always Filter from All Users (Not Just Suggestions)
-    const filtered = allUsers.filter(
-      (user) =>
-        user.username.toLowerCase().includes(input) ||
-        user.name.toLowerCase().includes(input)
+    // ✅ Always Filter from All Users (Not Suggestions)
+    const filtered = allUsers.filter((user) =>
+      user.username.toLowerCase().includes(input)
     );
     setFilteredUsers(filtered);
   };
@@ -290,13 +282,12 @@ const Friends = () => {
               {filteredUsers.map((user) => (
                 <li key={user.id} className="suggestion-item">
                   <img
-                    src={user.profilePic || "/default-profile.png"}
+                    src={user.profilePic}
                     alt={user.username}
                     className="profile-pic"
                   />
                   <div className="info">
                     <span className="username">{user.username}</span>
-                    <span className="name">{user.name}</span>
                   </div>
 
                   {/* ✅ Follow/Unfollow Button */}

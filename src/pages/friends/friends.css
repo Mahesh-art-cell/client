@@ -113,28 +113,21 @@
 
 
 
-
-
- 
- /* friends.css */
-.friends {
+ .friends {
   padding: 20px;
-  background-color: #f9f9f9;
 }
 
 .container {
-  width: 90%;
   max-width: 600px;
-  margin: 0 auto;
+  margin: auto;
 }
 
 .search-bar input {
   width: 100%;
   padding: 10px;
-  margin-bottom: 20px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  outline: none;
+  margin-bottom: 20px;
 }
 
 .counts {
@@ -147,60 +140,43 @@
   font-size: 16px;
 }
 
-.suggestions {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.suggestions h3 {
+  margin-bottom: 10px;
 }
 
 .suggestion-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 10px;
   border-bottom: 1px solid #eee;
-}
-
-.suggestion-item:last-child {
-  border-bottom: none;
 }
 
 .profile-pic {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  object-fit: cover;
   margin-right: 10px;
 }
 
 .info {
-  flex: 1;
+  flex-grow: 1;
 }
 
-.username {
-  font-weight: bold;
-}
-
-.name {
-  font-size: 14px;
-  color: #888;
-}
-
-.follow-btn,
-.following-btn {
-  padding: 6px 12px;
+.follow-btn {
+  background-color: #007bff;
+  color: white;
   border: none;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.follow-btn {
+.following-btn {
   background-color: #4caf50;
   color: white;
-}
-
-.following-btn {
-  background-color: #ddd;
-  color: #555;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
 }
