@@ -290,8 +290,8 @@ const Stories = () => {
         <img
           src={
             currentUser.profilePic
-              ? `/upload/${currentUser.profilePic}`
-              : "/default-avatar.png"
+              //? `/upload/${currentUser.profilePic}`
+              // : "/default-avatar.png"
           }
           alt="profile"
         />

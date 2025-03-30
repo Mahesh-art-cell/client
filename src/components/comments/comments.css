@@ -148,7 +148,7 @@
 }
 
 .comments .write button {
-  padding: 10px 20px;
+  /* padding: 10px 20px; */
   background-color: #1877f2;
   color: white;
   border: none;
@@ -224,6 +224,7 @@
   cursor: pointer;
   font-size: 12px;
   transition: background-color 0.3s;
+  width: 50px;
 }
 
 .comments .comment .deleteBtn:hover {

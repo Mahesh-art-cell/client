@@ -195,8 +195,8 @@
 
 /* Upload Story Image */
 .stories .upload-story img {
-  width: 100px;
-  height: 100px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 5px;

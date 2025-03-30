@@ -60,12 +60,15 @@ const Comments = ({ postId }) => {
       deleteMutation.mutate(commentId);
     }
   };
+  console.log(currentUser.profilePic)
 
   return (
     <div className="comments">
       {/* ✅ Write Comment Section */}
       <div className="write">
-        <img src={"/upload/" + currentUser.profilePic} alt="" />
+        {/* <img src={"/upload/" + currentUser.profilePic} alt="" /> */}
+        <img src={ currentUser.profilePic} alt="" />
+
         <input
           type="text"
           placeholder="Write a comment"
@@ -83,7 +86,7 @@ const Comments = ({ postId }) => {
       ) : (
         data.map((comment) => (
           <div className="comment" key={comment.id}>
-            <img src={"/upload/" + comment.profilePic} alt="" />
+            <img src={comment.profilePic} alt="" />
             <div className="info">
               <span>{comment.name}</span>
               <p>{comment.description}</p> {/* ✅ Fixed to use 'description' */}
@@ -96,7 +99,7 @@ const Comments = ({ postId }) => {
                 className="deleteBtn"
                 onClick={() => handleDelete(comment.id)}
               >
-                ❌ Delete
+              Delete 
               </button>
             )}
           </div>

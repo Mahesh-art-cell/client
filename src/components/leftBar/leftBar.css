@@ -1,17 +1,32 @@
 
 .leftBar {
-  width: 250px;
+  /* width: 250px;
   background-color: #fff; 
   border-right: 1px solid #ddd;
   padding: 15px;
   height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
+ */
+  width: 250px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  padding: 15px;
+  height: 100vh;
+  position: fixed; /* ✅ Fixed position */
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  z-index: 1000; /* ✅ Stay above content */
 }
+
 
 .leftBar .container {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* position: fixed; */
+  margin-top: 80px;
 }
 
 .leftBar .menu {
