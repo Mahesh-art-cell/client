@@ -98,3 +98,38 @@
 } 
 
 
+/* ✅ Dark Mode Styles */
+.rightBar.dark {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.rightBar.dark .container .item {
+  background-color: #333;
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
+.rightBar.dark .container .item span {
+  color: #ccc;
+}
+
+.rightBar.dark .container .item .user .userInfo span {
+  color: #fff;
+}
+
+.rightBar.dark .container .item .user .buttons button {
+  background-color: #444;
+  color: #fff;
+}
+
+.rightBar.dark .container .item .user .buttons button:hover {
+  background-color: #555;
+}
+
+.rightBar.dark .container .item .user .buttons button:nth-child(2) {
+  background-color: #e63a3a;
+}
+
+.rightBar.dark .container .item .user .buttons button:nth-child(2):hover {
+  background-color: #ff4d4d;
+}
