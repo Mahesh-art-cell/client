@@ -151,17 +151,17 @@
 
 import "./friends.css";
 import { useState, useEffect } from "react";
-import { makeRequest } from "../../axios"; // ✅ Use the configured axios instance
+import { makeRequest } from "../../axios";
 
 const Friends = () => {
   const [counts, setCounts] = useState({ followers: 0, following: 0 });
-  const [allUsers, setAllUsers] = useState([]); // ✅ Store all users for search and suggestions
-  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ Filtered users for display
-  const [followedUsers, setFollowedUsers] = useState(new Set()); // ✅ Track followed users
+  const [allUsers, setAllUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [followedUsers, setFollowedUsers] = useState(new Set());
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(""); // ✅ Search term state
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // ✅ Fetch Followers and Following Counts
+  // Fetch Followers and Following Counts
   const fetchCounts = async () => {
     try {
       const res = await makeRequest.get("/relationships/counts");
@@ -171,13 +171,13 @@ const Friends = () => {
     }
   };
 
-  // ✅ Fetch All Users for Suggestions and Search
+  // Fetch All Users for Suggestions and Search
   const fetchAllUsers = async () => {
     try {
       const res = await makeRequest.get("/relationships/suggestions");
       if (res.data && Array.isArray(res.data)) {
         setAllUsers(res.data);
-        setFilteredUsers(res.data); // ✅ Show all users initially
+        setFilteredUsers(res.data);
       } else {
         setAllUsers([]);
         setFilteredUsers([]);
@@ -187,7 +187,7 @@ const Friends = () => {
     }
   };
 
-  // ✅ Fetch Followed Users to Track Follow Status
+  // Fetch Followed Users to Track Follow Status
   const fetchFollowedUsers = async () => {
     try {
       const res = await makeRequest.get("/relationships/followedUsers");
@@ -198,7 +198,7 @@ const Friends = () => {
     }
   };
 
-  // ✅ Fetch Data on Component Mount
+  // Fetch Data on Component Mount
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([fetchCounts(), fetchAllUsers(), fetchFollowedUsers()]);
@@ -208,41 +208,50 @@ const Friends = () => {
     fetchData();
   }, []);
 
-  // ✅ Handle Follow/Unfollow
+  // Handle Follow/Unfollow
   const handleFollow = async (userId, action) => {
     try {
       if (action === "follow") {
         await makeRequest.post("/relationships/", {
           followedUserId: userId,
         });
-        followedUsers.add(userId); // ✅ Add to followed list
+        // Create a new Set with the existing followed users plus the new one
+        setFollowedUsers(prev => new Set([...prev, userId]));
       } else {
         await makeRequest.delete(`/relationships/?userId=${userId}`);
-        followedUsers.delete(userId); // ✅ Remove from followed list
+        // Create a new Set with the userId removed
+        setFollowedUsers(prev => {
+          const newSet = new Set([...prev]);
+          newSet.delete(userId);
+          return newSet;
+        });
       }
-
-      // ✅ Update Followed Users Set
-      setFollowedUsers(new Set(followedUsers));
-      // ✅ Refresh Counts After Action
+      
+      // Refresh Counts After Action
       fetchCounts();
     } catch (err) {
       console.error(`❌ Error trying to ${action}:`, err.message);
     }
   };
 
-  // ✅ Handle User Search
+  // Handle User Search
   const handleSearch = (e) => {
     const input = e.target.value.toLowerCase();
     setSearchTerm(input);
 
-    // ✅ Always Filter from All Users (Not Suggestions)
-    const filtered = allUsers.filter((user) =>
-      user.username.toLowerCase().includes(input)
-    );
-    setFilteredUsers(filtered);
+    if (input.trim() === "") {
+      // Show all users when search is empty
+      setFilteredUsers(allUsers);
+    } else {
+      // Filter users based on search term
+      const filtered = allUsers.filter((user) =>
+        user.username.toLowerCase().includes(input)
+      );
+      setFilteredUsers(filtered);
+    }
   };
 
-  // ✅ Show Loading Indicator While Fetching Data
+  // Show Loading Indicator While Fetching Data
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -250,7 +259,7 @@ const Friends = () => {
   return (
     <div className="friends">
       <div className="container">
-        {/* ✅ Search Bar */}
+        {/* Search Bar */}
         <div className="search-bar">
           <input
             type="text"
@@ -260,7 +269,7 @@ const Friends = () => {
           />
         </div>
 
-        {/* ✅ Followers and Following Counts */}
+        {/* Followers and Following Counts */}
         <div className="counts">
           <div className="count-item">
             <span className="label">Followers:</span>
@@ -272,7 +281,7 @@ const Friends = () => {
           </div>
         </div>
 
-        {/* ✅ Suggestions List */}
+        {/* Suggestions List */}
         <div className="suggestions">
           <h3>Suggestions for You</h3>
           {filteredUsers.length === 0 ? (
@@ -290,7 +299,7 @@ const Friends = () => {
                     <span className="username">{user.username}</span>
                   </div>
 
-                  {/* ✅ Follow/Unfollow Button */}
+                  {/* Follow/Unfollow Button */}
                   {followedUsers.has(user.id) ? (
                     <button
                       className="following-btn"
