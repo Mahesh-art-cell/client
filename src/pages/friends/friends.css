@@ -1,4 +1,4 @@
-/* 
+
 .friends {
   display: flex;
   justify-content: center;
@@ -109,11 +109,11 @@
 }
 
 
- */
 
 
 
- .friends {
+
+ /* .friends {
   padding: 20px;
 }
 
@@ -179,4 +179,4 @@
   padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
-}
+} */
