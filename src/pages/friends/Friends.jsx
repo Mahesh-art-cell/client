@@ -191,67 +191,74 @@ const Friends = () => {
   const fetchFollowedUsers = async () => {
     try {
       const res = await makeRequest.get("/relationships/followedUsers");
-      const followedSet = new Set(res.data.map((user) => user.id));
-      setFollowedUsers(followedSet);
+      if (res.data && Array.isArray(res.data)) {
+        const followedSet = new Set(res.data.map(user => user.id));
+        setFollowedUsers(followedSet);
+      }
     } catch (err) {
       console.error("❌ Error fetching followed users:", err.message);
     }
   };
 
-  // Fetch Data on Component Mount
+  // Initial data fetch
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([fetchCounts(), fetchAllUsers(), fetchFollowedUsers()]);
-      setLoading(false);
+      try {
+        setLoading(true);
+        await Promise.all([fetchCounts(), fetchAllUsers(), fetchFollowedUsers()]);
+      } catch (err) {
+        console.error("❌ Error during initial data fetch:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
   }, []);
 
+  // Update filtered users when search term or all users change
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredUsers(allUsers);
+    } else {
+      const filtered = allUsers.filter(user => 
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    }
+  }, [searchTerm, allUsers]);
+
   // Handle Follow/Unfollow
   const handleFollow = async (userId, action) => {
     try {
+      // First, optimistically update the UI
+      const newFollowedUsers = new Set(followedUsers);
+      
       if (action === "follow") {
-        await makeRequest.post("/relationships/", {
-          followedUserId: userId,
-        });
-        // Create a new Set with the existing followed users plus the new one
-        setFollowedUsers(prev => new Set([...prev, userId]));
+        await makeRequest.post("/relationships/", { followedUserId: userId });
+        newFollowedUsers.add(userId);
       } else {
         await makeRequest.delete(`/relationships/?userId=${userId}`);
-        // Create a new Set with the userId removed
-        setFollowedUsers(prev => {
-          const newSet = new Set([...prev]);
-          newSet.delete(userId);
-          return newSet;
-        });
+        newFollowedUsers.delete(userId);
       }
       
-      // Refresh Counts After Action
+      // Update the state with the new set of followed users
+      setFollowedUsers(newFollowedUsers);
+      
+      // Update counts to reflect the changes
       fetchCounts();
     } catch (err) {
       console.error(`❌ Error trying to ${action}:`, err.message);
+      // Revert the optimistic update if the API call fails
+      fetchFollowedUsers();
     }
   };
 
   // Handle User Search
   const handleSearch = (e) => {
-    const input = e.target.value.toLowerCase();
-    setSearchTerm(input);
-
-    if (input.trim() === "") {
-      // Show all users when search is empty
-      setFilteredUsers(allUsers);
-    } else {
-      // Filter users based on search term
-      const filtered = allUsers.filter((user) =>
-        user.username.toLowerCase().includes(input)
-      );
-      setFilteredUsers(filtered);
-    }
+    setSearchTerm(e.target.value);
   };
 
-  // Show Loading Indicator While Fetching Data
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -291,9 +298,10 @@ const Friends = () => {
               {filteredUsers.map((user) => (
                 <li key={user.id} className="suggestion-item">
                   <img
-                    src={user.profilePic}
+                    src={user.profilePic || "/default-profile.jpg"}
                     alt={user.username}
                     className="profile-pic"
+                    onError={(e) => {e.target.src = "/default-profile.jpg"}}
                   />
                   <div className="info">
                     <span className="username">{user.username}</span>
