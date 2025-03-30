@@ -162,64 +162,65 @@ const Friends = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch Followers and Following Counts
-  const fetchCounts = async () => {
+  // This function will fetch all the required data
+  const fetchAllData = async () => {
     try {
-      const res = await makeRequest.get("/relationships/counts");
-      setCounts(res.data);
-    } catch (err) {
-      console.error("❌ Error fetching counts:", err.message);
-    }
-  };
-
-  // Fetch All Users for Suggestions
-  const fetchAllUsers = async () => {
-    try {
-      const res = await makeRequest.get("/relationships/suggestions");
-      if (res.data && Array.isArray(res.data)) {
-        setAllUsers(res.data);
-        setFilteredUsers(res.data);
+      setLoading(true);
+      
+      // Fetch counts
+      const countsRes = await makeRequest.get("/relationships/counts");
+      if (countsRes.data) {
+        setCounts(countsRes.data);
+      }
+      
+      // Fetch all users for suggestions
+      const allUsersRes = await makeRequest.get("/relationships/suggestions");
+      if (allUsersRes.data && Array.isArray(allUsersRes.data)) {
+        setAllUsers(allUsersRes.data);
+        setFilteredUsers(allUsersRes.data);
       } else {
         setAllUsers([]);
         setFilteredUsers([]);
       }
-    } catch (err) {
-      console.error("❌ Error fetching suggestions:", err.message);
-    }
-  };
-
-  // Fetch Followed Users (users you're following)
-  const fetchFollowedUsers = async () => {
-    try {
-      const res = await makeRequest.get("/relationships/followedUsers");
-      if (res.data && Array.isArray(res.data)) {
-        // Store the complete user objects for the Following list
-        setFollowingList(res.data);
-        // Store just the IDs in a Set for efficient lookup
-        setFollowedUserIds(new Set(res.data.map(user => user.id)));
+      
+      // Fetch followed users
+      const followedUsersRes = await makeRequest.get("/relationships/followedUsers");
+      if (followedUsersRes.data && Array.isArray(followedUsersRes.data)) {
+        setFollowingList(followedUsersRes.data);
+        setFollowedUserIds(new Set(followedUsersRes.data.map(user => user.id)));
+      } else {
+        setFollowingList([]);
+        setFollowedUserIds(new Set());
       }
     } catch (err) {
-      console.error("❌ Error fetching followed users:", err.message);
+      console.error("❌ Error fetching data:", err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Initial data fetch
+  // Initial data fetch on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        await Promise.all([fetchCounts(), fetchAllUsers(), fetchFollowedUsers()]);
-      } catch (err) {
-        console.error("❌ Error during initial data fetch:", err);
-      } finally {
-        setLoading(false);
-      }
+    fetchAllData();
+    
+    // Add event listener for page visibility changes
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    // Clean up event listener on component unmount
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-
-    fetchData();
   }, []);
 
-  // Handle search functionality
+  // Handle page visibility changes (user switches tabs or returns to the page)
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      // Refresh data when page becomes visible again
+      fetchAllData();
+    }
+  };
+
+  // Update filtered users when search term changes
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredUsers(allUsers);
@@ -249,9 +250,14 @@ const Friends = () => {
       }
       
       // Refresh counts
-      fetchCounts();
+      const countsRes = await makeRequest.get("/relationships/counts");
+      if (countsRes.data) {
+        setCounts(countsRes.data);
+      }
     } catch (err) {
       console.error("❌ Error following user:", err.message);
+      // If an error occurs, refresh all data to ensure consistency
+      fetchAllData();
     }
   };
 
@@ -270,9 +276,14 @@ const Friends = () => {
       });
       
       // Refresh counts
-      fetchCounts();
+      const countsRes = await makeRequest.get("/relationships/counts");
+      if (countsRes.data) {
+        setCounts(countsRes.data);
+      }
     } catch (err) {
       console.error("❌ Error unfollowing user:", err.message);
+      // If an error occurs, refresh all data to ensure consistency
+      fetchAllData();
     }
   };
 
@@ -354,8 +365,12 @@ const Friends = () => {
         {/* Suggestions Section */}
         <div className="suggestions">
           <h3>Suggestions for You</h3>
-          {filteredUsers.length === 0 ? (
-            <p>No user suggestions available.</p>
+          {filteredUsers.filter(user => !followedUserIds.has(user.id)).length === 0 ? (
+            searchTerm ? (
+              <p>No suggestions match your search.</p>
+            ) : (
+              <p>No more suggestions available.</p>
+            )
           ) : (
             <ul>
               {filteredUsers
