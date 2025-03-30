@@ -97,6 +97,7 @@ import MediaList from "./components/media/MediaList";
 import Friends from "./pages/friends/Friends";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
+import Details from "./pages/user/Details"; // ✅ Import User Details Page
 import { AuthContext } from "./context/authContext";
 import { DarkModeContext } from "./context/darkModeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -153,7 +154,8 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "/profile/:id", element: <Profile /> },
         { path: "/media", element: <MediaList /> },
-        { path: "/friends", element: <Friends /> }, // ✅ Friends Page Route
+        { path: "/friends", element: <Friends /> },
+        { path: "/user/Details/:id", element: <Details /> }, // ✅ Add User Details Page
       ],
     },
     { path: "/login", element: <Login /> },

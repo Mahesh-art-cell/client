@@ -1,6 +1,6 @@
 
 .rightBar {
-  flex: 3;
+  /* flex: 4; */
   position: sticky;
   top: 70px;
   height: calc(100vh - 70px);
