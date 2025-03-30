@@ -151,154 +151,98 @@
 
 import "./friends.css";
 import { useState, useEffect } from "react";
-import { makeRequest } from "../../axios";
+import { makeRequest } from "../../axios"; // ✅ Use the configured axios instance
 
 const Friends = () => {
   const [counts, setCounts] = useState({ followers: 0, following: 0 });
-  const [allUsers, setAllUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [followingList, setFollowingList] = useState([]); // List of users you follow
-  const [followedUserIds, setFollowedUserIds] = useState(new Set()); // Set of IDs for quick lookup
+  const [allUsers, setAllUsers] = useState([]); // ✅ Store all users for search and suggestions
+  const [filteredUsers, setFilteredUsers] = useState([]); // ✅ Filtered users for display
+  const [followedUsers, setFollowedUsers] = useState(new Set()); // ✅ Track followed users
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // ✅ Search term state
 
-  // This function will fetch all the required data
-  const fetchAllData = async () => {
+  // ✅ Fetch Followers and Following Counts
+  const fetchCounts = async () => {
     try {
-      setLoading(true);
-      
-      // Fetch counts
-      const countsRes = await makeRequest.get("/relationships/counts");
-      if (countsRes.data) {
-        setCounts(countsRes.data);
-      }
-      
-      // Fetch all users for suggestions
-      const allUsersRes = await makeRequest.get("/relationships/suggestions");
-      if (allUsersRes.data && Array.isArray(allUsersRes.data)) {
-        setAllUsers(allUsersRes.data);
-        setFilteredUsers(allUsersRes.data);
+      const res = await makeRequest.get("/relationships/counts");
+      setCounts(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching counts:", err.message);
+    }
+  };
+
+  // ✅ Fetch All Users for Suggestions and Search
+  const fetchAllUsers = async () => {
+    try {
+      const res = await makeRequest.get("/relationships/suggestions");
+      if (res.data && Array.isArray(res.data)) {
+        setAllUsers(res.data);
+        setFilteredUsers(res.data); // ✅ Show all users initially
       } else {
         setAllUsers([]);
         setFilteredUsers([]);
       }
-      
-      // Fetch followed users
-      const followedUsersRes = await makeRequest.get("/relationships/followedUsers");
-      if (followedUsersRes.data && Array.isArray(followedUsersRes.data)) {
-        setFollowingList(followedUsersRes.data);
-        setFollowedUserIds(new Set(followedUsersRes.data.map(user => user.id)));
-      } else {
-        setFollowingList([]);
-        setFollowedUserIds(new Set());
-      }
     } catch (err) {
-      console.error("❌ Error fetching data:", err.message);
-    } finally {
-      setLoading(false);
+      console.error("❌ Error fetching suggestions:", err.message);
     }
   };
 
-  // Initial data fetch on component mount
+  // ✅ Fetch Followed Users to Track Follow Status
+  const fetchFollowedUsers = async () => {
+    try {
+      const res = await makeRequest.get("/relationships/followedUsers");
+      const followedSet = new Set(res.data.map((user) => user.id));
+      setFollowedUsers(followedSet);
+    } catch (err) {
+      console.error("❌ Error fetching followed users:", err.message);
+    }
+  };
+
+  // ✅ Fetch Data on Component Mount
   useEffect(() => {
-    fetchAllData();
-    
-    // Add event listener for page visibility changes
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    
-    // Clean up event listener on component unmount
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    const fetchData = async () => {
+      await Promise.all([fetchCounts(), fetchAllUsers(), fetchFollowedUsers()]);
+      setLoading(false);
     };
+
+    fetchData();
   }, []);
 
-  // Handle page visibility changes (user switches tabs or returns to the page)
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
-      // Refresh data when page becomes visible again
-      fetchAllData();
-    }
-  };
-
-  // Update filtered users when search term changes
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredUsers(allUsers);
-    } else {
-      const term = searchTerm.toLowerCase();
-      const filteredSuggestions = allUsers.filter(user => 
-        user.username.toLowerCase().includes(term)
-      );
-      setFilteredUsers(filteredSuggestions);
-    }
-  }, [searchTerm, allUsers]);
-
-  // Handle Follow User
-  const handleFollow = async (userId) => {
+  // ✅ Handle Follow/Unfollow
+  const handleFollow = async (userId, action) => {
     try {
-      await makeRequest.post("/relationships/", {
-        followedUserId: userId
-      });
-      
-      // Find the user in allUsers
-      const userToFollow = allUsers.find(user => user.id === userId);
-      if (userToFollow) {
-        // Update followingList by adding the user
-        setFollowingList(prev => [...prev, userToFollow]);
-        // Update the Set of followed user IDs
-        setFollowedUserIds(prev => new Set([...prev, userId]));
+      if (action === "follow") {
+        await makeRequest.post("/relationships/", {
+          followedUserId: userId,
+        });
+        followedUsers.add(userId); // ✅ Add to followed list
+      } else {
+        await makeRequest.delete(`/relationships/?userId=${userId}`);
+        followedUsers.delete(userId); // ✅ Remove from followed list
       }
-      
-      // Refresh counts
-      const countsRes = await makeRequest.get("/relationships/counts");
-      if (countsRes.data) {
-        setCounts(countsRes.data);
-      }
+
+      // ✅ Update Followed Users Set
+      setFollowedUsers(new Set(followedUsers));
+      // ✅ Refresh Counts After Action
+      fetchCounts();
     } catch (err) {
-      console.error("❌ Error following user:", err.message);
-      // If an error occurs, refresh all data to ensure consistency
-      fetchAllData();
+      console.error(`❌ Error trying to ${action}:`, err.message);
     }
   };
 
-  // Handle Unfollow User
-  const handleUnfollow = async (userId) => {
-    try {
-      await makeRequest.delete(`/relationships/?userId=${userId}`);
-      
-      // Remove user from followingList
-      setFollowingList(prev => prev.filter(user => user.id !== userId));
-      // Remove ID from the Set of followed user IDs
-      setFollowedUserIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(userId);
-        return newSet;
-      });
-      
-      // Refresh counts
-      const countsRes = await makeRequest.get("/relationships/counts");
-      if (countsRes.data) {
-        setCounts(countsRes.data);
-      }
-    } catch (err) {
-      console.error("❌ Error unfollowing user:", err.message);
-      // If an error occurs, refresh all data to ensure consistency
-      fetchAllData();
-    }
-  };
-
-  // Handle User Search
+  // ✅ Handle User Search
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+    const input = e.target.value.toLowerCase();
+    setSearchTerm(input);
+
+    // ✅ Always Filter from All Users (Not Suggestions)
+    const filtered = allUsers.filter((user) =>
+      user.username.toLowerCase().includes(input)
+    );
+    setFilteredUsers(filtered);
   };
 
-  // Filter the followingList based on search term
-  const filteredFollowing = searchTerm.trim() === "" 
-    ? followingList 
-    : followingList.filter(user => 
-        user.username.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
+  // ✅ Show Loading Indicator While Fetching Data
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -306,7 +250,7 @@ const Friends = () => {
   return (
     <div className="friends">
       <div className="container">
-        {/* Search Bar */}
+        {/* ✅ Search Bar */}
         <div className="search-bar">
           <input
             type="text"
@@ -316,7 +260,7 @@ const Friends = () => {
           />
         </div>
 
-        {/* Followers and Following Counts */}
+        {/* ✅ Followers and Following Counts */}
         <div className="counts">
           <div className="count-item">
             <span className="label">Followers:</span>
@@ -327,73 +271,43 @@ const Friends = () => {
             <span className="value">{counts.following}</span>
           </div>
         </div>
-        
-        {/* Following Section */}
-        <div className="following-section">
-          <h3>People You Follow</h3>
-          {filteredFollowing.length === 0 ? (
-            searchTerm ? (
-              <p>No followed users match your search.</p>
-            ) : (
-              <p>You're not following anyone yet.</p>
-            )
+
+        {/* ✅ Suggestions List */}
+        <div className="suggestions">
+          <h3>Suggestions for You</h3>
+          {filteredUsers.length === 0 ? (
+            <p>No users found matching your search.</p>
           ) : (
             <ul>
-              {filteredFollowing.map((user) => (
-                <li key={user.id} className="following-item">
+              {filteredUsers.map((user) => (
+                <li key={user.id} className="suggestion-item">
                   <img
-                    src={user.profilePic || "/default-profile.jpg"}
+                    src={user.profilePic}
                     alt={user.username}
                     className="profile-pic"
-                    onError={(e) => {e.target.src = "/default-profile.jpg"}}
                   />
                   <div className="info">
                     <span className="username">{user.username}</span>
                   </div>
-                  <button
-                    className="following-btn"
-                    onClick={() => handleUnfollow(user.id)}
-                  >
-                    Following
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
 
-        {/* Suggestions Section */}
-        <div className="suggestions">
-          <h3>Suggestions for You</h3>
-          {filteredUsers.filter(user => !followedUserIds.has(user.id)).length === 0 ? (
-            searchTerm ? (
-              <p>No suggestions match your search.</p>
-            ) : (
-              <p>No more suggestions available.</p>
-            )
-          ) : (
-            <ul>
-              {filteredUsers
-                .filter(user => !followedUserIds.has(user.id)) // Only show users you don't follow
-                .map((user) => (
-                  <li key={user.id} className="suggestion-item">
-                    <img
-                      src={user.profilePic || "/default-profile.jpg"}
-                      alt={user.username}
-                      className="profile-pic"
-                      onError={(e) => {e.target.src = "/default-profile.jpg"}}
-                    />
-                    <div className="info">
-                      <span className="username">{user.username}</span>
-                    </div>
+                  {/* ✅ Follow/Unfollow Button */}
+                  {followedUsers.has(user.id) ? (
+                    <button
+                      className="following-btn"
+                      onClick={() => handleFollow(user.id, "unfollow")}
+                    >
+                      Following
+                    </button>
+                  ) : (
                     <button
                       className="follow-btn"
-                      onClick={() => handleFollow(user.id)}
+                      onClick={() => handleFollow(user.id, "follow")}
                     >
                       Follow
                     </button>
-                  </li>
-                ))}
+                  )}
+                </li>
+              ))}
             </ul>
           )}
         </div>

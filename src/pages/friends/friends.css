@@ -113,228 +113,70 @@
 
 
 
- 
-
-
- /* Main container styling */
-.friends {
-  background-color: #f7f7f7;
+ .friends {
   padding: 20px;
-  border-radius: 10px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Search bar styling */
-.search-bar {
-  margin-bottom: 20px;
+  max-width: 600px;
+  margin: auto;
 }
 
 .search-bar input {
   width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 25px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
 }
 
-.search-bar input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-/* Counts section styling */
 .counts {
   display: flex;
   justify-content: space-between;
-  background-color: white;
-  padding: 15px 20px;
-  border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .count-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.label {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.value {
-  font-size: 22px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* Following section styling */
-.following-section {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  margin-bottom: 20px;
-}
-
-.following-section h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.following-section ul,
-.suggestions ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.following-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.following-item:last-child {
-  border-bottom: none;
-}
-
-/* Suggestions section styling */
-.suggestions {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 16px;
 }
 
 .suggestions h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+  margin-bottom: 10px;
 }
 
-/* User item styling (common for both sections) */
-.suggestion-item,
-.following-item {
+.suggestion-item {
   display: flex;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.suggestion-item:last-child,
-.following-item:last-child {
-  border-bottom: none;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 .profile-pic {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  object-fit: cover;
-  margin-right: 15px;
-  border: 1px solid #eaeaea;
+  margin-right: 10px;
 }
 
 .info {
   flex-grow: 1;
 }
 
-.username {
-  font-weight: 500;
-  color: #333;
-  font-size: 15px;
-}
-
-/* Button styling */
-.follow-btn, .following-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
-}
-
 .follow-btn {
   background-color: #007bff;
   color: white;
   border: none;
-}
-
-.follow-btn:hover {
-  background-color: #0069d9;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .following-btn {
-  background-color: #e9ecef;
-  color: #495057;
-  border: 1px solid #ced4da;
-}
-
-.following-btn:hover {
-  background-color: #f1f3f5;
-  color: #dc3545;
-  border-color: #dc3545;
-}
-
-/* Loading state */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: 18px;
-  color: #666;
-}
-
-/* Empty state messages */
-.following-section p,
-.suggestions p {
-  color: #666;
-  text-align: center;
-  padding: 15px 0;
-}
-
-/* Responsive styling */
-@media (max-width: 768px) {
-  .counts {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .count-item {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .value {
-    font-size: 18px;
-  }
-  
-  .profile-pic {
-    width: 35px;
-    height: 35px;
-  }
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
 }
