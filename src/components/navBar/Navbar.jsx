@@ -560,6 +560,8 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // console.log(allUsers)
+
   return (
     <div className={`navbar ${darkMode ? "dark" : "light"}`}>
       {/* ✅ Left Side of Navbar */}
