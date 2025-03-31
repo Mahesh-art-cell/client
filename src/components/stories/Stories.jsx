@@ -218,7 +218,6 @@ import { toast } from "react-toastify";
 const Stories = () => {
   const { currentUser } = useContext(AuthContext);
   const fileInputRef = useRef(null);
-  const storiesContainerRef = useRef(null); // ✅ Ref for scrolling
   const [uploading, setUploading] = useState(false);
 
   const queryClient = useQueryClient();
@@ -287,107 +286,66 @@ const Stories = () => {
 
   // ✅ Handle Story Deletion with Confirmation Toast
   const handleDeleteStory = async (storyId) => {
-    toast.info(
-      <div>
-        <p>🗑️ Are you sure you want to delete this story?</p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-          <button
-            onClick={() => {
-              deleteMutation.mutate(storyId);
-              toast.dismiss();
-            }}
-            style={{
-              backgroundColor: "#ff4d4d",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => toast.dismiss()}
-            style={{
-              backgroundColor: "#4caf50",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            No
-          </button>
-        </div>
-      </div>,
-      {
-        position: "top-center",
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        closeButton: false,
-      }
-    );
-  };
-
-  // ✅ Scroll Stories Left/Right
-  const scrollLeft = () => {
-    storiesContainerRef.current.scrollLeft -= 300;
-  };
-
-  const scrollRight = () => {
-    storiesContainerRef.current.scrollLeft += 300;
+    if (window.confirm("Are you sure you want to delete this story?")) {
+      deleteMutation.mutate(storyId);
+    }
   };
 
   return (
-    <div className="stories-wrapper" style={{ position: "relative" }}>
-      {/* ✅ Scroll Buttons */}
-      <button className="scroll-btn left" onClick={scrollLeft}>
-        {"<"}
-      </button>
-      <button className="scroll-btn right" onClick={scrollRight}>
-        {">"}
-      </button>
-
-      <div className="stories" ref={storiesContainerRef}>
-        {/* ✅ Upload New Story */}
-        <div
-          className="story upload-story"
-          onClick={() => fileInputRef.current.click()}
-        >
-          <img
-            src={
-              currentUser.profilePic ||
-              "/default-avatar.png"
-            }
-            alt="profile"
-          />
-          <span>{currentUser.name}</span>
-          <button className="plus-btn">+</button>
-        </div>
-
-        {/* ✅ Hidden File Input */}
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept="image/*, video/*"
-          onChange={handleStoryUpload}
-          style={{ display: "none" }}
+    <div className="stories-wrapper">
+      {/* ✅ Upload New Story */}
+      <div
+        className="story upload-story"
+        onClick={() => fileInputRef.current.click()}
+      >
+        <img
+          src={currentUser.profilePic || "/default-avatar.png"}
+          alt="profile"
         />
+        <span>{currentUser.name}</span>
+        <button className="plus-btn">+</button>
+      </div>
 
-        {uploading && <p>Uploading...</p>}
+      {/* ✅ Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*, video/*"
+        onChange={handleStoryUpload}
+        style={{ display: "none" }}
+      />
 
-        {/* ✅ Display Stories */}
+      {uploading && <p>Uploading...</p>}
+
+      {/* ✅ Display Stories using Swiper */}
+      <div className="swiper-container">
         {error ? (
           <p>Something went wrong!</p>
         ) : isLoading ? (
           <p>Loading...</p>
         ) : (
-          <>
+          <Swiper
+            slidesPerView={3} // ✅ Show 3 stories per view
+            spaceBetween={10}
+            navigation={true} // ✅ Enable navigation
+            modules={[Navigation]}
+            breakpoints={{
+              768: {
+                slidesPerView: 3,
+                spaceBetween: 15,
+              },
+              576: {
+                slidesPerView: 2,
+                spaceBetween: 10,
+              },
+              360: {
+                slidesPerView: 1,
+                spaceBetween: 5,
+              },
+            }}
+          >
             {data?.map((story) => (
-              <div key={story.id} className="story-slide">
+              <SwiperSlide key={story.id} className="story-slide">
                 {story.img.endsWith(".mp4") ? (
                   <video controls className="story-media">
                     <source src={story.img} type="video/mp4" />
@@ -406,9 +364,9 @@ const Stories = () => {
                     ❌
                   </button>
                 )}
-              </div>
+              </SwiperSlide>
             ))}
-          </>
+          </Swiper>
         )}
       </div>
     </div>
@@ -416,8 +374,3 @@ const Stories = () => {
 };
 
 export default Stories;
-
-
-
-
-

@@ -1,4 +1,4 @@
-
+/* 
  .stories {
   display: flex;
   align-items: center;
@@ -113,4 +113,125 @@
 
 
 
+ */
 
+
+
+
+ /* Stories Wrapper - Container */
+.stories-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 10px 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Upload Story Box */
+.upload-story {
+  width: 120px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-story:hover {
+  background-color: #e8e8e8;
+}
+
+/* Swiper Container */
+.swiper-container {
+  width: calc(100% - 140px); /* Adjust width to make space for upload box */
+  overflow: hidden;
+}
+
+/* Story Slide */
+.story-slide {
+  width: 120px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Story Media (Image/Video) */
+.story-media {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+/* Story Slide Text */
+.story-slide span,
+.upload-story span {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Delete Button */
+.delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Swiper Navigation Buttons */
+.swiper-button-prev,
+.swiper-button-next {
+  color: #333;
+  font-size: 18px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .upload-story,
+  .story-slide {
+    width: 100px;
+    height: 180px;
+  }
+  .story-media {
+    height: 130px;
+  }
+}
+
+@media (max-width: 576px) {
+  .upload-story,
+  .story-slide {
+    width: 90px;
+    height: 160px;
+  }
+  .story-media {
+    height: 110px;
+  }
+}
