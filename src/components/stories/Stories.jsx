@@ -479,17 +479,19 @@ const Stories = () => {
 
   // ✅ Handle Story Upload
   const handleStoryUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-      // ✅ Upload story
-      await addMutation.mutateAsync(formData);
+        // ✅ Upload each story
+        await addMutation.mutateAsync(formData);
+      }
     } catch (err) {
       console.error("❌ Error uploading story:", err);
       toast.error("❌ Error uploading story. Try again.");
@@ -530,8 +532,8 @@ const Stories = () => {
         {">"}
       </button>
 
-      <div className="stories-container">
-        <div className="stories" ref={storiesContainerRef}>
+      <div className="stories-container" ref={storiesContainerRef}>
+        <div className="stories">
           {/* ✅ Upload New Story */}
           <div
             className="story upload-story"
@@ -545,11 +547,12 @@ const Stories = () => {
             <button className="plus-btn">+</button>
           </div>
 
-          {/* ✅ Hidden File Input */}
+          {/* ✅ Hidden File Input - Allow Multiple File Selection */}
           <input
             type="file"
             ref={fileInputRef}
             accept="image/*, video/*"
+            multiple
             onChange={handleStoryUpload}
             style={{ display: "none" }}
           />

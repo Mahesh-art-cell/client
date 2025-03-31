@@ -109,11 +109,6 @@
   cursor: pointer;
 } */
 
-
-
-
-
-
 /* Stories Wrapper - Container for whole component */
 .stories-wrapper {
   position: relative;
@@ -122,21 +117,21 @@
   overflow: hidden;
 }
 
-/* Stories Container - Limit Width and Prevent Expansion */
+/* Stories Scrollable Area - Fixed Width to Prevent Expansion */
 .stories-container {
   width: 100%;
   overflow-x: auto;
   max-width: 100%;
   position: relative;
+  padding: 10px 0;
 }
 
-/* Stories Scrollable Area */
+/* Stories - Scrollable Items */
 .stories {
   display: flex;
   align-items: center;
   gap: 10px;
   overflow-x: auto;
-  padding: 10px;
   scroll-behavior: smooth;
   flex-wrap: nowrap;
   max-width: 100%;
@@ -149,13 +144,13 @@
 
 /* Hide scrollbar for IE, Edge, and Firefox */
 .stories {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Story Slide - Prevents Flex Expansion */
-.stories .story-slide {
-  flex: 0 0 auto; /* Prevents growing/shrinking */
+/* Story Slide - Prevent Flex Expansion */
+.story-slide {
+  flex-shrink: 0;
   width: 120px;
   height: 200px;
   display: flex;
@@ -170,8 +165,8 @@
 }
 
 /* Upload Story Box */
-.stories .upload-story {
-  flex: 0 0 auto;
+.upload-story {
+  flex-shrink: 0;
   width: 120px;
   height: 200px;
   display: flex;
@@ -185,14 +180,15 @@
 }
 
 /* Story Media (Image/Video) */
-.stories .story-slide .story-media {
+.story-media {
   width: 100%;
   height: 150px;
   object-fit: cover;
 }
 
-/* Story Text */
-.stories .story-slide span {
+/* Story Slide Text */
+.story-slide span,
+.upload-story span {
   margin-top: 5px;
   font-size: 12px;
   font-weight: bold;
@@ -204,7 +200,7 @@
 }
 
 /* Delete Button */
-.stories .story-slide .delete-btn {
+.delete-btn {
   position: absolute;
   top: 5px;
   right: 5px;
@@ -245,27 +241,28 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .stories .story-slide,
-  .stories .upload-story {
+  .story-slide,
+  .upload-story {
     width: 100px;
     height: 180px;
   }
-  .stories .story-slide .story-media {
+  .story-media {
     height: 130px;
-  }
-  .scroll-btn {
-    width: 25px;
-    height: 25px;
   }
 }
 
 @media (max-width: 576px) {
-  .stories .story-slide,
-  .stories .upload-story {
+  .story-slide,
+  .upload-story {
     width: 90px;
     height: 160px;
   }
-  .stories .story-slide .story-media {
+  .story-media {
     height: 110px;
   }
 }
+
+
+
+
+
