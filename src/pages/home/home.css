@@ -9,15 +9,46 @@
 }
 
 
+@import "../../style.css";
+
+.home {
+  padding: 20px 70px;
+  background-color: var(--bgSoft);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ✅ Small Screens - Mobile */
 @media (max-width: 600px) {
   .home {
     padding: 10px;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .home > * {
+    width: 100%;
   }
 }
 
-
+/* ✅ Tablets & Small Laptops */
 @media (min-width: 601px) and (max-width: 1024px) {
   .home {
     padding: 20px;
+    gap: 15px;
+    width: 90%;
+    margin: 0 auto;
+  }
+}
+
+/* ✅ Larger Screens */
+@media (min-width: 1025px) {
+  .home {
+    padding: 20px 70px;
+    gap: 20px;
+    width: 70%;
+    margin: 0 auto;
   }
 }

@@ -1,4 +1,4 @@
-
+/* 
  .stories {
   display: flex;
   align-items: center;
@@ -107,10 +107,453 @@
   width: 30px;
   height: 30px;
   cursor: pointer;
-} 
+} */
+
+
+.stories-container {
+  width: 100%;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.stories-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stories-carousel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Replace swiper with custom scrollable container */
+.stories-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 5px 0;
+  gap: 10px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.stories-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.story-slide {
+  width: 120px;
+  min-width: 120px; /* Important - ensures the width is fixed */
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  transition: 0.3s;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.story-slide:hover {
+  transform: scale(1.05);
+}
+
+.story-slide .story-media {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.story-slide span {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+}
+
+.story-slide .delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.upload-story {
+  width: 120px;
+  min-width: 120px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-right: 10px; /* Add space between upload box and carousel */
+}
+
+.upload-story img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 5px;
+}
+
+.upload-story span {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.upload-story .plus-btn {
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 18px;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+/* Status messages */
+.upload-status, 
+.error-message, 
+.loading-message {
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.upload-status {
+  color: #4caf50;
+}
+
+.error-message {
+  color: #f44336;
+}
+
+/* Full Story View Styling */
+.story-view-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.story-view-container {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.story-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  color: white;
+}
+
+.story-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.story-user-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.close-btn {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.story-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.story-view-media {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.story-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s;
+}
+
+.story-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.prev-btn {
+  left: 10px;
+}
+
+.next-btn {
+  right: 10px;
+}
+
+.story-progress-container {
+  display: flex;
+  gap: 5px;
+  padding: 15px;
+  justify-content: center;
+}
+
+.story-progress-bar {
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.3);
+  flex: 1;
+  border-radius: 3px;
+}
+
+.story-progress-bar.active {
+  background-color: white;
+  animation: progress 5s linear;
+}
+
+.story-progress-bar.viewed {
+  background-color: white;
+}
+
+@keyframes progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Responsive adjustments */
 
 
 
+/* ======================= */
+/* 📱 Small Devices (Up to 480px) */
+/* ======================= */
+@media (max-width: 480px) {
+  .stories-container {
+    width: 0%;
+    margin-bottom: 10px;
+    z-index: 1100; /* ✅ Stories always above posts */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
+  .stories-wrapper {
+    padding: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 
+  .stories-scroll-container {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 5px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .stories-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .upload-story,
+  .story-slide {
+    width: 90px;
+    min-width: 90px; /* ✅ Fixed width for proper horizontal scroll */
+    height: 150px;
+    flex-shrink: 0;
+    margin-right: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .story-slide .story-media {
+    height: 110px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .story-slide span {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .upload-story img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .upload-story .plus-btn {
+    width: 25px;
+    height: 25px;
+    font-size: 16px;
+  }
+
+  .story-nav-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .story-view-container {
+    max-width: 95%;
+    height: 100%;
+    z-index: 1200;
+  }
+
+  .story-progress-container {
+    padding: 8px;
+  }
+}
+
+/* ======================= */
+/* 📱 Medium Devices (481px to 768px) */
+/* ======================= */
+@media (max-width: 768px) {
+  .stories-container {
+    width: 100%;
+    margin-bottom: 15px;
+    z-index: 1100;
+  }
+
+  .stories-wrapper {
+    padding: 5px 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .stories-scroll-container {
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .upload-story,
+  .story-slide {
+    width: 100px;
+    min-width: 100px;
+    height: 170px;
+    margin-right: 8px;
+  }
+
+  .story-slide .story-media {
+    height: 130px;
+  }
+
+  .story-slide span {
+    font-size: 11px;
+  }
+
+  .story-view-container {
+    max-width: 95%;
+    height: 100%;
+  }
+
+  .story-progress-container {
+    padding: 10px;
+  }
+}
+
+/* ======================= */
+/* 🖥️ Larger Devices (769px to 1024px) */
+/* ======================= */
+@media (max-width: 1024px) {
+  .stories-container {
+    width: 100%;
+    margin-bottom: 20px;
+    z-index: 1100;
+  }
+
+  .stories-wrapper {
+    padding: 10px;
+  }
+
+  .stories-scroll-container {
+    gap: 10px;
+  }
+
+  .upload-story,
+  .story-slide {
+    width: 110px;
+    min-width: 110px;
+    height: 180px;
+  }
+
+  .story-slide .story-media {
+    height: 140px;
+  }
+
+  .story-slide span {
+    font-size: 12px;
+  }
+
+  .story-view-container {
+    max-width: 90%;
+    height: 100%;
+  }
+
+  .story-progress-container {
+    padding: 12px;
+  }
+}
 
