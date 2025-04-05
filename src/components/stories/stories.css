@@ -391,7 +391,7 @@
   .stories-container {
     width: 0%;
     margin-bottom: 10px;
-    z-index: 1100; /* ✅ Stories always above posts */
+    /* z-index: 1100; ✅ Stories always above posts */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -474,7 +474,7 @@
   .stories-container {
     width: 100%;
     margin-bottom: 15px;
-    z-index: 1100;
+    /* z-index: 1100; */
   }
 
   .stories-wrapper {
