@@ -380,18 +380,14 @@
   to { width: 100%; }
 }
 
-/* Responsive adjustments */
 
 
 
-/* ======================= */
-/* 📱 Small Devices (Up to 480px) */
-/* ======================= */
-@media (max-width: 480px) {
+
+/* @media (max-width: 480px) {
   .stories-container {
     width: 0%;
     margin-bottom: 10px;
-    /* z-index: 1100; ✅ Stories always above posts */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -409,17 +405,17 @@
     scroll-behavior: smooth;
     padding: 5px 0;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none; 
   }
 
   .stories-scroll-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none; 
   }
 
   .upload-story,
   .story-slide {
     width: 90px;
-    min-width: 90px; /* ✅ Fixed width for proper horizontal scroll */
+    min-width: 90px; 
     height: 150px;
     flex-shrink: 0;
     margin-right: 5px;
@@ -459,7 +455,6 @@
   .story-view-container {
     max-width: 95%;
     height: 100%;
-    z-index: 1200;
   }
 
   .story-progress-container {
@@ -467,14 +462,11 @@
   }
 }
 
-/* ======================= */
-/* 📱 Medium Devices (481px to 768px) */
-/* ======================= */
+
 @media (max-width: 768px) {
   .stories-container {
     width: 100%;
     margin-bottom: 15px;
-    /* z-index: 1100; */
   }
 
   .stories-wrapper {
@@ -514,14 +506,11 @@
   }
 }
 
-/* ======================= */
-/* 🖥️ Larger Devices (769px to 1024px) */
-/* ======================= */
+
 @media (max-width: 1024px) {
   .stories-container {
     width: 100%;
     margin-bottom: 20px;
-    z-index: 1100;
   }
 
   .stories-wrapper {
@@ -556,4 +545,4 @@
     padding: 12px;
   }
 }
-
+ */
