@@ -1,16 +1,15 @@
-
+/* 
 .leftBar {
   width: 250px;
   background-color: #fff;
   border-right: 1px solid #ddd;
   padding: 15px;
   height: 100vh;
-  position: fixed; /* ✅ Fixed position */
+  position: fixed; 
   top: 0;
   left: 0;
   overflow-y: auto;
   transition: background-color 0.3s ease, color 0.3s ease;
-  z-index: 1000; /* ✅ Stay above content */
 }
 
 
@@ -18,7 +17,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* position: fixed; */
   margin-top: 80px;
 }
 
@@ -78,104 +76,206 @@
 .dark .leftBar .user img,
 .dark .leftBar .item img {
   border: 1px solid #555;
-} 
+}  */
 
 
 
 
-/* Media query for tablets and smaller devices */
+
+
+/* ========= Default styles (desktop-first) ========= */
+/* .leftBar {
+  width: 250px;
+  padding: 15px;
+  height: 100vh;
+}
+
+
+
+@media (min-width: 1025px) {
+  .leftBar {
+    display: block;
+    position: fixed;
+    width: 250px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .leftBar {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    top: auto;
+  }
+} */
+
+
+
+
+
+.leftBar {
+  /* width: 250px; */ 
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  padding: 15px;
+  height: 100vh;
+  /* Removed fixed positioning to integrate into page layout */
+  position: relative;
+  overflow-y: auto;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  z-index: 1;
+  /* margin-left: 500px; */
+}
+
+.leftBar .container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 80px;
+}
+
+.leftBar .menu {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.leftBar .user,
+.leftBar .item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.leftBar .user:hover,
+.leftBar .item:hover {
+  background-color: #f5f5f5;
+}
+
+.leftBar .user span,
+.leftBar .item span {
+  color: #333;
+}
+
+.leftBar .user img,
+.leftBar .item img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ✅ Dark mode support */
+.dark .leftBar {
+  background-color: #242526;
+  border-right: 1px solid #3a3b3c;
+}
+
+.dark .leftBar .user span,
+.dark .leftBar .item span {
+  color: #fff;
+}
+
+.dark .leftBar .user:hover,
+.dark .leftBar .item:hover {
+  background-color: #3a3b3c;
+}
+
+.dark .leftBar .user img,
+.dark .leftBar .item img {
+  border: 1px solid #555;
+}
+
+/* ✅ Media Queries */
+
+/* Tablets and below */
 @media (max-width: 768px) {
   .leftBar {
     width: 200px;
     padding: 10px;
+    height: 100vh;
   }
-  
+
   .leftBar .container {
     margin-top: 70px;
   }
-  
-  .leftBar .menu {
-    gap: 12px;
+  .leftBar .container .menu{
+    margin-left: 700px;
+    z-index: 1000;
+  }
+
+  .leftBar .user,
+  .leftBar .item {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .leftBar .user span,
+  .leftBar .item span {
+    font-size: 14px;
+  }
+
+  .leftBar .user img,
+  .leftBar .item img {
+    width: 26px;
+    height: 26px;
   }
 }
 
-/* Media query for mobile phones */
-@media (max-width: 576px) {
+/* Mobile devices */
+@media (max-width: 480px) {
   .leftBar {
     width: 100%;
     height: auto;
     position: fixed;
     bottom: 0;
-    top: auto;
     left: 0;
+    right: 0;
+    top: auto;
     border-right: none;
     border-top: 1px solid #ddd;
-    padding: 10px 5px;
-    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    z-index: 1001;
   }
-  
+
   .leftBar .container {
     margin-top: 0;
-  }
-  
-  .leftBar .menu {
     flex-direction: row;
     justify-content: space-around;
-    gap: 0;
-  }
-  
-  .leftBar .user, .leftBar .item {
-    flex-direction: column;
-    padding: 8px 5px;
-    gap: 5px;
-    width: 70px;
-    text-align: center;
-  }
-  
-  .leftBar .user span, .leftBar .item span {
-    font-size: 12px;
-  }
-  
-  /* Dark mode adjustments for mobile */
-  .dark .leftBar {
-    border-top: 1px solid #3a3b3c;
-    border-right: none;
-  }
-}
-
-/* Media query for very small screens */
-@media (max-width: 380px) {
-  .leftBar .user, .leftBar .item {
-    width: 60px;
-  }
-  
-  .leftBar .user span, .leftBar .item span {
-    font-size: 10px;
-  }
-}
-
-/* Handle landscape orientation on mobile */
-@media (max-height: 450px) and (orientation: landscape) {
-  .leftBar {
     width: 100%;
-    height: 60px;
-    padding: 5px;
   }
-  
+
   .leftBar .menu {
     flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .leftBar .user,
+  .leftBar .item {
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 5px;
+    padding: 6px;
   }
-  
-  .leftBar .user, .leftBar .item {
-    flex-direction: row;
-    width: auto;
-    padding: 5px 10px;
-    gap: 8px;
-  }
-  
-  .leftBar .user span, .leftBar .item span {
+
+  .leftBar .user span,
+  .leftBar .item span {
     font-size: 12px;
+    text-align: center;
+  }
+
+  .leftBar .user img,
+  .leftBar .item img {
+    width: 24px;
+    height: 24px;
   }
 }

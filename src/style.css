@@ -92,7 +92,7 @@ body {
 
 /* ✅ Main Content Wrapper */
 .main-content {
-  margin-left: 250px; /* ✅ Same width as LeftBar */
+  margin-left: 250px; 
   padding: 20px;
   flex-grow: 1;
   background-color: #f9f9f9;
@@ -112,7 +112,7 @@ body {
   border-right: 1px solid #ddd;
   padding: 15px;
   height: 100vh;
-  position: fixed; /* ✅ Fixed Sidebar */
+  position: fixed; 
   top: 0;
   left: 0;
   overflow-y: auto;
@@ -127,14 +127,14 @@ body {
 }
 
 /* ✅ Responsive Design for Small Screens */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .leftBar {
     display: none;
   }
   .main-content {
-    margin-left: 0; /* ✅ No offset on smaller screens */
+    margin-left: 0; 
   }
   .rightBar {
     display: none;
   }
-}
+} */

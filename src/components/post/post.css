@@ -1,111 +1,3 @@
-/* 
-.post {
-  width: 100%;
-  max-width: 600px;
-  margin: 20px auto;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
-  .container {
-    padding: 15px;
-
-    .user {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-
-      .userInfo {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-
-        img {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
-
-        .details {
-          display: flex;
-          flex-direction: column;
-
-          .name {
-            font-weight: bold;
-            font-size: 14px;
-          }
-
-          .date {
-            font-size: 12px;
-            color: #888;
-          }
-        }
-      }
-
-      // ✅ Delete Button Styles
-      .delete-btn {
-        cursor: pointer;
-        color: red;
-        transition: 0.3s;
-
-        &:hover {
-          color: darkred;
-        }
-      }
-    }
-
-    // ✅ Content Area
-    .content {
-      margin-top: 10px;
-
-      .post-text {
-        font-size: 14px;
-        margin-bottom: 10px;
-      }
-
-      .media-container {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 10px;
-
-        img,
-        video {
-          width: 100%;
-          height: 300px;
-          object-fit: cover;
-          border-radius: 8px;
-        }
-      }
-    }
-
-    // ✅ Info Section (Likes, Comments, Share)
-    .info {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      padding: 10px 0;
-      border-top: 1px solid #eee;
-
-      .item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        color: #555;
-
-        &:hover {
-          color: #000;
-        }
-      }
-    }
-  }
-} */
-
 
 /* Main Post Container */
 .post {
@@ -227,3 +119,7 @@
 .post .container .info .item:hover {
   color: #000;
 }
+
+
+
+
