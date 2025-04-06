@@ -95,7 +95,7 @@ body {
   margin-left: 250px; 
   padding: 20px;
   flex-grow: 1;
-  background-color: #f9f9f9;
+  /* background-color: #f9f9f9; */
   min-height: 100vh;
   transition: margin-left 0.3s ease;
 }
@@ -111,7 +111,7 @@ body {
   background-color: #fff;
   border-right: 1px solid #ddd;
   padding: 15px;
-  height: 100vh;
+  /* height: 100vh; */
   position: fixed; 
   top: 0;
   left: 0;
@@ -119,12 +119,6 @@ body {
   z-index: 1; /* ✅ Stay above content */
 }
 
-/* ✅ Adjust RightBar */
-.rightBar {
-  width: 300px;
-  padding: 15px;
-  border-left: 1px solid #ddd;
-}
 
 /* ✅ Responsive Design for Small Screens */
 /* @media (max-width: 768px) {

@@ -197,23 +197,24 @@
   .leftBar {
     width: 200px;
     padding: 10px;
-    height: 100vh;
+    /* height: 150vh; */
+    height: 1000px;
   }
-
+  
   .leftBar .container {
     margin-top: 70px;
   }
   .leftBar .container .menu{
-    margin-left: 700px;
+    /* margin-left: 700px; */
     z-index: 1000;
   }
-
+  
   .leftBar .user,
   .leftBar .item {
     gap: 8px;
     padding: 8px;
   }
-
+  
   .leftBar .user span,
   .leftBar .item span {
     font-size: 14px;
@@ -246,14 +247,14 @@
 
   .leftBar .container {
     margin-top: 0;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-around;
     width: 100%;
   }
 
   .leftBar .menu {
-    flex-direction: row;
-    gap: 10px;
+    flex-direction: column;
+    gap: 50px;
     width: 100%;
     justify-content: space-around;
   }
@@ -275,7 +276,7 @@
 
   .leftBar .user img,
   .leftBar .item img {
-    width: 24px;
-    height: 24px;
+    width: 54px;
+    height: 54px;
   }
 }
