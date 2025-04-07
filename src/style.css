@@ -120,15 +120,3 @@ body {
 }
 
 
-/* ✅ Responsive Design for Small Screens */
-/* @media (max-width: 768px) {
-  .leftBar {
-    display: none;
-  }
-  .main-content {
-    margin-left: 0; 
-  }
-  .rightBar {
-    display: none;
-  }
-} */
