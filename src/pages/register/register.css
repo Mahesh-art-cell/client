@@ -1,4 +1,4 @@
-
+/* 
 .register {
     height: 100vh;
     background-color: rgb(193, 190, 255);
@@ -17,7 +17,6 @@
     overflow: hidden;
   }
   
-  /* Left Section */
   .register .card .left {
     flex: 1;
     background: linear-gradient(rgba(39, 11, 96, 0.5), rgba(39, 11, 96, 0.5)),
@@ -54,7 +53,7 @@
     cursor: pointer;
   }
   
-  /* Right Section */
+  
   .register .card .right {
     flex: 1;
     padding: 50px;
@@ -92,9 +91,7 @@
   
 
 
-  /* ========== MEDIA QUERIES ========== */
-
-/* Tablets (768px and below) */
+ 
 @media (max-width: 768px) {
   .register .card {
     flex-direction: row;
@@ -134,7 +131,7 @@
   }
 }
 
-/* Mobile Devices (480px and below) */
+
 @media (max-width: 480px) {
   .register {
     width: 100%;
@@ -183,4 +180,278 @@
     padding: 12px;
     font-size: 14px;
   }
+} */
+
+
+
+/* ========== Container ========== */
+.register {
+  min-height: 100vh;
+  background: linear-gradient(to right, #c2e9fb, #a1c4fd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
 }
+
+/* ========== Card ========== */
+.register .card {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 90%;
+  max-width: 1100px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* ========== Left Side ========== */
+.register .card .left {
+  flex: 1;
+  background: linear-gradient(rgba(39, 11, 96, 0.5), rgba(39, 11, 96, 0.5)),
+    url("https://images.pexels.com/photos/4881619/pexels-photo-4881619.jpeg?auto=compress&cs=tinysrgb&w=1600")
+      center/cover no-repeat;
+  padding: 60px 40px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+  animation: slideLeft 0.7s ease-in-out;
+}
+
+.register .card .left h1 {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.register .card .left p {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.register .card .left span {
+  font-size: 14px;
+}
+
+.register .card .left button {
+  background-color: #fff;
+  color: #5d3fd3;
+  font-weight: 600;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register .card .left button:hover {
+  background-color: #e2e2ff;
+  transform: scale(1.05);
+}
+
+/* ========== Right Side ========== */
+.register .card .right {
+  flex: 1;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+  animation: slideRight 0.7s ease-in-out;
+}
+
+.register .card .right h1 {
+  color: #333;
+  font-size: 36px;
+}
+
+.register .card .right form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.register .card .right form input {
+  padding: 15px 12px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.register .card .right form input:focus {
+  border-color: #5d3fd3;
+}
+
+.register .card .right form button {
+  background-color: #5d3fd3;
+  color: white;
+  font-weight: 600;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register .card .right form button:hover {
+  background-color: #4b2ecf;
+  transform: translateY(-2px);
+}
+
+/* ========== Animations ========== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .register .card {
+    flex-direction: column;
+  }
+
+  .register .card .left,
+  .register .card .right {
+    padding: 30px;
+  }
+
+  .register .card .left h1 {
+    font-size: 40px;
+  }
+
+  .register .card .right h1 {
+    font-size: 28px;
+  }
+
+  .register .card .right form button,
+  .register .card .left button {
+    width: 100%;
+  }
+}
+
+
+
+
+@media (max-width: 768px) {
+  .register .card {
+    flex-direction: row;
+    min-height: auto;
+    width: 90%;
+    margin: 20px;
+  }
+
+  .register .card .left,
+  .register .card .right {
+    padding: 30px;
+  }
+
+  .register .card .left {
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .register .card .left h1 {
+    font-size: 60px;
+    line-height: 60px;
+  }
+
+  .register .card .right {
+    gap: 30px;
+  }
+
+  .register .card .right form input {
+    padding: 15px 10px;
+  }
+
+  .register .card .right form button,
+  .register .card .left button {
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .register {
+    width: 100%;
+    height: auto;
+    padding: 20px 0;
+  }
+
+  .register .card {
+    flex-direction: row;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .register .card .left,
+  .register .card .right {
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .register .card .left h1 {
+    font-size: 45px;
+    line-height: 50px;
+  }
+
+  .register .card .left p,
+  .register .card .left span {
+    font-size: 14px;
+  }
+
+  .register .card .right h1 {
+    font-size: 24px;
+  }
+
+  .register .card .right form {
+    gap: 20px;
+  }
+
+  .register .card .right form input {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .register .card .right form button,
+  .register .card .left button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+} 
