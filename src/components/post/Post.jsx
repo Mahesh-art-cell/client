@@ -33,9 +33,9 @@ const Post = ({ post }) => {
   const [liked, setLiked] = useState(false);
 
   // ✅ Fetch Likes
-  const { isLoading, data } = useQuery(["likes", post.id], async () => {
+  const { isLoading, data } = useQuery(["likes", post._id], async () => {
     try {
-      const res = await makeRequest.get(`/likes?postId=${post.id}`);
+      const res = await makeRequest.get(`/likes?postId=${post._id}`);
       console.log("✅ Likes fetched:", res.data);
       return res.data;
     } catch (err) {
@@ -46,6 +46,7 @@ const Post = ({ post }) => {
 
   // ✅ Update Like Count When Data is Available
   useEffect(() => {
+    // console.log(post._id)
     if (data) {
       setLikeCount(data.length);
       setLiked(data.includes(currentUser.id));
@@ -56,14 +57,14 @@ const Post = ({ post }) => {
   const likeMutation = useMutation(
     (liked) => {
       if (liked) {
-        return makeRequest.delete(`/likes?postId=${post.id}`);
+        return makeRequest.delete(`/likes?postId=${post._id}`);
       } else {
-        return makeRequest.post("/likes", { postId: post.id });
+        return makeRequest.post("/likes", { postId: post._id });
       }
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["likes", post.id]);
+        queryClient.invalidateQueries(["likes", post._id]);
       },
     }
   );
@@ -87,7 +88,7 @@ const Post = ({ post }) => {
   // ✅ Delete Post Mutation
   const deleteMutation = useMutation(
     async () => {
-      return makeRequest.delete(`/posts/${post.id}`);
+      return makeRequest.delete(`/posts/${post._id}`);
     },
     {
       onSuccess: () => {
@@ -99,7 +100,10 @@ const Post = ({ post }) => {
       },
     }
   );
-
+console.log(currentUser.profilePic)
+console.log(post.userId._id)
+console.log(currentUser.id)
+console.log(post.userId.profilePic)
   // ✅ Handle Post Deletion with Confirmation
   const handleDeletePost = () => {
     toast.info(
@@ -153,7 +157,7 @@ const Post = ({ post }) => {
         <div className="user">
           <div className="userInfo">
             <img
-              src={post.profilePic || "/defaultProfilePic.jpg"}
+              src={post.userId.profilePic || "/defaultProfilePic.jpg"}
               alt="Profile"
             />
             <div className="details">
@@ -168,7 +172,7 @@ const Post = ({ post }) => {
           </div>
 
           {/* ✅ Delete Button (Show Only for Owner of Post) */}
-          {post.userId === currentUser.id && (
+          {post.userId._id === currentUser.id && (
             <DeleteOutlineIcon
               className="delete-btn"
               onClick={handleDeletePost}
@@ -223,7 +227,7 @@ const Post = ({ post }) => {
         </div>
 
         {/* ✅ Comments Section */}
-        {commentOpen && <Comments postId={post.id} />}
+        {commentOpen && <Comments postId={post._id} />}
       </div>
     </div>
   );

@@ -24,31 +24,58 @@ const Register = () => {
   };
 
   // 📌 Handle Form Submission
+  // const handleClick = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     // ✅ Make POST Request to Register API
+  //     await axios.post("https://server-wi41.onrender.com/api/auth/register", inputs);
+
+  //     // 🎉 Show Success Toast
+  //     toast.success("✅ Registration successful! Redirecting to login...", {
+  //       position: "top-center",
+  //       autoClose: 3000, // Close after 3 seconds
+  //     });
+
+  //     // ⏳ Delay Redirection to Login Page After 3 Seconds
+  //     setTimeout(() => {
+  //       navigate("/login");
+  //     }, 3000);
+  //   } catch (err) {
+  //     // ❌ Show Error Toast if Registration Fails
+  //     toast.error(err.response?.data?.message || "❌ Registration failed. Try again.", {
+  //       position: "top-center",
+  //       autoClose: 3000,
+  //     });
+  //   }
+  // };
+
+
   const handleClick = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      // ✅ Make POST Request to Register API
-      await axios.post("https://server-wi41.onrender.com/api/auth/register", inputs);
+  try {
+    // ✅ Use local backend URL instead of Render
+    await axios.post("http://localhost:8800/api/auth/register", inputs);
 
-      // 🎉 Show Success Toast
-      toast.success("✅ Registration successful! Redirecting to login...", {
-        position: "top-center",
-        autoClose: 3000, // Close after 3 seconds
-      });
+    // 🎉 Show Success Toast
+    toast.success("✅ Registration successful! Redirecting to login...", {
+      position: "top-center",
+      autoClose: 3000,
+    });
 
-      // ⏳ Delay Redirection to Login Page After 3 Seconds
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
-    } catch (err) {
-      // ❌ Show Error Toast if Registration Fails
-      toast.error(err.response?.data?.message || "❌ Registration failed. Try again.", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    }
-  };
+    setTimeout(() => {
+      navigate("/login");
+    }, 3000);
+  } catch (err) {
+    // ❌ Show Error Toast if Registration Fails
+    toast.error(err.response?.data?.message || "❌ Registration failed. Try again.", {
+      position: "top-center",
+      autoClose: 3000,
+    });
+  }
+};
+
 
   return (
     <div className="register">

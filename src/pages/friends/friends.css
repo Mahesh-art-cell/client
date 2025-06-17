@@ -1,111 +1,71 @@
-
 .friends {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-
-.friends .container {
-  width: 60%;
-  background-color: #fff;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.container {
+  max-width: 600px;
+  margin: auto;
+}
 
-.friends .container .counts {
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.counts {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-bottom: 20px;
 }
 
-
-.friends .container .counts .count-item {
-  text-align: center;
+.count-item {
+  font-size: 16px;
 }
 
-
-.friends .container .counts .count-item .label {
-  font-size: 14px;
-  color: #777;
-}
-
-
-.friends .container .counts .count-item .value {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-}
-
-
-.friends .container .suggestions {
-  margin-top: 20px;
-}
-
-
-.friends .container .suggestions h3 {
-  font-size: 18px;
+.suggestions h3 {
   margin-bottom: 10px;
 }
 
-
-.friends .container .suggestions ul {
-  list-style: none;
-  padding: 0;
-}
-
-.friends .container .suggestions ul .suggestion-item {
+.suggestion-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #e1e1e1;
-  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 8px;
+  border: 1px solid #eee;
+  border-radius: 6px;
 }
 
-
-.friends .container .suggestions ul .suggestion-item .profile-pic {
+.profile-pic {
   width: 40px;
   height: 40px;
+  object-fit: cover;
   border-radius: 50%;
   margin-right: 10px;
 }
 
-
-.friends .container .suggestions ul .suggestion-item .info {
-  flex-grow: 1;
+.info {
+  flex: 1;
 }
 
-
-.friends .container .suggestions ul .suggestion-item .info .username {
-  font-weight: bold;
-  font-size: 14px;
+.username {
+  font-weight: 500;
 }
 
-
-.friends .container .suggestions ul .suggestion-item .follow-btn {
-  background-color: #1877f2;
-  color: #fff;
-  padding: 5px 10px;
+.follow-btn {
+  padding: 5px 12px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  width: 60px;
+  background-color: #1877f2;
+  color: white;
 }
 
-
-.friends .container .suggestions ul .suggestion-item .follow-btn:hover {
-  background-color: #145db2;
-}
-
-
-.friends .container .loading {
-  text-align: center;
-  font-size: 16px;
-  margin-top: 20px;
+.follow-btn.unfollow {
+  background-color: #ccc;
+  color: black;
 }
 
 

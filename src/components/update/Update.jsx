@@ -1,126 +1,72 @@
 
+
+
 // import { useState } from "react";
-// import { makeRequest } from "../../axios";
 // import "./update.css";
 // import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
+// import axios from "axios";
 
-// const Update = ({ setOpenUpdate, user }) => {
+// const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
 //   const [cover, setCover] = useState(null);
 //   const [profile, setProfile] = useState(null);
-//   const [texts, setTexts] = useState({
-//     name: user.name,
-//     email: user.email,
-//     username: user.username,
-//   });
+//   const [name, setName] = useState(user.name);
+//   const [email, setEmail] = useState(user.email);
+//   const [username, setUsername] = useState(user.username);
 
-//   const queryClient = useQueryClient();
-
-//   // ✅ Upload to Cloudinary via Backend API
-//   const mutation = useMutation(
-//     async (updatedUser) => {
-//       const formData = new FormData();
-//       if (profile) formData.append("profilePic", profile);
-//       if (cover) formData.append("coverPic", cover);
-
-//       formData.append("name", texts.name);
-//       formData.append("email", texts.email);
-//       formData.append("username", texts.username);
-
-//       return await makeRequest.put(`/users/${user.id}`, formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//       });
-//     },
-//     {
-//       onSuccess: () => {
-//         queryClient.invalidateQueries(["user"]);
-//         setOpenUpdate(false);
-//       },
-//     }
-//   );
-
-//   // ✅ Handle Form Submission
-//   const handleClick = (e) => {
+//   const handleSubmit = async (e) => {
 //     e.preventDefault();
-//     mutation.mutate();
+//     try {
+//       const formData = new FormData();
+//       formData.append("name", name);
+//       formData.append("email", email);
+//       formData.append("username", username);
+//       if (cover) formData.append("coverPic", cover);
+//       if (profile) formData.append("profilePic", profile);
+
+//       const res = await axios.put(`http://localhost:8800/api/users/${user._id}`, formData, {
+//         headers: { "Content-Type": "multipart/form-data" },
+//       });
+
+//       onProfileUpdate(res.data); // update parent state
+//       setOpenUpdate(false);
+//     } catch (err) {
+//       console.error("❌ Profile update failed:", err.response?.data || err.message);
+//     }
 //   };
 
 //   return (
-//     <div className="update">
-//       <div className="wrapper">
-//         <h1>Update Your Profile</h1>
-//         <form>
-//           <div className="files">
-//             {/* ✅ Cover Upload */}
-//             <label htmlFor="cover">
-//               <span>Cover Picture</span>
-//               <div className="imgContainer">
-//                 <img
-//                   src={
-//                     cover
-//                       ? URL.createObjectURL(cover)
-//                       : user.coverPic || "/default-cover.png"
-//                   }
-//                   alt="Cover"
-//                 />
-//                 <CloudUploadIcon className="icon" />
-//               </div>
-//             </label>
-//             <input
-//               type="file"
-//               id="cover"
-//               style={{ display: "none" }}
-//               onChange={(e) => setCover(e.target.files[0])}
-//             />
+//     <div className="updateModal">
+//       <div className="updateContainer">
+//         <span className="close" onClick={() => setOpenUpdate(false)}>❌</span>
+//         <h2>Update Your Profile</h2>
+//         <form onSubmit={handleSubmit}>
+//           <div className="images">
+//             <div className="imageInput">
+//               <img
+//                 src={cover ? URL.createObjectURL(cover) : user.coverPic}
+//                 alt="Cover"
+//                 className="imagePreview"
+//               />
+//               <label htmlFor="coverInput"><CloudUploadIcon className="icon" /></label>
+//               <input type="file" id="coverInput" style={{ display: "none" }} onChange={(e) => setCover(e.target.files[0])} />
+//             </div>
 
-//             {/* ✅ Profile Upload */}
-//             <label htmlFor="profile">
-//               <span>Profile Picture</span>
-//               <div className="imgContainer">
-//                 <img
-//                   src={
-//                     profile
-//                       ? URL.createObjectURL(profile)
-//                       : user.profilePic || "/default-avatar.png"
-//                   }
-//                   alt="Profile"
-//                 />
-//                 <CloudUploadIcon className="icon" />
-//               </div>
-//             </label>
-//             <input
-//               type="file"
-//               id="profile"
-//               style={{ display: "none" }}
-//               onChange={(e) => setProfile(e.target.files[0])}
-//             />
+//             <div className="imageInput">
+//               <img
+//                 src={profile ? URL.createObjectURL(profile) : user.profilePic}
+//                 alt="Profile"
+//                 className="imagePreview"
+//               />
+//               <label htmlFor="profileInput"><CloudUploadIcon className="icon" /></label>
+//               <input type="file" id="profileInput" style={{ display: "none" }} onChange={(e) => setProfile(e.target.files[0])} />
+//             </div>
 //           </div>
 
-//           <input
-//             type="text"
-//             placeholder="Name"
-//             value={texts.name}
-//             onChange={(e) => setTexts({ ...texts, name: e.target.value })}
-//           />
-//           <input
-//             type="email"
-//             placeholder="Email"
-//             value={texts.email}
-//             onChange={(e) => setTexts({ ...texts, email: e.target.value })}
-//           />
-//           <input
-//             type="text"
-//             placeholder="Username"
-//             value={texts.username}
-//             onChange={(e) => setTexts({ ...texts, username: e.target.value })}
-//           />
-//           <button onClick={handleClick}>Update</button>
+//           <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
+//           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+//           <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
+//           <button type="submit" className="updateButton">Update</button>
 //         </form>
-//         <button className="close" onClick={() => setOpenUpdate(false)}>
-//           X
-//         </button>
 //       </div>
 //     </div>
 //   );
@@ -130,141 +76,85 @@
 
 
 
-// 📌 src/components/update/Update.jsx
 import { useState } from "react";
-import { makeRequest } from "../../axios";
 import "./update.css";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
-const Update = ({ setOpenUpdate, user }) => {
+const Update = ({ setOpenUpdate, user, onProfileUpdate }) => {
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [texts, setTexts] = useState({
-    name: user.name,
-    email: user.email,
-    username: user.username,
-  });
+  const [name, setName] = useState(user.name || "");
+  const [email, setEmail] = useState(user.email || "");
+  const [username, setUsername] = useState(user.username || "");
 
-  const queryClient = useQueryClient();
-
-  // ✅ Upload to Cloudinary via Backend API
-  const mutation = useMutation(
-    async (updatedUser) => {
-      const formData = new FormData();
-      if (profile) formData.append("profilePic", profile);
-      if (cover) formData.append("coverPic", cover);
-
-      formData.append("name", texts.name);
-      formData.append("email", texts.email);
-      formData.append("username", texts.username);
-
-      return await makeRequest.put(`/users/${user.id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["user"]);
-        toast.success("✅ Profile updated successfully!", {
-          position: "top-center", // 🎯 Show at top-center
-          autoClose: 3000,
-        });
-        setOpenUpdate(false);
-      },
-      onError: () => {
-        toast.error("❌ Failed to update profile. Please try again.", {
-          position: "top-center",
-          autoClose: 3000,
-        });
-      },
-    }
-  );
-
-  // ✅ Handle Form Submission
-  const handleClick = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    mutation.mutate();
+
+    try {
+      const formData = new FormData();
+
+      // Only append if changed
+      if (name.trim() && name !== user.name) formData.append("name", name);
+      if (email.trim() && email !== user.email) formData.append("email", email);
+      if (username.trim() && username !== user.username) formData.append("username", username);
+      if (cover) formData.append("coverPic", cover);
+      if (profile) formData.append("profilePic", profile);
+
+      // Skip update if nothing changed
+      if (!formData.has("name") && !formData.has("email") && !formData.has("username") && !cover && !profile) {
+        alert("No changes to update.");
+        return;
+      }
+
+      const res = await axios.put(`http://localhost:8800/api/users/${user.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      onProfileUpdate(res.data); // Pass only updated fields
+      setOpenUpdate(false);
+    } catch (err) {
+      console.error("❌ Profile update failed:", err.response?.data || err.message);
+    }
   };
 
-  return (
-    <div className="update">
-      <div className="wrapper">
-        <h1>Update Your Profile</h1>
-        <form>
-          <div className="files">
-            {/* ✅ Cover Upload */}
-            <label htmlFor="cover">
-              <span>Cover Picture</span>
-              <div className="imgContainer">
-                <img
-                  src={
-                    cover
-                      ? URL.createObjectURL(cover)
-                      : user.coverPic || "/default-cover.png"
-                  }
-                  alt="Cover"
-                />
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
-            <input
-              type="file"
-              id="cover"
-              style={{ display: "none" }}
-              onChange={(e) => setCover(e.target.files[0])}
-            />
+  console.log("User ID being updated:", user.id); // Should NOT be undefined
 
-            {/* ✅ Profile Upload */}
-            <label htmlFor="profile">
-              <span>Profile Picture</span>
-              <div className="imgContainer">
-                <img
-                  src={
-                    profile
-                      ? URL.createObjectURL(profile)
-                      : user.profilePic || "/default-avatar.png"
-                  }
-                  alt="Profile"
-                />
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
-            <input
-              type="file"
-              id="profile"
-              style={{ display: "none" }}
-              onChange={(e) => setProfile(e.target.files[0])}
-            />
+
+  return (
+    <div className="updateModal">
+      <div className="updateContainer">
+        <span className="close" onClick={() => setOpenUpdate(false)}>❌</span>
+        <h2>Update Your Profile</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="images">
+            <div className="imageInput">
+              <img
+                src={cover ? URL.createObjectURL(cover) : user.coverPic}
+                alt="Cover"
+                className="imagePreview"
+              />
+              <label htmlFor="coverInput"><CloudUploadIcon className="icon" /></label>
+              <input type="file" id="coverInput" style={{ display: "none" }} onChange={(e) => setCover(e.target.files[0])} />
+            </div>
+
+            <div className="imageInput">
+              <img
+                src={profile ? URL.createObjectURL(profile) : user.profilePic}
+                alt="Profile"
+                className="imagePreview"
+              />
+              <label htmlFor="profileInput"><CloudUploadIcon className="icon" /></label>
+              <input type="file" id="profileInput" style={{ display: "none" }} onChange={(e) => setProfile(e.target.files[0])} />
+            </div>
           </div>
 
-          <input
-            type="text"
-            placeholder="Name"
-            value={texts.name}
-            onChange={(e) => setTexts({ ...texts, name: e.target.value })}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={texts.email}
-            onChange={(e) => setTexts({ ...texts, email: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Username"
-            value={texts.username}
-            onChange={(e) => setTexts({ ...texts, username: e.target.value })}
-          />
-          <button onClick={handleClick}>Update</button>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+          
+          <button type="submit" className="updateButton">Update</button>
         </form>
-        <button className="close" onClick={() => setOpenUpdate(false)}>
-          X
-        </button>
       </div>
     </div>
   );

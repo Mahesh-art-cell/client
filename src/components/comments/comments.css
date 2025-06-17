@@ -1,115 +1,3 @@
-/* 
-
-
-.comments {
-  width: 100%;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.comments .write {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-}
-
-.comments .write img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.comments .write input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  font-size: 14px;
-  outline: none;
-}
-
-.comments .write button {
-  padding: 10px 15px;
-  background-color: #1877f2;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.3s;
-}
-
-.comments .write button:hover {
-  background-color: #165cbb;
-}
-
-.comments .comment {
-  display: flex;
-    gap: 10px;
-    position: relative;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
-}
-
-.comments .comment img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.comments .comment .info {
-  flex: 1;
-      display: flex;
-      flex-direction: column;
-}
-
-.comments .comment .info span {
-  font-weight: bold;
-        font-size: 14px;
-        color: #333;
-}
-
-.comments .comment .info p {
-  font-size: 14px;
-        color: #555;
-        margin-top: 5px;
-}
-
-.comments .comment .date {
-  font-size: 12px;
-      color: #888;
-      align-self: flex-start;
-}
-
-
-.comments .comment .deleteBtn {
-  position: absolute;
-      top: 5px;
-      right: 5px;
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 5px 8px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: background-color 0.3s;
-}
-
-.comments .comment .deleteBtn:hover {
-  background-color: #ff1a1a;
-} */
-
-
-
 /* comments.css */
 .comments {
   width: 100%;
@@ -148,7 +36,6 @@
 }
 
 .comments .write button {
-  /* padding: 10px 20px; */
   background-color: #1877f2;
   color: white;
   border: none;
@@ -163,17 +50,17 @@
   background-color: #165cbb;
 }
 
-/* ✅ Comment Box Styling */
+/* ✅ Comment List */
 .comments .comment {
   display: flex;
   gap: 10px;
-  position: relative;
-  padding: 10px;
+  align-items: flex-start;
   background-color: #f9f9f9;
+  padding: 10px 10px 10px 0;
   border-radius: 10px;
   border: 1px solid #ddd;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  align-items: flex-start;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
 }
 
 .comments .comment img {
@@ -181,14 +68,15 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  margin-left: 10px;
+  flex-shrink: 0;
 }
 
 /* ✅ Comment Info Section */
 .comments .comment .info {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  flex: 1;
 }
 
 .comments .comment .info span {
@@ -201,6 +89,7 @@
   font-size: 14px;
   color: #555;
   margin-top: 5px;
+  word-break: break-word;
 }
 
 /* ✅ Comment Date */
@@ -210,32 +99,25 @@
   margin-top: 5px;
 }
 
-/* ✅ Delete Button Styles */
+/* ✅ Delete Button — Fixed */
 .comments .comment .deleteBtn {
   position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
+  top: 8px;
+  right: 8px;
+  width: 50px;
   background-color: #ff4d4d;
   color: white;
   border: none;
-  padding: 5px 8px;
+  /* padding: 5px 10px; */
   border-radius: 5px;
   cursor: pointer;
   font-size: 12px;
+  z-index: 10;
   transition: background-color 0.3s;
-  width: 50px;
 }
 
 .comments .comment .deleteBtn:hover {
-  background-color: #ff1a1a;
-}
-
-/* ✅ Comment List Container */
-.comments .comment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background-color: #e60000;
 }
 
 /* ✅ Empty State */
