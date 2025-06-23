@@ -44,7 +44,7 @@ import axios from "axios";
 
 const makeRequest = axios.create({
   // baseURL: "http://localhost:8800/api",
-  baseURL: "https://client-brown-seven.vercel.app/api/",
+  baseURL: "https://server-wi41.onrender.com/api",
   withCredentials: true, // only if your backend uses cookies
 });
 
