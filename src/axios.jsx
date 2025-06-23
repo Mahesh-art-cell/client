@@ -43,7 +43,8 @@
 import axios from "axios";
 
 const makeRequest = axios.create({
-  baseURL: "http://localhost:8800/api",
+  // baseURL: "http://localhost:8800/api",
+  baseURL: "https://client-brown-seven.vercel.app/api/",
   withCredentials: true, // only if your backend uses cookies
 });
 
