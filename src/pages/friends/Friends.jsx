@@ -21,9 +21,12 @@ const Friends = () => {
     try {
       const countRes = await makeRequest.get("/relationships/counts");
       setCounts(countRes.data);
+      console.log(countRes)
 
       const followRes = await makeRequest.get("/relationships/followingIds");
       setFollowingUserIds(followRes.data); // [userId1, userId2, ...]
+
+      console.log(followRes)
     } catch (err) {
       console.error("❌ Error fetching counts or following IDs:", err.message);
     }
@@ -34,6 +37,7 @@ const Friends = () => {
     try {
       const res = await makeRequest.get("/relationships/suggestions");
       const users = res.data || [];
+      console.log(res)
       setSuggestions(users);
       setAllUsers(users);
       setFilteredUsers(users);
