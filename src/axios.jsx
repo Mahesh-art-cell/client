@@ -2,14 +2,10 @@
 
 import axios from "axios";
 
-// Create Axios instance
-export const makeRequest = axios.create({
+const makeRequest = axios.create({
   // baseURL: "http://localhost:8800/api",
   baseURL: "https://server-wi41.onrender.com/api",
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  withCredentials: true, // only if your backend uses cookies
 });
 
 // ✅ Interceptor to attach token dynamically before every request
